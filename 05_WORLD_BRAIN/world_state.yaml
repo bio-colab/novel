@@ -1,0 +1,531 @@
+# ==============================================================================
+# WORLD STATE SNAPSHOT: قطار الرمل
+# Snapshot Timestamp: 19:00:00 (Moment of Catastrophic Drive Shaft Failure)
+# Calendar Date: 18 January (Winter Solstice Arc, Iraqi Western Desert)
+# Geographic Coordinates: 31°14' N, 42°35' E | Milepost: KP 312.4
+# Schema: Invariant Entity-Component System (ECS) for Novel World Simulation
+# ==============================================================================
+
+metadata:
+  schema_version: "1.0.0"
+  novel_id: "sand_train"
+  snapshot_id: "STATE-1900-STALL"
+  calendar_date: "18 January"
+  timeline_minute: 0  # 19:00:00 is baseline t0
+  narrative_phase: "breakdown_and_impact"
+  macro_location:
+    region: "بادية الحماد - الهضبة الغربية"
+    rail_line: "خط سكة الترحيل العسكري المهجور"
+    kilometer_point: 312.4
+    nearest_civilian_settlement_km: 142.0  # Al-Beer Prison (KP 454.4)
+    nearest_abandoned_outpost_km: 68.0    # Tal Al-Suwan (KP 244.4)
+
+astronomical_ephemeris:
+  sunset_time: "17:18:00"
+  civil_dusk_time: "17:44:00"
+  nautical_dusk_time: "18:14:00"
+  astronomical_dusk_time: "18:42:00"
+  solar_midnight_time: "00:11:00"
+  astronomical_dawn_time: "05:22:00"
+  sunrise_time: "06:48:00"
+  solar_depression_angle_deg: -22.5
+  lunar_status:
+    phase: "waning_crescent_3_percent"
+    moonset_time: "16:22:00"
+    is_moon_above_horizon: false
+    moonlight_lux: 0.0
+
+environment:
+  ambient_temperature_c: 0.0
+  ambient_humidity_percent: 12.0
+  barometric_pressure_hpa: 1018.0
+  radiation_cooling_rate_c_per_hour: 1.8
+  illumination_lux: 0.8  # Starlight only
+  wind:
+    speed_kmh: 38.0
+    bearing_from_deg: 315.0  # NW
+    wind_chill_effective_c: -5.4
+    incident_angle_on_train_deg: 30.0  # Strikes right rear flank
+
+compass_and_vectors:
+  train_heading_bearing_deg: 165.0   # SSE towards Samawah desert
+  wind_drift_bearing_deg: 135.0      # SE (carries sound/smoke into desert void)
+  ambush_ridge_bearing_deg: 250.0    # WSW
+  ambush_distance_m: 850.0
+  ambush_elevation_m: +25.0
+
+train:
+  metrics:
+    total_length_m: 67.4
+    total_width_m: 2.8
+    total_height_m: 3.4
+    track_gauge_m: 1.435  # Standard Gauge
+
+  locomotive:
+    model: "diesel_hydraulic_class_48"
+    length_m: 16.2
+    engine:
+      status: "stalled"
+      rpm: 0
+      fuel_pressure_bar: 0.0
+      oil_viscosity_cst: 140.0
+      coolant_temp_c: 42.0
+    fuel_line:
+      status: "fractured"
+      fracture_type: "longitudinal_shrapnel_gash"
+      breach_length_mm: 14
+      airlock_present: true
+      line_pressure_bar: 0.0
+    cabin:
+      status: "locked"
+      internal_latch_engaged: true
+      glass_integrity: "intact"
+      occupant_telemetry: "unresponsive"
+    braking_system:
+      type: "westinghouse_fail_safe_pneumatic"
+      train_pipe_pressure_bar: 0.0
+      auxiliary_reservoir_bar: 0.0
+      brake_shoes: "clamped_locked"
+      slack_action_shock_dissipated: true
+
+  cars:
+    car_01_guard:
+      id: "car_01"
+      name: "العربة الأولى (الإدارة والحراسة)"
+      length_m: 12.0
+      y_start_m: 17.0
+      y_end_m: 29.0
+      interior_temp_c: 4.2
+      interior_lux: 15.0
+      acoustics_cavity_gain_db: 18.0
+      doors:
+        front_engine_hatch: "bolted"
+        rear_sliding_door: "closed_unlatched"
+      structural_integrity: 1.0
+      occupants: ["خالد", "أبو_علي", "أبو_اللول", "حناطة", "حجي_عمار", "بسام"]
+
+    car_02_middle:
+      id: "car_02"
+      name: "العربة الوسطى (التكدس والسجناء)"
+      length_m: 12.0
+      y_start_m: 29.8
+      y_end_m: 41.8
+      interior_temp_c: 1.8
+      interior_lux: 1.5
+      acoustics_cavity_gain_db: 20.0
+      doors:
+        front_sliding_door: "closed_unlatched"
+        rear_connecting_door: "jammed_half_open"
+      vents: "jammed_black_soot"
+      structural_integrity: 0.95
+      occupants: ["عزيز", "سردار", "خليل", "مهدي", "حسن_كاز"]
+
+    car_03_rear:
+      id: "car_03"
+      name: "العربة الأخيرة (الصاج العاري والعزل)"
+      length_m: 12.0
+      y_start_m: 42.6
+      y_end_m: 54.6
+      interior_temp_c: -0.5
+      interior_lux: 0.05
+      acoustics_cavity_gain_db: 20.0
+      doors:
+        front_connecting_door: "jammed_half_open"
+        rear_draft_breach: "unlatched_3cm_gap"
+      structural_integrity: 0.88
+      occupants: ["سلوم", "بشير"]
+
+    platform_rear:
+      id: "car_platform"
+      name: "المنصة الخلفية المكشوفة"
+      length_m: 2.0
+      y_start_m: 55.4
+      y_end_m: 57.4
+      interior_temp_c: -5.4
+      interior_lux: 0.8
+      wind_exposure_factor: 1.0
+      occupants: ["عباس"]
+
+inventory:
+  water_supply:
+    container: "blue_polyethylene_barrel_car_01"
+    coordinates: { x_m: 2.4, y_m: 20.5 }
+    volume_remaining_liters: 14.0
+    state: "liquid_subzero_verge"
+    ration_unit_ml: 100.0
+
+  ammunition_7_62x39:
+    wooden_crate_car_01:
+      coordinates: { x_m: 2.4, y_m: 21.8 }
+      rounds: 60
+    weapon_khalid_ak47_rounds: 28
+    weapon_abbas_ak47_rounds: 30
+    total_effective_rounds: 118
+
+  tools:
+    english_wrench_12in:
+      coordinates: { x_m: 0.6, y_m: 26.2 }
+      condition: "functional_rusted"
+    solid_iron_wire_m:
+      coordinates: { x_m: 2.2, y_m: 31.0 }
+      length_meters: 4.5
+      gauge_mm: 2.0
+    pliers_wire_cutter:
+      carried_by: "أبو_علي"
+      condition: "functional"
+    medical_kit:
+      carried_by: "بسام"
+      gauze_rolls: 3
+      alcohol_disinfectant_ml: 250
+
+threats:
+  ambushers:
+    known_by_train_occupants: false
+    status: "stalking_in_darkness"
+    coordinates:
+      bearing_deg: 250.0
+      distance_m: 850.0
+      elevation_m: +25.0
+    weapons: "7.62x39mm_rifles"
+    waiting_for: "thermal_paralysis_and_total_immobility"
+
+# ==============================================================================
+# CHARACTERS MATRIX: METRIC COORDINATES AND BIOMETRICS (14 ENTITIES)
+# ==============================================================================
+characters:
+  خالد:
+    role: "قائد مفرزة الحراسة"
+    location: "car_01_guard"
+    coordinates: { x_m: 2.2, y_m: 18.2 }  # Inside Car 01 (right bench)
+    physical:
+      core_temp_c: 36.8
+      fingers_temp_c: 24.5
+      motor_dexterity: 0.95
+      injury: "none"
+      stamina: 0.85
+    psychological:
+      stress_level: 0.65
+      authority_weight: 0.80
+      panic_index: 0.15
+    active_tic:
+      name: "ندبة_الفك"
+      trigger: "authority_threat_or_mechanical_stall"
+      active_now: true
+    epistemic_bubble:
+      visual: "sees_dim_cabin_and_panicked_guards"
+      auditory: "hears_engine_silence_and_wind_whistle"
+      known_truths: ["قطار_معطل", "السائق_لا_يرد", "البرد_يهبط"]
+      blind_spots: ["موقع_المهاجمين", "ما_في_داخل_مقصورة_السائق", "مؤامرة_حناطة"]
+
+  أبو_علي:
+    role: "عامل خدمة القطار"
+    location: "car_01_guard"
+    coordinates: { x_m: 1.4, y_m: 17.5 }  # Front gangway near locomotive hatch
+    physical:
+      core_temp_c: 36.6
+      fingers_temp_c: 22.0
+      motor_dexterity: 0.88
+      injury: "diesel_irritation_on_palms"
+      stamina: 0.70
+    psychological:
+      stress_level: 0.55
+      authority_weight: 0.30
+      panic_index: 0.20
+    active_tic:
+      name: "مسح_الكفين_ببنطال_الديزل"
+      trigger: "mechanical_perplexity"
+      active_now: true
+    epistemic_bubble:
+      visual: "sees_khalid_and_abu_al_loul_bleeding"
+      auditory: "hears_air_brake_hiss_bleed_out"
+      known_truths: ["أنبوب_الديزل_منكسر", "مكابح_الهواء_أطبقت"]
+      blind_spots: ["وجود_مسلحين", "حقيقة_هروب_السائق"]
+
+  أبو_اللول:
+    role: "حارس"
+    location: "car_01_guard"
+    coordinates: { x_m: 0.6, y_m: 23.0 }  # Left bench, slumped against wooden frame
+    physical:
+      core_temp_c: 36.4
+      fingers_temp_c: 20.0
+      motor_dexterity: 0.60
+      injury: "fractured_nasal_bone_from_slack_action"
+      bleeding_rate_ml_min: 8.0
+      stamina: 0.45
+    psychological:
+      stress_level: 0.92
+      authority_weight: 0.10
+      panic_index: 0.88
+    active_tic:
+      name: "مسح_العرق_ونزيف_الأنف"
+      trigger: "physical_pain_and_terror"
+      active_now: true
+    epistemic_bubble:
+      visual: "blurred_by_blood_and_tears"
+      auditory: "ringing_tinnitus_from_impact"
+      known_truths: ["أنفي_مكسور", "نحن_سنموت_هنا"]
+      blind_spots: ["الوضع_الميكانيكي", "بقية_العربات"]
+
+  حناطة:
+    role: "حارس متوتر"
+    location: "car_01_guard"
+    coordinates: { x_m: 0.6, y_m: 26.2 }  # Rear bench near sliding door
+    physical:
+      core_temp_c: 36.5
+      fingers_temp_c: 21.0
+      motor_dexterity: 0.80
+      injury: "none"
+      stamina: 0.75
+    psychological:
+      stress_level: 0.85
+      authority_weight: 0.25
+      panic_index: 0.70
+    active_tic:
+      name: "الضحكة_الهستيرية_وفرك_الكفين"
+      trigger: "loss_of_control"
+      active_now: false
+    epistemic_bubble:
+      visual: "darting_eyes_at_doors_and_desert"
+      auditory: "fixated_on_creaking_metal"
+      known_truths: ["القطار_لن_يتحرك", "السلطة_انهارت"]
+      blind_spots: ["توقيت_الهجوم", "نوايا_خالد_الحقيقية"]
+
+  عباس:
+    role: "حارس المنصة الخلفية"
+    location: "platform_rear"
+    coordinates: { x_m: 1.4, y_m: 56.4 }  # Open gangway at extreme rear
+    physical:
+      core_temp_c: 35.8
+      fingers_temp_c: 11.2  # LAW-BIO-01 threshold: motor skills dropping
+      motor_dexterity: 0.48
+      injury: "numb_toes"
+      stamina: 0.80
+    psychological:
+      stress_level: 0.70
+      authority_weight: 0.20
+      panic_index: 0.30
+    active_tic:
+      name: "إدارة_الحصاة_الصوانية"
+      trigger: "isolation_in_cold"
+      active_now: true
+    epistemic_bubble:
+      visual: "open_black_desert_wind_whipping"
+      auditory: "wind_howl_swallowing_all_sounds"
+      known_truths: ["الصحراء_مفتوحة", "الريح_شمالية_غربية_قارسة"]
+      blind_spots: ["حقيقة_العطل_الأمامي", "ما_يحدث_في_عربة_الإدارة"]
+
+  سردار:
+    role: "سجين ومقاتل سابق وخبير ميكانيك"
+    location: "car_02_middle"
+    coordinates: { x_m: 2.2, y_m: 31.0 }  # Near front right wire-screen window
+    physical:
+      core_temp_c: 36.7
+      fingers_temp_c: 18.0
+      motor_dexterity: 0.90
+      injury: "iron_shackle_bruising_wrists"
+      stamina: 0.90
+    psychological:
+      stress_level: 0.40
+      authority_weight: 0.75
+      panic_index: 0.05
+    active_tic:
+      name: "فحص_مفاصل_القبضتين"
+      trigger: "anticipation_of_violence_or_action"
+      active_now: true
+    epistemic_bubble:
+      visual: "shadows_of_detainees_in_middle_car"
+      auditory: "recognized_slack_action_and_engine_choke"
+      known_truths: ["المحرك_مات_بكسر_عزم", "الحراس_مرتبكون", "البرد_سيهلك_الضعفاء"]
+      blind_spots: ["كمية_الماء_المتبقية", "ما_يدور_في_كابينة_السائق"]
+
+  عزيز:
+    role: "سجين صامت"
+    location: "car_02_middle"
+    coordinates: { x_m: 2.2, y_m: 35.0 }  # Leaning against central iron rib
+    physical:
+      core_temp_c: 36.2
+      fingers_temp_c: 15.0
+      motor_dexterity: 0.75
+      injury: "chronic_chest_congestion"
+      stamina: 0.60
+    psychological:
+      stress_level: 0.60
+      authority_weight: 0.40
+      panic_index: 0.10
+    active_tic:
+      name: "إبهام_عزيز_وسبابة_الدم"
+      trigger: "deep_silence_or_gathering_grief"
+      active_now: true
+    epistemic_bubble:
+      visual: "gazing_at_his_knees"
+      auditory: "vibrations_of_cold_sheet_metal"
+      known_truths: ["هذه_ليلة_الموت", "الحديد_لا_يرحم"]
+      blind_spots: ["الخلافات_بين_الحراس", "حجم_التهديد_الخارجي"]
+
+  خليل:
+    role: "سجين تركماني وقور"
+    location: "car_02_middle"
+    coordinates: { x_m: 0.6, y_m: 33.5 }  # Left wooden bench
+    physical:
+      core_temp_c: 36.0
+      fingers_temp_c: 14.0
+      motor_dexterity: 0.68
+      injury: "stiff_knees_and_rheumatism"
+      stamina: 0.50
+    psychological:
+      stress_level: 0.45
+      authority_weight: 0.60
+      panic_index: 0.15
+    active_tic:
+      name: "حذاء_خليل_الأسود"
+      trigger: "dirt_cold_or_insult"
+      active_now: true
+    epistemic_bubble:
+      visual: "spotlight_on_his_leather_shoe_crease"
+      auditory: "muffled_prayers_and_breathing"
+      known_truths: ["الكرامة_هي_آخر_ما_يموت", "البرد_ينخر_المفاصل"]
+      blind_spots: ["كل_ما_هو_خارج_العربة_الوسطى"]
+
+  بسام:
+    role: "سجين ممرض"
+    location: "car_01_guard"
+    coordinates: { x_m: 2.2, y_m: 23.0 }  # Right bench across from Abu Al-Loul
+    physical:
+      core_temp_c: 36.6
+      fingers_temp_c: 21.0
+      motor_dexterity: 0.85
+      injury: "none"
+      stamina: 0.70
+    psychological:
+      stress_level: 0.50
+      authority_weight: 0.50
+      panic_index: 0.10
+    active_tic:
+      name: "الضغط_على_منبت_الظفر"
+      trigger: "clinical_assessment_under_pressure"
+      active_now: false
+    epistemic_bubble:
+      visual: "assessing_blood_dripping_from_abu_al_loul"
+      auditory: "listening_to_shallow_breathing_of_guards"
+      known_truths: ["أنف_أبي_اللول_يحتاج_ضماداً", "الصقيع_سيسرع_تجلط_الدم"]
+      blind_spots: ["حجم_الذخيرة_في_الصندوق_الخشبي"]
+
+  سلوم:
+    role: "فتى سجين مهمش"
+    location: "car_03_rear"
+    coordinates: { x_m: 1.2, y_m: 46.5 }  # Curled on bare corrugated floor
+    physical:
+      core_temp_c: 35.5
+      fingers_temp_c: 8.5  # Critical hypothermia onset
+      motor_dexterity: 0.30
+      injury: "frostbitten_bare_feet"
+      stamina: 0.40
+    psychological:
+      stress_level: 0.88
+      authority_weight: 0.05
+      panic_index: 0.65
+    active_tic:
+      name: "جيب_سلوم_الفارغ"
+      trigger: "freezing_hunger_and_terror"
+      active_now: true
+    epistemic_bubble:
+      visual: "darkness_broken_only_by_door_crack"
+      auditory: "wind_draft_screaming_through_chink"
+      known_truths: ["أنا_أتجمد", "الباب_الخلفي_مخلوع_جزئياً"]
+      blind_spots: ["كل_ما_يحدث_في_مقدمة_القطار"]
+
+  بشير:
+    role: "سجين كتوم"
+    location: "car_03_rear"
+    coordinates: { x_m: 0.5, y_m: 45.0 }  # Leaning against left sheet wall
+    physical:
+      core_temp_c: 36.1
+      fingers_temp_c: 13.0
+      motor_dexterity: 0.65
+      injury: "none"
+      stamina: 0.65
+    psychological:
+      stress_level: 0.50
+      authority_weight: 0.35
+      panic_index: 0.10
+    active_tic:
+      name: "ورقة_بشير_المطوية"
+      trigger: "emotional_isolation_need"
+      active_now: true
+    epistemic_bubble:
+      visual: "observing_salloum_shivering_violently"
+      auditory: "chattering_of_salloums_teeth"
+      known_truths: ["الولد_سيموت_إن_لم_يُغطَّ", "القطار_واقف_في_الفراغ"]
+      blind_spots: ["مخطط_سردار", "حقيقة_المهاجمين"]
+
+  حجي_عمار:
+    role: "المدير العام السابق"
+    location: "car_01_guard"
+    coordinates: { x_m: 0.6, y_m: 18.2 }  # Front left bench
+    physical:
+      core_temp_c: 36.3
+      fingers_temp_c: 19.0
+      motor_dexterity: 0.70
+      injury: "none"
+      stamina: 0.35
+    psychological:
+      stress_level: 0.80
+      authority_weight: 0.30
+      panic_index: 0.60
+    active_tic:
+      name: "الزر_المخلوع_والساعة_المفقودة"
+      trigger: "bureaucratic_denial_of_collapse"
+      active_now: true
+    epistemic_bubble:
+      visual: "his_soiled_suit_and_khaki_uniforms"
+      auditory: "khalids_angry_barks_at_guards"
+      known_truths: ["هذا_إهمال_إداري_يعاقب_عليه_القانون", "المحرك_توقف"]
+      blind_spots: ["أن_اللوائح_والدولة_سقطت_في_هذه_البادية"]
+
+  حسن_كاز:
+    role: "مهرب وبائع عملة"
+    location: "car_02_middle"
+    coordinates: { x_m: 0.6, y_m: 37.5 }  # Near exit gangway aisle
+    physical:
+      core_temp_c: 36.5
+      fingers_temp_c: 17.5
+      motor_dexterity: 0.80
+      injury: "none"
+      stamina: 0.65
+    psychological:
+      stress_level: 0.75
+      authority_weight: 0.40
+      panic_index: 0.50
+    active_tic:
+      name: "رزمة_الدنانير_المشتتة"
+      trigger: "calculating_escape_and_bribe"
+      active_now: false
+    epistemic_bubble:
+      visual: "calculating_distance_to_windows_and_doors"
+      auditory: "whispering_of_detainees"
+      known_truths: ["إذا_بقينا_سنموت_مجاناً", "معي_مال_يكفي_لشراء_كتيبة"]
+      blind_spots: ["قانون_الصحراء_الذي_يمحو_النقود_والأجساد"]
+
+  مهدي:
+    role: "السجين الشبح"
+    location: "car_02_middle"
+    coordinates: { x_m: 2.4, y_m: 40.0 }  # Over the undercarriage trapdoor
+    physical:
+      core_temp_c: 36.8
+      fingers_temp_c: 20.0
+      motor_dexterity: 0.95
+      injury: "scars_and_old_wounds"
+      stamina: 0.95
+    psychological:
+      stress_level: 0.20
+      authority_weight: 0.10
+      panic_index: 0.00
+    active_tic:
+      name: "السكون_الحيواني"
+      trigger: "gathering_for_the_pounce"
+      active_now: true
+    epistemic_bubble:
+      visual: "mapping_all_bolts_and_sheet_gaps"
+      auditory: "filtering_breaths_for_the_weakest_moment"
+      known_truths: ["القطار_قبر_متحرك", "اللحظة_القادمة_هي_لحظة_القفز"]
+      blind_spots: ["أي_اعتبار_أخلاقي_أو_اجتماعي"]

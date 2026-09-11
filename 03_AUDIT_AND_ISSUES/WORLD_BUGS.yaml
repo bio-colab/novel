@@ -1,0 +1,217 @@
+# ==============================================================================
+# WORLD INVARIANT & TELEMETRY BUG TRACKER
+# Project: قطار الرمل
+# Schema: Deterministic Invariant Violations (Evaluated by Laws & Telemetry)
+# ==============================================================================
+
+schema_version: "1.0.0"
+evaluator: "World State & Invariants Auditor"
+target_baseline: "v1.0.0-baseline"
+
+bugs:
+  - id: "WORLD-BUG-001"
+    title: "مقصورة القيادة مقفلة بسقاطة داخلية دون وجود فاعل فيزيائي"
+    type: "Causality"
+    severity: "CRITICAL"
+    law_broken: "LAW-SPATIAL-01 (Conservation of Mechanical Closure)"
+    observed:
+      description: >
+        طرق أبو علي وخالد باب مقصورة السائق ووجداه مغلقاً بسقاطة فولاذية داخلية جاذبية.
+        في نهاية الرواية تُركت المقصورة مغلقة وتم تشغيل القاطرة يدوياً من الخارج دون فتحها.
+      state_snapshot: "train.locomotive.cabin.internal_latch_engaged = true"
+    required:
+      invariant: >
+        سقاطة الإغلاق الميكانيكية الداخلية تتطلب إما وجود كائن داخل المقصورة قام بإسقاطها،
+        أو آلية ارتداد هيدروليكية صدمية موثقة أغلقتها، أو أن السائق هرب وترك منفذاً بديلاً مفتوحاً.
+      physical_minimum: "Causal agent or mechanical mechanism required to engage internal gravity latch."
+    evidence:
+      telemetry:
+        - "door_state: latched_internally"
+        - "cabin_glass: intact"
+        - "driver_status: missing_or_dead"
+        - "front_breach_detected: false"
+    affected:
+      components:
+        - "train.locomotive.cabin"
+        - "timeline (05:45 engine restart sequence)"
+        - "causal logic of driver escape/fate"
+    simulation_impact:
+      runs_affected: "100 / 100"
+      fragility_score: 0.95
+    remediation_proposal:
+      proposal_id: "PR-001-CABIN"
+      patch: >
+        إضافة أثر مادي حتمي يكتشفه أبو علي عند الفجر: شرخ في الزجاج السفلي لنافذة السائق المطلة
+        على السكة مع سقوط حذاء السائق في مجرى الرمل، أو سماع ارتطام جثة السائق المتصلبة بالصاج
+        عند أول دوران للمكبس.
+
+  - id: "WORLD-BUG-002"
+    title: "انسحاب المهاجمين المفاجئ في عتمة منتصف الليل دون مبرر تكتيكي أو كلفة سالبة"
+    type: "Game_Theory_and_Tactics"
+    severity: "HIGH"
+    law_broken: "LAW-TACTICAL-01 (Predator Advantage Conservation)"
+    observed:
+      description: >
+        توقف إطلاق النار فجأة عند الدقيقة 00:35 كما لو أن صماماً عملاقاً قد أُغلق،
+        وانسحب المهاجمون تماماً تاركين قطاراً معطلاً في العراء لا يملك سوى بندقية واحدة.
+      state_snapshot: "threats.ambushers.status = withdrawn_spontaneously"
+    required:
+      invariant: >
+        طرف يملك التفوق التكتيكي المطلق (الذخيرة، العتمة، إحاطة الهدف، تجمد الخصم) لا ينسحب
+        إلا لظهور كلفة سالبة قاهرة (Threat/Cost Trigger) تكسر ميزان القوى، أو لتحقق غايته بدقة.
+      physical_minimum: "External constraint or specific objective fulfillment required."
+    evidence:
+      telemetry:
+        - "train_effective_rounds_remaining: 18"
+        - "ambushers_estimated_rounds: > 300"
+        - "train_mobility: 0 (wheels locked by Westinghouse shoes)"
+        - "ambient_temp: -4.0°C"
+    affected:
+      components:
+        - "threats.ambushers"
+        - "tactical credibility of survival"
+        - "pacing of Part 3"
+    simulation_impact:
+      runs_affected: "92 / 100"
+      fragility_score: 0.88
+    remediation_proposal:
+      proposal_id: "PR-002-AMBUSH"
+      patch: >
+        تأسيس مبرر موضوعي حتمي: وميض كشافات لدورية حدودية بعيدة شوهدت على خط الهضبة،
+        أو أن الهدف الحصري للكمين كان شخصاً محدداً (تصفية/استخلاص) وانتهت المهمة.
+
+  - id: "WORLD-BUG-003"
+    title: "الفجوة الزمنية واستهلاك الصقيع بين 01:00 و 04:30"
+    type: "Thermodynamics_and_Biology"
+    severity: "MEDIUM_HIGH"
+    law_broken: "LAW-THERMO-01 & LAW-BIO-01"
+    observed:
+      description: >
+        مرور 210 دقيقة في النص بأسطر قليلة وتأملات مجردة، بينما تظل الشخصيات على قيد الحياة
+        وتحتفظ بقدرتها على التحدث بحرية والتصرف دون علامات الهذيان أو التيبس الطرفي الحاد.
+      state_snapshot: "environment.temp drops from -4.0°C to -8.0°C with zero heat source"
+    required:
+      invariant: >
+        التعرض لـ 3.5 ساعات في صاج مضلع غير معزول عند درجات بين -4°C و -8°C يفرض حتمياً دخول
+        الجميع في المرحلة الثانية من انخفاض الحرارة (Hypothermia Stage 2)، مع تيبس أصابع كامل
+        (motor_dexterity < 0.20)، تباطؤ كلامي، وهذيان للضعفاء كخليل وسلوم.
+      physical_minimum: "Cognitive degradation and motor skill collapse mandatory."
+    evidence:
+      telemetry:
+        - "external_temp_at_0430: -8.0°C"
+        - "car_03_temp_at_0430: -6.5°C"
+        - "insulation_r_value: 0.0"
+        - "heating_fuel_burned: 0"
+    affected:
+      components:
+        - "characters.*.physical.core_temp_c"
+        - "characters.*.physical.motor_dexterity"
+        - "dialogue_pace_and_lucidity"
+    simulation_impact:
+      runs_affected: "84 / 100"
+      fragility_score: 0.80
+    remediation_proposal:
+      proposal_id: "PR-003-COLD-DECAY"
+      patch: >
+        تجسيد ساعات الانتظار المتجمدة حسياً: تجمد البول في زوايا العربة، صراع النوم القاتل،
+        وثقل الألسن في نطق الكلمات قبيل موال عزيز وبعده.
+
+  - id: "WORLD-BUG-004"
+    title: "اختراق حدود العزل السمعي بين العربة الأولى والعربة الثالثة"
+    type: "Acoustic_and_Epistemic"
+    severity: "MEDIUM"
+    law_broken: "LAW-ACOUST-03 (Inter-Car Acoustic Isolation)"
+    observed:
+      description: >
+        سماع الحراس في العربة الأولى لهمسات وحركات خافتة تجري في العربة الأخيرة ومقصورة العزل،
+        والاستجابة لها كما لو كانوا في غرفة واحدة.
+      state_snapshot: "acoustics.inter_car_isolation = breached"
+    required:
+      invariant: >
+        مع وجود بابين منزلقين ورياح شمالية غربية عاتية (38 كم/س)، يبلغ الفقد السمعي بين العربة الأولى
+        والثالثة > 35 dB؛ يستحيل سماع أي صوت دون 75 dB (لا يعبر سوى الرصاص والصراخ والطرق المعدني).
+      physical_minimum: "Acoustic attenuation prevents transmission of normal speech."
+    evidence:
+      telemetry:
+        - "wind_speed: 38 km/h"
+        - "inter_car_doors: 2"
+        - "ambient_noise_draft_db: 65 dB"
+    affected:
+      components:
+        - "characters.خالد.epistemic_bubble"
+        - "characters.حناطة.epistemic_bubble"
+    simulation_impact:
+      runs_affected: "76 / 100"
+      fragility_score: 0.72
+    remediation_proposal:
+      proposal_id: "PR-004-ACOUSTICS"
+      patch: >
+        حصر معرفة خالد بما يجري في الخلف على الإشارات الحتمية: الطرق المتعمد على الصاج،
+        أو نقل الخبر عبر أبي علي الذي يتحرك في الممر بين العربات.
+
+  - id: "WORLD-BUG-005"
+    title: "إصلاح أنبوب الوقود وشد السلك بالأصابع في الصقيع دون احتساب تآكل المهارات الدقيقة"
+    type: "Biomechanics"
+    severity: "MEDIUM_HIGH"
+    law_broken: "LAW-BIO-01 & LAW-PNEUM-02"
+    observed:
+      description: >
+        نزول سردار وأبي علي تحت الشاسيه وربط سلك معدني صلب (2 ملم) حول شق الأنبوب بسرعة وسلاسة،
+        رغم أن حرارة الحديد تبلغ -7°C وملامسته تؤدي لالتصاق الجلد والتيبس الحركي.
+      state_snapshot: "characters.سردار.physical.motor_dexterity assumed = 0.90 in extreme frost"
+    required:
+      invariant: >
+        بعد ساعات الصقيع، لا يمكن ثني سلك صلب 2 ملم بالأصابع المجردة؛ يتطلب الإصلاح بالضرورة
+        استخدام مفتاح الربط والزرادية (Pliers) لتدوير السلك، ومساندة جسدية ثنائية متناوبة.
+      physical_minimum: "Mechanical tools and physical assistance required for 2mm wire twisting."
+    evidence:
+      telemetry:
+        - "surface_temp_chassis: -7.2°C"
+        - "unprotected_finger_skin_contact_limit: 15 seconds"
+        - "wire_stiffness_yield: 250 MPa"
+    affected:
+      components:
+        - "characters.سردار.physical"
+        - "characters.أبو_علي.physical"
+        - "repair_duration (must be >= 17 minutes)"
+    simulation_impact:
+      runs_affected: "87 / 100"
+      fragility_score: 0.85
+    remediation_proposal:
+      proposal_id: "PR-005-REPAIR-PHYSICS"
+      patch: >
+        إبراز صراع الأدوات تحت الشاسيه: استخدام زرادية أبي علي لشد السلك، لفه على عتلة المفتاح
+        الإنجليزي للتدوير بعزم ميكانيكي، واحتراق جلد أصابع سردار بالصقيع أثناء التثبيت.
+
+  - id: "WORLD-BUG-006"
+    title: "اختفاء مهدي الشبح دون ترك بصمة فيزيائية أو خرق مادي في الجدار"
+    type: "Causality_and_Continuity"
+    severity: "HIGH"
+    law_broken: "LAW-SPATIAL-02 (Mass and Spatial Trajectory Conservation)"
+    observed:
+      description: >
+        تلاشي مهدي من العربة الوسطى في ذروة إطلاق النار كالظل السحري دون بيان نقطة الخروج المادية
+        أو كيف تفادى نيران الكمين المنهمرة على الجانبين.
+      state_snapshot: "characters.مهدي.location = unknown_void"
+    required:
+      invariant: >
+        خروج أي كتلة بشرية من عربة مغلقة يتطلب نافذة مكسورة، أو فتحة أرضية للصيانة، أو باباً
+        انخلع جزئياً، ويجب أن يترك علامة مادية ملموسة (تمزق قماش، بصمة دم، أو فتحة شبك).
+      physical_minimum: "Physical exit vector and spatial aperture required."
+    evidence:
+      telemetry:
+        - "middle_car_windows: barbed_wire_jammed"
+        - "doors_exit: front/rear only"
+        - "ambush_firing_arc: covering both flanks"
+    affected:
+      components:
+        - "characters.مهدي"
+        - "train.cars.car_02_middle.structural_integrity"
+    simulation_impact:
+      runs_affected: "95 / 100"
+      fragility_score: 0.90
+    remediation_proposal:
+      proposal_id: "PR-006-MEHDI-EXIT"
+      patch: >
+        تأسيس مسبق لفتحة الصيانة الأرضية (Trapdoor) المهترئة تحت المقعد الأخير في العربة الوسطى،
+        وانسلاله منها إلى أسفل الشاسيه بين قضبان السكة ثم التسلل كحبل صامت في وادي الظل.
