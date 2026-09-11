@@ -443,6 +443,22 @@ class WorldAuditor:
         except Exception as e:
             self.warnings.append(f"Could not run PsychologyDetector: {e}")
 
+        # 5. Socio-Demography & Ideology Analyzer
+        try:
+            from socio_demography_analyzer import SocioDemographyAnalyzer
+            socio_analyzer = SocioDemographyAnalyzer()
+            demo_res = socio_analyzer.audit_demographic_census_and_strata()
+            ideo_res = socio_analyzer.audit_ideological_distribution()
+            power_res = socio_analyzer.audit_power_inversion_dynamics()
+            econ_res = socio_analyzer.audit_economic_value_inversion()
+
+            if demo_res["passed"] and ideo_res["passed"] and power_res["passed"] and econ_res["passed"]:
+                self.passes.append("Socio-Demography Engine: 100% demographic mosaic, power inversion (LAW-SOC-01/03), and use-value primacy (LAW-SOC-02) verified.")
+            else:
+                self.violations.append("SocioDemographyAnalyzer detected invariants violation in social strata or power inversion dynamics.")
+        except Exception as e:
+            self.warnings.append(f"Could not run SocioDemographyAnalyzer: {e}")
+
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
             print(f"  ✅ {p}")

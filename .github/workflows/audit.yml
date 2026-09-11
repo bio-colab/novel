@@ -40,5 +40,9 @@ jobs:
       - name: Run Psychology & Behavioral Detector
         run: python 02_TOOLS/psychology_detector.py
 
+      - name: Run Socio-Demography & Ideology Analyzer
+        run: python 02_TOOLS/socio_demography_analyzer.py
+
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py
+
