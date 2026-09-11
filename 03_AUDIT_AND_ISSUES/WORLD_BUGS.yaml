@@ -25,6 +25,7 @@ bugs:
         أو آلية ارتداد هيدروليكية صدمية موثقة أغلقتها، أو أن السائق هرب وترك منفذاً بديلاً مفتوحاً.
       physical_minimum: "Causal agent or mechanical mechanism required to engage internal gravity latch."
     evidence:
+      telemetry_timestamp: "05:45:00 (Minute 645 - Engine Restart Attempt)"
       telemetry:
         - "door_state: latched_internally"
         - "cabin_glass: intact"
@@ -61,6 +62,15 @@ bugs:
         إلا لظهور كلفة سالبة قاهرة (Threat/Cost Trigger) تكسر ميزان القوى، أو لتحقق غايته بدقة.
       physical_minimum: "External constraint or specific objective fulfillment required."
     evidence:
+      telemetry_timestamp: "00:35:00 (Minute 335 - Ambush Cessation Point)"
+      causal_consumption_trace:
+        initial_rounds_at_1900: 118
+        rounds_expended_in_ambush_0000_to_0035: 100
+        rounds_expended_breakdown:
+          abbas_weapon_rounds_fired: 30
+          khalid_weapon_rounds_fired: 28
+          wooden_crate_rounds_fired_by_sardar_and_guards: 42
+        train_effective_rounds_remaining: 18
       telemetry:
         - "train_effective_rounds_remaining: 18"
         - "ambushers_estimated_rounds: > 300"
@@ -97,6 +107,7 @@ bugs:
         (motor_dexterity < 0.20)، تباطؤ كلامي، وهذيان للضعفاء كخليل وسلوم.
       physical_minimum: "Cognitive degradation and motor skill collapse mandatory."
     evidence:
+      telemetry_timestamp: "04:30:00 (Minute 570 - Pre-Dawn Cold Peak)"
       telemetry:
         - "external_temp_at_0430: -8.0°C"
         - "car_03_temp_at_0430: -6.5°C"
@@ -132,6 +143,7 @@ bugs:
         والثالثة > 35 dB؛ يستحيل سماع أي صوت دون 75 dB (لا يعبر سوى الرصاص والصراخ والطرق المعدني).
       physical_minimum: "Acoustic attenuation prevents transmission of normal speech."
     evidence:
+      telemetry_timestamp: "20:30:00 (Minute 90 - Inter-Car Monitoring)"
       telemetry:
         - "wind_speed: 38 km/h"
         - "inter_car_doors: 2"
@@ -165,6 +177,7 @@ bugs:
         استخدام مفتاح الربط والزرادية (Pliers) لتدوير السلك، ومساندة جسدية ثنائية متناوبة.
       physical_minimum: "Mechanical tools and physical assistance required for 2mm wire twisting."
     evidence:
+      telemetry_timestamp: "05:00:00 (Minute 600 - Undercarriage Repair)"
       telemetry:
         - "surface_temp_chassis: -7.2°C"
         - "unprotected_finger_skin_contact_limit: 15 seconds"
@@ -199,6 +212,7 @@ bugs:
         انخلع جزئياً، ويجب أن يترك علامة مادية ملموسة (تمزق قماش، بصمة دم، أو فتحة شبك).
       physical_minimum: "Physical exit vector and spatial aperture required."
     evidence:
+      telemetry_timestamp: "00:15:00 (Minute 315 - Breach Confusion)"
       telemetry:
         - "middle_car_windows: barbed_wire_jammed"
         - "doors_exit: front/rear only"

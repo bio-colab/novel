@@ -46,7 +46,8 @@ novel/
 │   ├── SYSTEMIC_BEHAVIORS_AND_AFFORDANCES.md # ميثاق السلوك المنظومي والمتاحيات المكانية
 │   ├── CHARACTER_DOSSIERS.md        # بطاقات الشخصيات الـ 14 ولوازمها الحركية (Tics)
 │   └── TIMELINE_AND_MAP.md          # خارطة الزمكان وتخطيط العربات
-├── 02_TOOLS/                        # حزمة الأدوات البرمجية التحليلية (Python Suite)
+├── 02_TOOLS/                        # حزمة الأدوات البرمجية التحليلية والحتمية (Python Suite)
+│   ├── world_auditor.py             # مدقق حتمية العالم والثوابت الفيزيائية والمعرفية (CI Invariant Auditor)
 │   ├── sensory_linter.py            # فاحص التوازن والكثافة للحواس الخمس
 │   ├── character_tracker.py         # متتبع الشخصيات والحركات العصابية اللاإرادية
 │   ├── pacing_visualizer.py         # راسم الإيقاع والتوتر الدرامي
@@ -100,6 +101,12 @@ python 02_TOOLS/world_graph_builder.py
 ```
 يقوم بمسح شجرة العقل الثانوي (`05_WORLD_BRAIN`) وتوليد صفحة `world_brain_graph.html` التفاعلية فوراً.
 
+### 5. تدقيق حتمية وثوابت العالم آلياً (CI Invariant Auditor)
+```bash
+python 02_TOOLS/world_auditor.py
+```
+مدقق حتمية متكامل يفحص آلياً: سلامة الروابط المرجعية للقوانين، منع تداخل الإحداثيات المكانية (Collision Detection)، انحصار الكيانات في حدود العربات، الاتساق البيولوجي والحراري (LAW-BIO-01)، ومطابقة ميزان الموارد الحسابي.
+
 ---
 
 ## 🧠 العقل الثانوي (The Obsidian World Brain)
@@ -108,7 +115,7 @@ python 02_TOOLS/world_graph_builder.py
 👉 **[`05_WORLD_BRAIN/world_brain_graph.html`](file:///05_WORLD_BRAIN/world_brain_graph.html)**
 
 ### ميزات الرسم البياني:
-* **33 عقدة معرفية** مرتبطة بـ **102 علاقة سيميائية وبيئية**.
+* **36 عقدة معرفية** مرتبطة بـ **134 علاقة سيميائية وبيئية وفيزيائية**.
 * ترميز لوني ذكي (الشخصيات بالأزرق، الرموز بالبرتقالي، الفيزياء بالبنفسجي، وعلم الاجتماع بالأخضر).
 * شريط فحص جانبي تفاعلي (Node Inspector) وشريط بحث لحظي.
 
