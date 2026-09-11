@@ -37,5 +37,8 @@ jobs:
       - name: Run Discrete-Event Physical Profiler
         run: python 02_TOOLS/chrono_event_engine.py
 
+      - name: Run Psychology & Behavioral Detector
+        run: python 02_TOOLS/psychology_detector.py
+
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py

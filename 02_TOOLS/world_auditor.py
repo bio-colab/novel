@@ -428,6 +428,21 @@ class WorldAuditor:
         except Exception as e:
             self.warnings.append(f"Could not run ChronoEventEngine: {e}")
 
+        # 4. Psychology & Behavioral Detector
+        try:
+            from psychology_detector import PsychologyDetector
+            psy_detector = PsychologyDetector()
+            if psy_detector.load_novel():
+                psy_detector.audit_neurological_tics_distribution()
+                psy_detector.audit_panic_dialogue_fragmentation()
+                psy_detector.audit_defense_mechanism_archetypes()
+                if psy_detector.violations:
+                    self.violations.extend(psy_detector.violations)
+                else:
+                    self.passes.append("Psychology Detector: 100% behavioral tics (LAW-BIO-02) and panic speech fragmentation verified.")
+        except Exception as e:
+            self.warnings.append(f"Could not run PsychologyDetector: {e}")
+
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
             print(f"  ✅ {p}")
