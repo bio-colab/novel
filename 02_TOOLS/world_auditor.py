@@ -76,6 +76,7 @@ class WorldAuditor:
         defined_laws = set(re.findall(r"\[(LAW-[A-Z]+-\d+)\]", self.physical_laws_text))
 
         checked_count = 0
+        missing_laws = []
         for bug in bugs:
             law_broken = bug.get("law_broken", "")
             # Extract law codes mentioned (e.g., LAW-SPATIAL-01)
@@ -83,10 +84,11 @@ class WorldAuditor:
             for law in cited_laws:
                 checked_count += 1
                 if law not in defined_laws:
+                    missing_laws.append((bug.get('id'), law))
                     self.violations.append(
                         f"[Laws Reference Error] {bug.get('id')}: Cited law '{law}' is not defined in PHYSICAL_LAWS.md"
                     )
-        if not self.violations:
+        if not missing_laws:
             self.passes.append(f"Reference Integrity: All {checked_count} cited laws exist in PHYSICAL_LAWS.md")
 
     def check_spatial_collision(self):
@@ -158,9 +160,11 @@ class WorldAuditor:
             dexterity = phys.get("motor_dexterity", 1.0)
             core_temp = phys.get("core_temp_c", 37.0)
 
+            char_valid = True
             # Check LAW-BIO-01
             if fingers_temp < 12.0:
                 if dexterity >= 0.60:
+                    char_valid = False
                     self.violations.append(
                         f"[LAW-BIO-01 Violation] '{name}' has finger temp {fingers_temp}°C (< 12°C) but dexterity is {dexterity} (must be < 0.60)."
                     )
@@ -170,7 +174,8 @@ class WorldAuditor:
                 self.warnings.append(
                     f"[Hypothermia Warning] '{name}' core temp is {core_temp}°C (Critical Hypothermia Stage 3)."
                 )
-            bio_passes += 1
+            if char_valid:
+                bio_passes += 1
 
         self.passes.append(f"Bio-Thermal Invariants (LAW-BIO-01): Passed for all {bio_passes} characters.")
 

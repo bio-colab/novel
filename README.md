@@ -4,6 +4,7 @@
 [![License: Dual](https://img.shields.io/badge/License-MIT%20(Tools)%20%7C%20All%20Rights%20Reserved%20(Novel)-blue.svg)](#-الترخيص-وحقوق-الملكية)
 [![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Vault: Obsidian Ready](https://img.shields.io/badge/Vault-Obsidian%20Ready-purple.svg)](https://obsidian.md/)
+[![World Invariants CI](https://github.com/bio-colab/novel/actions/workflows/audit.yml/badge.svg)](https://github.com/bio-colab/novel/actions/workflows/audit.yml)
 [![Status: In Development](https://img.shields.io/badge/Status-Engineering%20Phase-orange.svg)](#)
 
 > **«الحديد لا ينام... يهتز بنبض واهن، رتيب، ينتقل من سكة الهضبة الغربية عبر المحاور الصدئة، ليصعد في صفائح الأرضية ويستقر في عظام الركب.»**
@@ -31,6 +32,8 @@
 
 ```text
 novel/
+├── .github/workflows/audit.yml      # أتمتة فحص الحتمية والثوابت (GitHub Actions CI)
+├── requirements.txt                 # الاعتماديات البرمجية المعيارية (PyYAML)
 ├── README.md                        # دليل المشروع العام وخارطة الطريق
 ├── LICENSE.md                       # وثيقة الترخيص المزدوج (MIT للأدوات + حقوق محفوظة للرواية)
 ├── MEMORY.md                        # الذاكرة المعرفية الحاكمة والدستور الدائم للمشروع
@@ -75,7 +78,12 @@ novel/
 
 ## 🛠️ تشغيل واستخدام الأدوات البرمجية
 
-المشروع مبني بلغة Python 3 ويعمل مباشرة دون أي مكتبات خارجية معقدة:
+المشروع مبني بلغة Python 3 ويعتمد على مكتبة معيارية وحيدة خفيفة (`PyYAML`):
+
+```bash
+# تثبيت الاعتماديات البرمجية (مرة واحدة)
+pip install -r requirements.txt
+```
 
 ### 1. فحص الكثافة والتوازن الحسي
 ```bash

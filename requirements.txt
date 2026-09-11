@@ -1,0 +1,4 @@
+# Sand Train (قطار الرمل) - Narrative Engineering & Simulation Framework
+# Minimal dependencies for World Auditor & Analysis Tools
+
+PyYAML>=6.0
