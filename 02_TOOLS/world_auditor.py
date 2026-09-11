@@ -459,6 +459,22 @@ class WorldAuditor:
         except Exception as e:
             self.warnings.append(f"Could not run SocioDemographyAnalyzer: {e}")
 
+        # 6. Historical & Political Analyzer
+        try:
+            from historical_political_analyzer import HistoricalPoliticalAnalyzer
+            hist_analyzer = HistoricalPoliticalAnalyzer()
+            anachronism_res = hist_analyzer.audit_anachronism_isolation()
+            artifact_res = hist_analyzer.audit_analog_material_artifacts()
+            erosion_res = hist_analyzer.audit_state_erosion_vs_void()
+            geo_res = hist_analyzer.audit_geopolitical_prison_trajectory()
+
+            if anachronism_res["passed"] and artifact_res["passed"] and erosion_res["passed"] and geo_res["passed"]:
+                self.passes.append("Historical-Political Engine: 100% analog isolation (LAW-POL-01), state erosion (LAW-POL-02), and closed prison trajectory (LAW-POL-03) verified.")
+            else:
+                self.violations.append("HistoricalPoliticalAnalyzer detected anachronism or geopolitical trajectory violation.")
+        except Exception as e:
+            self.warnings.append(f"Could not run HistoricalPoliticalAnalyzer: {e}")
+
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
             print(f"  ✅ {p}")

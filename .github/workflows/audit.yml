@@ -43,6 +43,9 @@ jobs:
       - name: Run Socio-Demography & Ideology Analyzer
         run: python 02_TOOLS/socio_demography_analyzer.py
 
+      - name: Run Historical & Political Analyzer
+        run: python 02_TOOLS/historical_political_analyzer.py
+
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py
 
