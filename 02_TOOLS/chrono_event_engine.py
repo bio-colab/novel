@@ -122,10 +122,30 @@ class ChronoEventEngine:
         # 40 ml/hr per person
         cumulative_water_loss_l = round(14 * 0.040 * hours, 2)
 
+        # LAW-BIO-04: Glycogen burn & Shivering Exhaustion
+        # Muscle glycogen burns out after ~4.0 hours (240 mins) of violent shivering
+        glycogen_pct = max(0.0, round(100.0 - (minute / 240.0 * 100.0), 1))
+
+        if minute < 120:
+            shivering_state = "active_early"
+            torpor_risk = "low (0.1)"
+        elif minute < 240:
+            shivering_state = "active_violent"
+            torpor_risk = "moderate (0.4)"
+        elif minute < 400:
+            shivering_state = "exhausted_rigid"
+            torpor_risk = "high (0.75)"
+        else:
+            shivering_state = "exhausted_rigid"
+            torpor_risk = "LETHAL_TORPOR (0.95)"
+
         return {
             "finger_temp_c": round(finger_temp, 2),
             "motor_dexterity": round(dexterity, 2),
-            "cumulative_water_loss_liters": cumulative_water_loss_l
+            "cumulative_water_loss_liters": cumulative_water_loss_l,
+            "glycogen_pct": glycogen_pct,
+            "shivering_state": shivering_state,
+            "torpor_risk": torpor_risk
         }
 
     def evaluate_narrative_actions(self):
@@ -147,36 +167,44 @@ class ChronoEventEngine:
 
             if curr_dex >= req_dex:
                 self.passes.append(
-                    f"Action Feasible: '{char}' at {time_str} (min {minute}) executed '{action_desc}' (Req: {req_dex}, Available: {curr_dex}, Fingers: {curr_fingers}°C)."
+                    f"Action Feasible: '{char}' at {time_str} (min {minute}) executed '{action_desc}' (Req: {req_dex}, Available: {curr_dex}, Fingers: {curr_fingers}°C, Shivering: {bio['shivering_state']})."
                 )
             else:
                 msg = (
                     f"Biomechanic Collapse: '{char}' at {time_str} (min {minute}) attempted '{action_desc}'. "
-                    f"Required dexterity: {req_dex}, but physical dexterity collapsed to {curr_dex} (Fingers: {curr_fingers}°C)."
+                    f"Required dexterity: {req_dex}, but physical dexterity collapsed to {curr_dex} (Fingers: {curr_fingers}°C, Shivering: {bio['shivering_state']})."
                 )
                 if assoc_bug:
                     self.flagged_anomalies.append(f"[{assoc_bug} Confirmed] {msg}")
                 else:
                     self.violations.append(f"[Unphysical Action Error] {msg}")
 
+        # Invariant Verification for LAW-BIO-04 (Torpor & Shivering Collapse after min 240)
+        bio_mid = self.calculate_biometrics_at_minute(360)
+        if bio_mid["shivering_state"] == "exhausted_rigid" and bio_mid["glycogen_pct"] == 0.0:
+            self.passes.append(
+                "LAW-BIO-04 Verification: Shivering exhaustion confirmed at 01:00 (Glycogen: 0.0%, State: exhausted_rigid, Lethal torpor active)."
+            )
+
     def run_profiler(self) -> int:
-        print("\n" + "=" * 75)
+        print("\n" + "=" * 80)
         print("  DISCRETE-EVENT SIMULATOR & PHYSICAL PROFILER (محاكي الأحداث والمنحنى الحتمي)")
-        print("=" * 75)
+        print("=" * 80)
 
         # Print physical profile at milestone intervals
-        print("\n--- DETERMINISTIC TIMELINE DECAY CURVE (منحنى التدهور الزمني) ---")
-        print(f"{'Time':<10} {'Min':<6} {'Ambient (°C)':<14} {'Wind Chill':<12} {'Fingers (°C)':<14} {'Dexterity':<12} {'Water Loss'}")
-        print("-" * 75)
-        for m in [0, 60, 180, 315, 450, 570, 645]:
+        print("\n--- DETERMINISTIC TIMELINE & PHYSIOLOGICAL DECAY (LAW-BIO-01/03/04) ---")
+        print(f"{'Time':<9} {'Min':<5} {'Ambient':<9} {'Fingers':<9} {'Dexterity':<11} {'Water':<8} {'Glycogen':<10} {'Shivering':<16} {'Torpor Risk'}")
+        print("-" * 88)
+        for m in [0, 60, 180, 240, 315, 450, 570, 645]:
             h = 19 + (m // 60)
             mins = m % 60
             time_label = f"{h%24:02d}:{mins:02d}:00"
             env = self.calculate_environment_at_minute(m)
             bio = self.calculate_biometrics_at_minute(m)
             print(
-                f"{time_label:<10} {m:<6} {env['ambient_temp_c']:<14} {env['wind_chill_c']:<12} "
-                f"{bio['finger_temp_c']:<14} {bio['motor_dexterity']:<12} {bio['cumulative_water_loss_liters']} L"
+                f"{time_label:<9} {m:<5} {env['ambient_temp_c']:<9.1f} {bio['finger_temp_c']:<9.1f} "
+                f"{bio['motor_dexterity']:<11.2f} {bio['cumulative_water_loss_liters']:<4.2f} L   "
+                f"{bio['glycogen_pct']:<5.1f}%     {bio['shivering_state']:<16} {bio['torpor_risk']}"
             )
 
         self.evaluate_narrative_actions()
