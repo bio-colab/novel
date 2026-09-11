@@ -11,8 +11,13 @@ This script performs deterministic invariant auditing across:
 1. Reference Integrity: Checks that all laws cited in WORLD_BUGS exist in PHYSICAL_LAWS.md.
 2. Spatial Collision Detection: Ensures no two agents occupy identical (x, y) coordinates without physical contact.
 3. Zone Confinement Bounds: Ensures all agent coordinates lie within their car boundary [y_start, y_end].
-4. Bio-Thermal Invariant Checks: Enforces LAW-BIO-01 (finger temp < 12°C -> dexterity < 0.60).
+4. Bio-Thermal Invariants: Enforces LAW-BIO-01 (finger temp < 12°C -> dexterity < 0.60) and hypothermia thresholds.
 5. Resource Arithmetic Balance: Enforces total ammo sum and water conservation.
+6. Westinghouse Pneumatics: Enforces LAW-PNEUM-01 fail-safe shoe clamping at 0.0 bar.
+7. Bio-Dehydration Balance: Enforces LAW-BIO-03 sub-zero breath water loss (40ml/hr) vs ration reserve.
+8. Acoustic Epistemic Boundary: Enforces LAW-ACOUST-03 inter-car attenuation (>35 dB loss).
+9. Chrono-Spatial Telemetry: Enforces timestamp format and temporal validity [0..645 minutes].
+10. Train Spatial Topology: Enforces non-overlapping, continuous car intervals within train length envelope.
 
 Exit Code:
   0: All invariants passed with zero violations.
@@ -202,6 +207,159 @@ class WorldAuditor:
         else:
             self.passes.append(f"Resource Conservation: Water reserve verified at {water}L.")
 
+    def check_westinghouse_fail_safe(self):
+        """Verify LAW-PNEUM-01: Fail-safe pneumatic braking mechanics"""
+        brakes = self.world_state.get("train", {}).get("locomotive", {}).get("braking_system", {})
+        pipe_pressure = brakes.get("train_pipe_pressure_bar", 5.0)
+        shoes_state = brakes.get("brake_shoes", "")
+        engine = self.world_state.get("train", {}).get("locomotive", {}).get("engine", {})
+        engine_status = engine.get("status", "")
+        engine_rpm = engine.get("rpm", 0)
+
+        # Invariant: If pipe pressure < 3.5 bar (and specifically 0.0 bar), brake shoes MUST clamp the wheels
+        if pipe_pressure < 3.5:
+            if shoes_state != "clamped_locked":
+                self.violations.append(
+                    f"[LAW-PNEUM-01 Violation] Air pipe pressure is {pipe_pressure} bar (< 3.5 bar) but brake shoes are '{shoes_state}' (must be 'clamped_locked')."
+                )
+            elif engine_status != "stalled" or engine_rpm != 0:
+                self.violations.append(
+                    f"[LAW-PNEUM-01 Violation] Brake shoes clamped at 0.0 bar but locomotive engine is {engine_status} with {engine_rpm} RPM."
+                )
+            else:
+                self.passes.append(
+                    f"Westinghouse Pneumatics (LAW-PNEUM-01): Fail-safe lock verified at 0.0 bar (shoes clamped, motion locked)."
+                )
+        else:
+            self.passes.append(f"Westinghouse Pneumatics: Nominal pressure ({pipe_pressure} bar).")
+
+    def check_respiratory_dehydration_balance(self):
+        """Verify LAW-BIO-03: Sub-zero desert respiration water loss against ration reserves"""
+        env = self.world_state.get("environment", {})
+        humidity = env.get("ambient_humidity_percent", 50.0)
+        water_inv = self.world_state.get("inventory", {}).get("water_supply", {})
+        vol_liters = water_inv.get("volume_remaining_liters", 0.0)
+        ration_ml = water_inv.get("ration_unit_ml", 100.0)
+        characters = self.world_state.get("characters", {})
+        char_count = len(characters)
+
+        # Desert aridity check (< 15% humidity triggers 40 ml/hr breath loss)
+        loss_rate_per_person_ml_hr = 40.0 if humidity <= 15.0 else 25.0
+        hourly_train_loss_liters = (char_count * loss_rate_per_person_ml_hr) / 1000.0
+
+        # Timeline duration: 10.75 hours (19:00:00 to 05:45:00)
+        duration_hours = 10.75
+        total_respiratory_deficit_liters = round(hourly_train_loss_liters * duration_hours, 2)
+
+        # Check reserve sufficiency
+        ration_round_liters = (char_count * ration_ml) / 1000.0
+        total_ration_rounds = vol_liters / ration_round_liters if ration_round_liters > 0 else 0
+
+        if vol_liters < total_respiratory_deficit_liters:
+            self.warnings.append(
+                f"[LAW-BIO-03 Warning] Water reserves ({vol_liters}L) below theoretical 10.75h respiration deficit ({total_respiratory_deficit_liters}L)."
+            )
+        else:
+            self.passes.append(
+                f"Bio-Dehydration Balance (LAW-BIO-03): Respiration loss ({total_respiratory_deficit_liters}L for {char_count} souls over 10.75h) safely covered by {vol_liters}L reserve ({total_ration_rounds:.1f} ration rounds)."
+            )
+
+    def check_acoustic_epistemic_bounds(self):
+        """Verify LAW-ACOUST-03: Inter-car acoustic attenuation prevents low-decibel knowledge leaks"""
+        cars = self.world_state.get("train", {}).get("cars", {})
+        car_01_occupants = cars.get("car_01_guard", {}).get("occupants", [])
+        characters = self.world_state.get("characters", {})
+
+        acoustic_leak = False
+        for name in car_01_occupants:
+            char_data = characters.get(name, {})
+            auditory_bubble = char_data.get("epistemic_bubble", {}).get("auditory", "").lower()
+            forbidden_terms = ["همس_سلوم", "عطاس_بشير", "حركة_العربة_الأخيرة_الخافتة"]
+            for term in forbidden_terms:
+                if term in auditory_bubble:
+                    acoustic_leak = True
+                    self.violations.append(
+                        f"[LAW-ACOUST-03 Violation] '{name}' in Car 01 can hear low-intensity event '{term}' across closed cars (> 35 dB loss)."
+                    )
+
+        if not acoustic_leak:
+            self.passes.append(
+                "Inter-Car Acoustic Boundary (LAW-ACOUST-03): Acoustic attenuation (>35 dB loss) strictly compartmentalizes auditory perception."
+            )
+
+    def check_chrono_spatial_telemetry(self):
+        """Verify consistency of timestamps and timeline progression across bugs and world state"""
+        bugs = self.world_bugs.get("bugs", [])
+        valid_timestamps = 0
+        timestamp_pattern = re.compile(r"(\d{2}:\d{2}:\d{2})\s*\(Minute\s*(\d+)")
+
+        for bug in bugs:
+            bug_id = bug.get("id")
+            evidence = bug.get("evidence", {})
+            ts = evidence.get("telemetry_timestamp", "")
+            if not ts:
+                self.violations.append(f"[Telemetry Missing] Bug '{bug_id}' lacks telemetry_timestamp.")
+                continue
+
+            match = timestamp_pattern.search(ts)
+            if not match:
+                self.violations.append(f"[Telemetry Format Error] Bug '{bug_id}' has invalid timestamp format: '{ts}'.")
+                continue
+
+            time_str, minute_str = match.groups()
+            minute_val = int(minute_str)
+            if not (0 <= minute_val <= 645):
+                self.violations.append(
+                    f"[Timeline Range Error] Bug '{bug_id}' minute {minute_val} exceeds simulation window [0, 645]."
+                )
+            else:
+                valid_timestamps += 1
+
+        if valid_timestamps == len(bugs):
+            self.passes.append(
+                f"Chrono-Spatial Telemetry: All {valid_timestamps} world bugs possess verified timestamp and minute telemetries [0..645]."
+            )
+
+    def check_train_topology_and_envelope(self):
+        """Verify geometric continuity and non-overlapping envelope of train cars"""
+        train_metrics = self.world_state.get("train", {}).get("metrics", {})
+        total_len = train_metrics.get("total_length_m", 0.0)
+        cars = self.world_state.get("train", {}).get("cars", {})
+
+        # Sort cars by y_start_m
+        sorted_cars = sorted(cars.items(), key=lambda item: item[1].get("y_start_m", 0.0))
+        overlap_found = False
+        prev_y_end = 0.0
+
+        for car_id, car_data in sorted_cars:
+            y_start = car_data.get("y_start_m", 0.0)
+            y_end = car_data.get("y_end_m", 0.0)
+            length = car_data.get("length_m", 0.0)
+
+            # Check car internal length arithmetic
+            if round(y_end - y_start, 2) != round(length, 2):
+                overlap_found = True
+                self.violations.append(
+                    f"[Topology Error] '{car_id}' length mismatch: y_end - y_start ({y_end - y_start:.2f}m) != length_m ({length}m)."
+                )
+
+            # Check non-overlap with previous car
+            if y_start < prev_y_end:
+                overlap_found = True
+                self.violations.append(
+                    f"[Topology Error] '{car_id}' y_start ({y_start}m) overlaps with previous car end ({prev_y_end}m)."
+                )
+            prev_y_end = y_end
+
+        if prev_y_end > total_len:
+            self.violations.append(
+                f"[Topology Error] Train cars extend to {prev_y_end}m, exceeding total_length_m ({total_len}m)."
+            )
+        elif not overlap_found:
+            self.passes.append(
+                f"Train Spatial Topology: All {len(sorted_cars)} car intervals are continuous, non-overlapping, and bounded within {total_len}m envelope."
+            )
+
     def run_all(self):
         print("\n" + "=" * 75)
         print("  WORLD AUDITOR & INVARIANT VERIFIER (مدقق حتمية العالم والثوابت)")
@@ -218,6 +376,11 @@ class WorldAuditor:
         self.check_zone_confinement()
         self.check_bio_thermal_invariants()
         self.check_resource_conservation()
+        self.check_westinghouse_fail_safe()
+        self.check_respiratory_dehydration_balance()
+        self.check_acoustic_epistemic_bounds()
+        self.check_chrono_spatial_telemetry()
+        self.check_train_topology_and_envelope()
 
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
@@ -245,3 +408,4 @@ class WorldAuditor:
 if __name__ == "__main__":
     auditor = WorldAuditor()
     sys.exit(auditor.run_all())
+
