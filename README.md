@@ -43,6 +43,7 @@ novel/
 │   ├── NARRATIVE_STANDARDS.md       # دستور السرد (التحريم التجريدي، البوليفونية، المفارقة)
 │   ├── PHYSICAL_LAWS.md             # الدستور الفيزيائي الشامل (7 قوانين حتمية للمادة والطاقة)
 │   ├── CHRONO_SPATIAL_SYSTEM.md     # المنظومة الزمكانية (التقويم، الساعة، البوصلة، الخريطة)
+│   ├── SYSTEMIC_BEHAVIORS_AND_AFFORDANCES.md # ميثاق السلوك المنظومي والمتاحيات المكانية
 │   ├── CHARACTER_DOSSIERS.md        # بطاقات الشخصيات الـ 14 ولوازمها الحركية (Tics)
 │   └── TIMELINE_AND_MAP.md          # خارطة الزمكان وتخطيط العربات
 ├── 02_TOOLS/                        # حزمة الأدوات البرمجية التحليلية (Python Suite)
