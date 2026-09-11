@@ -28,5 +28,14 @@ jobs:
       - name: Run World Invariants Auditor
         run: python 02_TOOLS/world_auditor.py
 
+      - name: Run Epistemic State Tracker
+        run: python 02_TOOLS/epistemic_tracker.py
+
+      - name: Run Narrative Causality Graph Analyzer
+        run: python 02_TOOLS/causality_graph.py
+
+      - name: Run Discrete-Event Physical Profiler
+        run: python 02_TOOLS/chrono_event_engine.py
+
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py

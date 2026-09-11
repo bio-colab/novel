@@ -381,6 +381,52 @@ class WorldAuditor:
         self.check_acoustic_epistemic_bounds()
         self.check_chrono_spatial_telemetry()
         self.check_train_topology_and_envelope()
+        self.check_subsystem_engines()
+
+    def check_subsystem_engines(self):
+        """Invoke and verify the three core narrative subsystem engines"""
+        tools_dir = os.path.dirname(__file__)
+        if tools_dir not in sys.path:
+            sys.path.insert(0, tools_dir)
+
+        # 1. Epistemic Tracker
+        try:
+            from epistemic_tracker import EpistemicTracker
+            tracker = EpistemicTracker(WORLD_STATE_PATH)
+            if tracker.load_world_state():
+                tracker.check_epistemic_bubbles_integrity()
+                tracker.check_inter_car_omniscience_leaks()
+                tracker.check_transmission_channel_physics()
+                if tracker.violations:
+                    self.violations.extend(tracker.violations)
+                else:
+                    self.passes.append("Epistemic Engine: 100% boundary isolation, channels, and zero omniscience leaks verified.")
+        except Exception as e:
+            self.warnings.append(f"Could not run EpistemicTracker: {e}")
+
+        # 2. Causality Graph Analyzer
+        try:
+            from causality_graph import CausalityGraphAnalyzer
+            c_analyzer = CausalityGraphAnalyzer()
+            c_analyzer.build_graph()
+            if c_analyzer.verify_dag_acyclicity():
+                self.passes.append(f"Causality DAG Engine: Acyclicity verified across {len(c_analyzer.nodes)} events with zero causal cycles.")
+            if c_analyzer.violations:
+                self.violations.extend(c_analyzer.violations)
+        except Exception as e:
+            self.warnings.append(f"Could not run CausalityGraphAnalyzer: {e}")
+
+        # 3. Chrono-Event Engine
+        try:
+            from chrono_event_engine import ChronoEventEngine
+            chrono_eng = ChronoEventEngine()
+            chrono_eng.evaluate_narrative_actions()
+            if chrono_eng.violations:
+                self.violations.extend(chrono_eng.violations)
+            else:
+                self.passes.append("Chrono-Event Engine: Action feasibility and biological decay curves strictly validated.")
+        except Exception as e:
+            self.warnings.append(f"Could not run ChronoEventEngine: {e}")
 
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
