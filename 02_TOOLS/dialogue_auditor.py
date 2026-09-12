@@ -22,11 +22,16 @@ def audit_dialogue(md_path: Path):
     lines = text.splitlines()
     dialogue_entries = []
     
-    current_chapter = "البداية"
+    current_part = "الجزء الأول"
+    current_chapter = "[الجزء الأول] البداية"
     for i, line in enumerate(lines):
         stripped = line.strip()
+        if "الجزء" in stripped and (stripped.startswith("#") or stripped.startswith("الجزء")):
+            current_part = stripped.replace("#", "").strip()
+            continue
         if stripped.startswith("## "):
-            current_chapter = stripped.replace("##", "").strip()
+            chap_title = stripped.replace("##", "").strip()
+            current_chapter = f"[{current_part}] {chap_title}"
             continue
             
         quotes = re.findall(r'«([^»]+)»', line)

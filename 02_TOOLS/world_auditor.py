@@ -486,6 +486,26 @@ class WorldAuditor:
         except Exception as e:
             self.warnings.append(f"Could not run MetaAuditor: {e}")
 
+        # 8. Grounding Auditor: Telemetry Calibration & Headcount/Chrono Invariants
+        try:
+            from grounding_auditor import GroundingAuditor
+            grounding = GroundingAuditor()
+            if grounding.load_data():
+                grounding.audit_chapter_indexing()
+                grounding.audit_telemetry_grounding()
+                grounding.audit_abbas_ammunition_truth()
+                grounding.audit_trapdoor_purge_and_exit_vector()
+                grounding.audit_headcount_invariants_and_slip()
+                grounding.audit_internal_time_vs_ephemeris()
+                if not grounding.violations:
+                    self.passes.append("Grounding & Calibration Engine: 100% telemetry calibration, headcount preservation, and temporal alignment verified.")
+                else:
+                    self.violations.extend(grounding.violations)
+            else:
+                self.violations.extend(grounding.violations)
+        except Exception as e:
+            self.warnings.append(f"Could not run GroundingAuditor: {e}")
+
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
             print(f"  ✅ {p}")

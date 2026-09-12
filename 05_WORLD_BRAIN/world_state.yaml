@@ -509,7 +509,7 @@ characters:
   مهدي:
     role: "السجين الشبح"
     location: "car_02_middle"
-    coordinates: { x_m: 2.4, y_m: 40.0 }  # Over the undercarriage trapdoor
+    coordinates: { x_m: 2.4, y_m: 40.0 }  # Beside middle car sliding side door
     physical:
       core_temp_c: 36.8
       fingers_temp_c: 20.0

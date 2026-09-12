@@ -65,17 +65,19 @@ bugs:
       telemetry_timestamp: "00:35:00 (Minute 335 - Ambush Cessation Point)"
       causal_consumption_trace:
         initial_rounds_at_1900: 118
-        rounds_expended_in_ambush_0000_to_0035: 100
+        rounds_expended_in_ambush_0000_to_0035: 73
         rounds_expended_breakdown:
-          abbas_weapon_rounds_fired: 30
-          khalid_weapon_rounds_fired: 28
-          wooden_crate_rounds_fired_by_sardar_and_guards: 42
-        train_effective_rounds_remaining: 18
-      telemetry:
-        - "train_effective_rounds_remaining: 18"
-        - "ambushers_estimated_rounds: > 300"
-        - "train_mobility: 0 (wheels locked by Westinghouse shoes)"
-        - "ambient_temp: -4.0°C"
+          abbas_weapon_rounds_fired: 3  # text-attested (Part 3, Ch 2, Lines 625 & 639)
+          khalid_weapon_rounds_fired: 28  # class: assumption (estimated defense expenditure)
+          wooden_crate_rounds_fired_by_sardar_and_guards: 42  # class: assumption (estimated defensive fire)
+        train_effective_rounds_remaining: 45  # class: assumption
+      text_attested_evidence:
+        - "abbas_weapon_rounds_fired: 3 (source: Part 3, Ch 2, Lines 625 & 639; 2 shots from platform + 1 under wheel, weapon jammed on 4th)"
+        - "train_mobility: 0 (source: Part 1, Ch 6, Lines 179-228; locked by Westinghouse fail-safe shoes)"
+      simulation_assumptions:
+        - "ambushers_estimated_rounds: > 300 (class: assumption; inferred from intense flanking crossfire)"
+        - "ambient_temp: -4.0°C (class: assumption; derived from Jan 18 astronomical/meteorological model)"
+        - "train_effective_rounds_remaining: 45 (class: assumption; remaining defense reserve)"
     affected:
       components:
         - "threats.ambushers"
@@ -197,35 +199,120 @@ bugs:
         الإنجليزي للتدوير بعزم ميكانيكي، واحتراق جلد أصابع سردار بالصقيع أثناء التثبيت.
 
   - id: "WORLD-BUG-006"
-    title: "اختفاء مهدي الشبح دون ترك بصمة فيزيائية أو خرق مادي في الجدار"
+    title: "اجتياز مهدي لقوس نيران الكمين واختفاؤه دون بصمة تتبع فيزيائية"
     type: "Causality_and_Continuity"
     severity: "HIGH"
     law_broken: "LAW-SPATIAL-02 (Mass and Spatial Trajectory Conservation)"
     observed:
       description: >
-        تلاشي مهدي من العربة الوسطى في ذروة إطلاق النار كالظل السحري دون بيان نقطة الخروج المادية
-        أو كيف تفادى نيران الكمين المنهمرة على الجانبين.
-      state_snapshot: "characters.مهدي.location = unknown_void"
+        وثّق النص خروج مهدي بالقفز من الباب الجانبي المنزلق للعربة الوسطى بعد أن سحبه حناطة
+        (الجزء الثالث، الفصل 4، سطر 717)، لكن الخرق الفيزيائي الحتمي يكمن في كيفية نجاته
+        من القفز بمحاذاة السكة واجتيازه قوس نيران الكمين المنهمر على الجانبين واختفائه التام
+        في العراء دون أن يصاب برصاصة ودون أن يترك أي بصمة دم أو أثر حركي على الحصى.
+      state_snapshot: "characters.مهدي.location = unknown_void (post_escape)"
     required:
       invariant: >
-        خروج أي كتلة بشرية من عربة مغلقة يتطلب نافذة مكسورة، أو فتحة أرضية للصيانة، أو باباً
-        انخلع جزئياً، ويجب أن يترك علامة مادية ملموسة (تمزق قماش، بصمة دم، أو فتحة شبك).
-      physical_minimum: "Physical exit vector and spatial aperture required."
+        حركة أي كتلة حيوية بشرية (>60 كغم) تقفز إلى فضاء اشتباك مكشوف محاط بقوس نيران رشاشة
+        تخضع لحتمية الاحتمال البالستي وترك آثار مادية ملموسة (انزلاق حصى، قطرات دم، أو تمزق قماش).
+      physical_minimum: "Ballistic survival probability and physical ground trace required."
     evidence:
       telemetry_timestamp: "00:15:00 (Minute 315 - Breach Confusion)"
-      telemetry:
-        - "middle_car_windows: barbed_wire_jammed"
-        - "doors_exit: front/rear only"
-        - "ambush_firing_arc: covering both flanks"
+      text_attested_evidence:
+        - "exit_aperture: middle_car_sliding_side_door (source: Part 3, Ch 4, Lines 701-717: Hannata unlatched sliding door, Mahdi jumped out into darkness)"
+        - "ambush_firing_arc: covering both flanks (source: Part 3, Ch 1, Line 611 & Ch 4, Line 713)"
+      simulation_assumptions:
+        - "ballast_surface_trace: zero footprints or blood detected (class: assumption; physical anomaly in open gravel)"
+        - "ballistic_crossfire_exposure_seconds: 4.5 (class: assumption; exposure time between door threshold and dead zone)"
     affected:
       components:
         - "characters.مهدي"
-        - "train.cars.car_02_middle.structural_integrity"
+        - "ballistic_credibility"
+        - "narrative_pacing_part_3"
     simulation_impact:
       runs_affected: "95 / 100"
       fragility_score: 0.90
     remediation_proposal:
       proposal_id: "PR-006-MEHDI-EXIT"
       patch: >
-        تأسيس مسبق لفتحة الصيانة الأرضية (Trapdoor) المهترئة تحت المقعد الأخير في العربة الوسطى،
-        وانسلاله منها إلى أسفل الشاسيه بين قضبان السكة ثم التسلل كحبل صامت في وادي الظل.
+        تأسيس الغطاء البيئي والبالستي للقفزة: استغلال كثافة دخان احتراق شحم المحور المتجه
+        مع الريح (سمت 135°)، واستتار مهدي بالزاوية الميتة لكتلة عجلات البوجي (Bogie) الضخمة
+        أثناء تدحرجه في منخفض الحصى المحاذي للسكة قبل الانسلال في سواد وادي الظل.
+
+  - id: "WORLD-BUG-007"
+    title: "انزلاق التعداد البشري السردي قبل الكمين (عشرة رجال مقابل 14 راكباً)"
+    type: "Continuity_and_Headcount"
+    severity: "MEDIUM"
+    law_broken: "LAW-DEMO-01 (Demographic Mosaic and Headcount Conservation)"
+    observed:
+      description: >
+        يصف النص في الجزء الثاني، الفصل 6، السطر 577 «صوت تنفس متقطع لعشرة رجال محبوسين في بطن الحديد»
+        في تمام الساعة 23:50 قبيل بدء الكمين، في حين أن التعداد الحقيقي لركاب القطار في هذه اللحظة
+        هو 14 رجلاً حياً. الرقم 10 لا يصح فيزيائياً إلا بعد انتهاء الكمين وسقوط الشهداء الأربعة
+        (14 - مقتل عباس وسلوم وحسن كاز - هروب مهدي = 10 رجال متبقين)، وهو ما يؤكده النص لاحقاً بدقة
+        في الجزء الرابع، الفصل 3، السطر 1141 («أنفاس الرجال العشرة المتبقين»).
+      state_snapshot: "characters.alive_count_at_2350 = 14, but text_described = 10"
+    required:
+      invariant: >
+        حفظ الكتلة البشرية والتعداد السكاني يوجب التطابق الحتمي بين التعداد المنطوق أو الموصوف
+        وبين الواقع الفيزيائي للأجساد الحية الموجودة على متن العربات في تلك اللحظة الزمنية.
+      physical_minimum: "Headcount census must equal 14 living souls prior to minute 300 (00:00)."
+    evidence:
+      telemetry_timestamp: "23:50:00 (Minute 290 - Pre-Ambush Silence)"
+      text_attested_evidence:
+        - "pre_ambush_described_men: 10 (source: Part 2, Ch 6, Line 577: «صوت تنفس متقطع لعشرة رجال»)"
+        - "actual_living_souls_at_2350: 14 (source: Part 1, Ch 1..8: 5 guards + 1 technician + 1 platform guard + 7 detainees)"
+        - "post_ambush_actual_souls: 10 (source: Part 4, Ch 3, Line 1141: «أنفاس الرجال العشرة المتبقين»)"
+      simulation_assumptions:
+        - "authorial_anticipation_error: true (class: assumption; author inadvertently applied post-ambush headcount to pre-ambush scene)"
+    affected:
+      components:
+        - "narrative_headcount_integrity"
+        - "demographic_census"
+    simulation_impact:
+      runs_affected: "100 / 100"
+      fragility_score: 0.75
+    remediation_proposal:
+      proposal_id: "PR-007-HEADCOUNT"
+      patch: >
+        توثيق الزلة السردية، وفي أي معالجة تحريرية مستقبلية يُعدل الوصف في سطر 577 ليصبح:
+        «صوت تنفس متقطع لأربعة عشر رجلاً محبوسين في بطن الحديد» أو صياغة جمعية دون تحديد رقمي مسبق.
+
+  - id: "WORLD-BUG-008"
+    title: "المفارقة الزمنية لتقدير الفجر (ساعتان حوارياً مقابل شروق فلكي 06:48)"
+    type: "Chrono_and_Perception"
+    severity: "MEDIUM"
+    law_broken: "LAW-CHRONO-01 (Solar and Astronomical Chronology)"
+    observed:
+      description: >
+        يصرح خالد في الجزء الرابع، الفصل 3، السطر 1253 (عند قرابة الساعة 01:00 بعد انتهاء الكمين
+        وتضميد الجراح): «بقى ساعتين ويطلع الضو. لازم نقرر شنسوي بالحديد قبل لا تطلع الشمس وتكشفنا للكاع كلها»،
+        مما يفترض بزوغ الضوء عند ~03:00 وشروق الشمس عند ~03:30، بينما الحسابات الفلكية الصارمة لبادية
+        الحماد في 18 كانون الثاني/يناير تحدد الفجر الفلكي عند 05:25 والشروق عند 06:48 (فارق زمني 3.8 ساعات).
+      state_snapshot: "dialogue_implied_sunrise ~ 03:30 vs astronomical_sunrise = 06:48"
+    required:
+      invariant: >
+        اتساق الكرونوتوب والزمن الفيزيائي مع الحوار المنطوق، أو التوثيق الصريح للانضغاط الزمني
+        كعرض نفسي لصدمة القتال والصقيع الشديد، وتجنب أي تصحيح صامت في الجداول الحسابية.
+      physical_minimum: "Solar ephemeris alignment or explicit psychological temporal compression required."
+    evidence:
+      telemetry_timestamp: "01:00:00 (Minute 360 - Post-Ambush Regroup)"
+      text_attested_evidence:
+        - "khalid_perceived_time_to_light: 2.0 hours (source: Part 4, Ch 3, Line 1253: «بقى ساعتين ويطلع الضو»)"
+        - "current_scene_chrono_anchor: ~01:00 (source: Part 3, Ch 8, Line 943 to Part 4, Ch 1..3)"
+      simulation_assumptions:
+        - "astronomical_sunrise_hamad_jan18: 06:48:00 (class: assumption; based on standard solar ephemeris for lat 33.5°N)"
+        - "discrepancy_magnitude: +3.8 hours (class: assumption; difference between dialogue estimate and solar dawn)"
+    affected:
+      components:
+        - "characters.خالد.perception"
+        - "timeline_continuity"
+        - "chrono_spatial_system"
+    simulation_impact:
+      runs_affected: "100 / 100"
+      fragility_score: 0.70
+    remediation_proposal:
+      proposal_id: "PR-008-CHRONO-DISTORTION"
+      patch: >
+        توثيق مقولة خالد إما كـ "تشوه إدراكي ذاتي للزمن تحت وطأة الصقيع والصدمة" (Subjective Temporal
+        Compression)، أو كـ "زلة تسريع زمني للمؤلف" للربط بمشهد بزوغ رماد الفجر في الجزء الخامس فصل 1.
+

@@ -19,24 +19,33 @@ ACTION_KEYWORDS = [
 ]
 
 def analyze_pacing(md_path: Path):
-    with open(md_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    # Split into numbered sections (e.g. ## 1. رائحة الصوف...)
-    chapters = re.split(r'\n(?=## \d+\. )', content)
+    sys.path.insert(0, str(Path(__file__).parent))
+    try:
+        from grounding_auditor import parse_novel_structure
+        parts, _ = parse_novel_structure(str(md_path))
+        all_chapters = []
+        for p in parts:
+            all_chapters.extend(p["chapters"])
+    except Exception:
+        with open(md_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        raw_chaps = re.split(r'\n(?=## \d+\. )', content)
+        all_chapters = []
+        for idx, chap in enumerate(raw_chaps):
+            lines = chap.strip().splitlines()
+            title = lines[0].replace("##", "").strip() if lines[0].startswith("##") else f"مقطع {idx}"
+            body = "\n".join(lines[1:]) if lines[0].startswith("##") else chap
+            all_chapters.append({"full_title": title, "body": body})
     
     print("=" * 85)
     print("تحليل الإيقاع والتوتر الدرامي عبر فصول الرواية (Pacing & Tension Audit)")
     print("=" * 85)
-    print(f"{'الفصل':<32} | {'كلمات':>6} | {'جمل':>5} | {'م.طول الجملة':>12} | {'حوار %':>8} | {'مؤشر التوتر':>11}")
+    print(f"{'الفصل':<34} | {'كلمات':>6} | {'جمل':>5} | {'م.طول الجملة':>12} | {'حوار %':>8} | {'مؤشر التوتر':>11}")
     print("-" * 85)
     
-    for idx, chap in enumerate(chapters):
-        if not chap.strip():
-            continue
-        lines = chap.strip().splitlines()
-        title = lines[0].replace("##", "").strip() if lines[0].startswith("##") else f"مقدمة {idx}"
-        body = "\n".join(lines[1:]) if lines[0].startswith("##") else chap
+    for chap in all_chapters:
+        title = chap["full_title"][:34]
+        body = chap["body"]
         
         words = re.findall(r'\b\w+\b', body)
         total_words = len(words)

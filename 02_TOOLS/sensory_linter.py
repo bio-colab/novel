@@ -41,10 +41,23 @@ SENSORY_LEXICON = {
 }
 
 def analyze_sensory_density(md_path: Path):
-    with open(md_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    chapters = re.split(r'\n(?=## \d+\. )', content)
+    sys.path.insert(0, str(Path(__file__).parent))
+    try:
+        from grounding_auditor import parse_novel_structure
+        parts, _ = parse_novel_structure(str(md_path))
+        all_chapters = []
+        for p in parts:
+            all_chapters.extend(p["chapters"])
+    except Exception:
+        with open(md_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        raw_chaps = re.split(r'\n(?=## \d+\. )', content)
+        all_chapters = []
+        for idx, chap in enumerate(raw_chaps):
+            lines = chap.strip().splitlines()
+            title = lines[0].replace("##", "").strip() if lines[0].startswith("##") else f"مقطع {idx}"
+            body = "\n".join(lines[1:]) if lines[0].startswith("##") else chap
+            all_chapters.append({"full_title": title, "body": body})
     
     print("=" * 70)
     print("تقرير الفحص الحسي (Sensory Grounding Audit)")
@@ -53,12 +66,9 @@ def analyze_sensory_density(md_path: Path):
     overall_counts = defaultdict(int)
     total_words_all = 0
 
-    for idx, chapter in enumerate(chapters):
-        if not chapter.strip():
-            continue
-        lines = chapter.strip().splitlines()
-        title = lines[0] if lines[0].startswith("##") else f"مقدمة / مقطع {idx}"
-        chapter_text = "\n".join(lines[1:]) if lines[0].startswith("##") else chapter
+    for chap in all_chapters:
+        title = chap["full_title"]
+        chapter_text = chap["body"]
         
         words = re.findall(r'\b\w+\b', chapter_text)
         word_count = len(words)
