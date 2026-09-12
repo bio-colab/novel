@@ -15,6 +15,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Verify Manuscript Baseline Sanctity (SHA-256)
+        run: |
+          echo "A173202BB1BF875B3EF371ACE387B107418E7292BA58CC79F751DE087FF607EC *00_BASELINE/novel_baseline.md" | sha256sum --check
+
+      - name: Verify Clean Root Workspace (No Duplicate RTF)
+        run: |
+          test ! -f "رواية.rtf"
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:

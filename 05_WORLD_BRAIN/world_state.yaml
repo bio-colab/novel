@@ -56,7 +56,7 @@ compass_and_vectors:
 
 train:
   metrics:
-    total_length_m: 67.4
+    total_length_m: 57.4
     total_width_m: 2.8
     total_height_m: 3.4
     track_gauge_m: 1.435  # Standard Gauge
@@ -72,7 +72,7 @@ train:
       coolant_temp_c: 42.0
     fuel_line:
       status: "fractured"
-      fracture_type: "longitudinal_shrapnel_gash"
+      fracture_type: "thermal_contraction_crack"  # Calibrated for t0=19:00 per LAW-THERMO-01; textual baseline line 1297 shrapnel claim tracked as WORLD-BUG-009
       breach_length_mm: 14
       airlock_present: true
       line_pressure_bar: 0.0

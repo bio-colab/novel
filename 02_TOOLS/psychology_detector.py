@@ -40,6 +40,12 @@ if sys.stdout.encoding != 'utf-8':
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BASELINE_NOVEL_PATH = os.path.join(ROOT_DIR, "00_BASELINE", "novel_baseline.md")
 
+# Roster Definition (LAW-BIO-02 & LAW-DEMO-01):
+# The world simulation tracks 14 living souls at t0=19:00.
+# Of these 14, exactly 9 focal characters exhibit repetitive neurological motor displacement tics.
+# The remaining 5 characters have distinct physical profiles: Abbas (platform guard, falls at min 300),
+# Mahdi (isolated shadow who escapes), Hassan Kaz (runs into desert), Sardar (stoic warrior of somatic mass),
+# and Bashir (silent trauma observer).
 CHARACTER_TIC_REGISTRY = {
     "خالد": {
         "tic_name": "ندبة الفك وعظم الشفة",
@@ -139,7 +145,7 @@ class PsychologyDetector:
 
         if all_passed:
             self.passes.append(
-                f"LAW-BIO-02 Invariant Verified: All 9 characters exhibit active neurological tics ({total_manifestations} total manifestations, {density_per_1k} per 1,000 words)."
+                f"LAW-BIO-02 Invariant Verified: All 9 focal characters exhibit active neurological tics ({total_manifestations} total manifestations, {density_per_1k} per 1,000 words; 5 non-tic/fallen/silent characters accounted in 14-soul roster)."
             )
 
     def audit_panic_dialogue_fragmentation(self):

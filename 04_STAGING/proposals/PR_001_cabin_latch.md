@@ -8,11 +8,11 @@
 ---
 
 ## 1. المشكلة المرتبطة (Associated Issue)
-* **المعرف:** [`WORLD-BUG-001`](file:///d:/قطار%20الرمل/1/03_AUDIT_AND_ISSUES/WORLD_BUGS.yaml)
+* **المعرف:** [`WORLD-BUG-001`](../../03_AUDIT_AND_ISSUES/WORLD_BUGS.yaml)
 * **العنوان:** مقصورة القيادة مقفلة بسقاطة داخلية دون وجود فاعل فيزيائي أو أثر للكتلة.
 * **القوانين الحاكمة المنتهكة:**
-  1. [`[LAW-SPATIAL-01] حفظ الانغلاق الميكانيكي (Conservation of Mechanical Closure)`](file:///d:/قطار%20الرمل/1/01_SPECS_AND_RULES/PHYSICAL_LAWS.md)
-  2. [`[LAW-SPATIAL-02] حفظ المسار والكتلة المكانية (Mass and Spatial Trajectory Conservation)`](file:///d:/قطار%20الrمل/1/01_SPECS_AND_RULES/PHYSICAL_LAWS.md)
+  1. [`[LAW-SPATIAL-01] حفظ الانغلاق الميكانيكي (Conservation of Mechanical Closure)`](../../01_SPECS_AND_RULES/PHYSICAL_LAWS.md)
+  2. [`[LAW-SPATIAL-02] حفظ المسار والكتلة المكانية (Mass and Spatial Trajectory Conservation)`](../../01_SPECS_AND_RULES/PHYSICAL_LAWS.md)
 * **الطابع الزمني الحتمي:** `05:45:00` (الدقيقة 645 - لحظة إعادة تشغيل القاطرة مع تباشير الفجر).
 * **الإحداثيات المكانية:** مقصورة القاطرة الرأسية $Y \in [0.0, 14.2\text{ m}]$, $X \in [0.0, 2.8\text{ m}]$.
 

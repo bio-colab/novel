@@ -84,15 +84,15 @@ class ChronoEventEngine:
     def calculate_environment_at_minute(self, minute: int) -> Dict[str, float]:
         """Compute environmental thermodynamics at timeline minute [0..645]"""
         # Baseline at minute 0 (19:00:00): 0.0°C
-        # Radiation cooling: ~1.8°C/hr down to pre-dawn minimum of -8.0°C at minute 570 (04:30)
+        # Radiation cooling: T_ambient = T_0 - 0.60 * (hours ** 1.15) down to pre-dawn minimum of -8.0°C at minute 570 (04:30)
         hours = minute / 60.0
-        ambient_temp = max(-8.0, 0.0 - (1.8 * hours))
+        ambient_temp = max(-8.0, 0.0 - (0.60 * (hours ** 1.15)))
         
         # Wind chill effective temp (constant 38 km/h wind strikes right flank)
         wind_chill_c = ambient_temp - 5.4
 
         # Illumination: Starlight 0.8 Lux, dipping to 0.05 inside Car 03
-        lux = 0.8 if minute < 600 else 2.5  # First signs of astronomical dawn at 05:22
+        lux = 0.8 if minute < 622 else 2.5  # First signs of astronomical dawn at minute 622 (05:22)
 
         return {
             "ambient_temp_c": round(ambient_temp, 2),

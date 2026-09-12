@@ -2,17 +2,17 @@
   "metadata": {
     "engine": "Sand Train Closed-World Platform Engine",
     "version": "2.0.0-platform-engine",
-    "timestamp_utc": "2026-09-12T08:52:25.623148+00:00",
+    "timestamp_utc": "2026-09-12T13:48:00.466885+00:00",
     "charter": "نحن نُحلل ونُقيّم.. ولا نُقوّم"
   },
   "phases": {
     "01_unit_tests": {
       "name": "Automated Unit Tests",
-      "total_tests": 30,
-      "passed": 30,
+      "total_tests": 36,
+      "passed": 36,
       "failures": 0,
       "errors": 0,
-      "duration_seconds": 1.908,
+      "duration_seconds": 2.444,
       "status": "PASSED"
     },
     "02_core_invariants": {
@@ -20,14 +20,14 @@
       "passed_invariants": 20,
       "violations": 0,
       "warnings": 0,
-      "duration_seconds": 0.261,
+      "duration_seconds": 0.312,
       "status": "PASSED"
     },
     "03_epistemic_grounding": {
       "grounding_auditor": "PASSED",
       "epistemic_tracker": "PASSED",
       "causality_graph": "PASSED",
-      "duration_seconds": 0.105,
+      "duration_seconds": 0.118,
       "status": "PASSED"
     },
     "04_existential_socio_political": {
@@ -36,7 +36,7 @@
       "socio_demography_analyzer": "PASSED",
       "historical_political_analyzer": "PASSED",
       "chrono_event_engine": "PASSED",
-      "duration_seconds": 0.087,
+      "duration_seconds": 0.103,
       "status": "PASSED"
     },
     "05_stylistic_sensory_linters": {
@@ -44,24 +44,46 @@
       "dialogue_auditor": "PASSED",
       "pacing_visualizer": "PASSED",
       "character_tracker": "PASSED",
-      "duration_seconds": 0.168,
+      "duration_seconds": 0.162,
       "status": "PASSED"
     },
     "06_world_brain_graph": {
       "world_graph_builder": "PASSED",
-      "duration_seconds": 0.021,
+      "duration_seconds": 0.017,
       "status": "PASSED"
+    },
+    "07_governance_and_sanctity": {
+      "name": "Governance, Baseline Sanctity & Staging Coverage",
+      "total_checks": 12,
+      "passed_checks": 12,
+      "failed_checks": 0,
+      "duration_seconds": 0.046,
+      "status": "PASSED",
+      "details": [
+        "✅ Baseline SHA-256 integrity verified (100% frozen ground truth).",
+        "✅ Root workspace clean: No redundant duplicate RTF found.",
+        "✅ WORLD-BUG-001: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_001_cabin_latch.md).",
+        "✅ WORLD-BUG-002: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_002_ambush_withdrawal.md).",
+        "✅ WORLD-BUG-003: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_003_frost_gap.md).",
+        "✅ WORLD-BUG-004: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_004_intercar_acoustics.md).",
+        "✅ WORLD-BUG-005: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_005_wire_rigidity.md).",
+        "✅ WORLD-BUG-006: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_006_telemetry_timestamps.md).",
+        "✅ WORLD-BUG-007: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_007_headcount_slip.md).",
+        "✅ WORLD-BUG-008: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_008_perceived_dawn.md).",
+        "✅ WORLD-BUG-009: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_009_fuel_line_shrapnel_anomaly.md).",
+        "✅ WORLD-BUG-010: Staging proposal valid with author blessing checkbox (04_STAGING/proposals/PR_010_water_barrel_location.md)."
+      ]
     }
   },
   "summary": {
-    "total_checks": 0,
-    "passed_checks": 0,
+    "total_checks": 81,
+    "passed_checks": 81,
     "failed_checks": 0,
     "success_rate_percent": 100.0,
     "status": "PASSED",
-    "total_phases": 6,
-    "passed_phases": 6,
+    "total_phases": 7,
+    "passed_phases": 7,
     "failed_phases": 0,
-    "total_duration_seconds": 2.55
+    "total_duration_seconds": 3.202
   }
 }

@@ -1,318 +1,539 @@
-# ==============================================================================
-# WORLD INVARIANT & TELEMETRY BUG TRACKER
-# Project: قطار الرمل
-# Schema: Deterministic Invariant Violations (Evaluated by Laws & Telemetry)
-# ==============================================================================
-
-schema_version: "1.0.0"
-evaluator: "World State & Invariants Auditor"
-target_baseline: "v1.0.0-baseline"
-
+schema_version: 1.0.0
+evaluator: World State & Invariants Auditor
+target_baseline: v1.0.0-baseline
 bugs:
-  - id: "WORLD-BUG-001"
-    title: "مقصورة القيادة مقفلة بسقاطة داخلية دون وجود فاعل فيزيائي"
-    type: "Causality"
-    severity: "CRITICAL"
-    law_broken: "LAW-SPATIAL-01 (Conservation of Mechanical Closure)"
-    observed:
-      description: >
-        طرق أبو علي وخالد باب مقصورة السائق ووجداه مغلقاً بسقاطة فولاذية داخلية جاذبية.
-        في نهاية الرواية تُركت المقصورة مغلقة وتم تشغيل القاطرة يدوياً من الخارج دون فتحها.
-      state_snapshot: "train.locomotive.cabin.internal_latch_engaged = true"
-    required:
-      invariant: >
-        سقاطة الإغلاق الميكانيكية الداخلية تتطلب إما وجود كائن داخل المقصورة قام بإسقاطها،
-        أو آلية ارتداد هيدروليكية صدمية موثقة أغلقتها، أو أن السائق هرب وترك منفذاً بديلاً مفتوحاً.
-      physical_minimum: "Causal agent or mechanical mechanism required to engage internal gravity latch."
-    evidence:
-      telemetry_timestamp: "05:45:00 (Minute 645 - Engine Restart Attempt)"
-      telemetry:
-        - "door_state: latched_internally"
-        - "cabin_glass: intact"
-        - "driver_status: missing_or_dead"
-        - "front_breach_detected: false"
-    affected:
-      components:
-        - "train.locomotive.cabin"
-        - "timeline (05:45 engine restart sequence)"
-        - "causal logic of driver escape/fate"
-    simulation_impact:
-      runs_affected: "100 / 100"
-      fragility_score: 0.95
-    remediation_proposal:
-      proposal_id: "PR-001-CABIN"
-      patch: >
-        إضافة أثر مادي حتمي يكتشفه أبو علي عند الفجر: شرخ في الزجاج السفلي لنافذة السائق المطلة
-        على السكة مع سقوط حذاء السائق في مجرى الرمل، أو سماع ارتطام جثة السائق المتصلبة بالصاج
-        عند أول دوران للمكبس.
+- id: WORLD-BUG-001
+  title: مقصورة القيادة مقفلة بسقاطة داخلية دون وجود فاعل فيزيائي
+  type: Causality
+  severity: CRITICAL
+  law_broken: LAW-SPATIAL-01 (Conservation of Mechanical Closure)
+  observed:
+    description: 'طرق أبو علي وخالد باب مقصورة السائق ووجداه مغلقاً بسقاطة فولاذية
+      داخلية جاذبية. في نهاية الرواية تُركت المقصورة مغلقة وتم تشغيل القاطرة يدوياً
+      من الخارج دون فتحها.
 
-  - id: "WORLD-BUG-002"
-    title: "انسحاب المهاجمين المفاجئ في عتمة منتصف الليل دون مبرر تكتيكي أو كلفة سالبة"
-    type: "Game_Theory_and_Tactics"
-    severity: "HIGH"
-    law_broken: "LAW-TACTICAL-01 (Predator Advantage Conservation)"
-    observed:
-      description: >
-        توقف إطلاق النار فجأة عند الدقيقة 00:35 كما لو أن صماماً عملاقاً قد أُغلق،
-        وانسحب المهاجمون تماماً تاركين قطاراً معطلاً في العراء لا يملك سوى بندقية واحدة.
-      state_snapshot: "threats.ambushers.status = withdrawn_spontaneously"
-    required:
-      invariant: >
-        طرف يملك التفوق التكتيكي المطلق (الذخيرة، العتمة، إحاطة الهدف، تجمد الخصم) لا ينسحب
-        إلا لظهور كلفة سالبة قاهرة (Threat/Cost Trigger) تكسر ميزان القوى، أو لتحقق غايته بدقة.
-      physical_minimum: "External constraint or specific objective fulfillment required."
-    evidence:
-      telemetry_timestamp: "00:35:00 (Minute 335 - Ambush Cessation Point)"
-      causal_consumption_trace:
-        initial_rounds_at_1900: 118
-        rounds_expended_in_ambush_0000_to_0035: 73
-        rounds_expended_breakdown:
-          abbas_weapon_rounds_fired: 3  # text-attested (Part 3, Ch 2, Lines 625 & 639)
-          khalid_weapon_rounds_fired: 28  # class: assumption (estimated defense expenditure)
-          wooden_crate_rounds_fired_by_sardar_and_guards: 42  # class: assumption (estimated defensive fire)
-        train_effective_rounds_remaining: 45  # class: assumption
-      text_attested_evidence:
-        - "abbas_weapon_rounds_fired: 3 (source: Part 3, Ch 2, Lines 625 & 639; 2 shots from platform + 1 under wheel, weapon jammed on 4th)"
-        - "train_mobility: 0 (source: Part 1, Ch 6, Lines 179-228; locked by Westinghouse fail-safe shoes)"
-      simulation_assumptions:
-        - "ambushers_estimated_rounds: > 300 (class: assumption; inferred from intense flanking crossfire)"
-        - "ambient_temp: -4.0°C (class: assumption; derived from Jan 18 astronomical/meteorological model)"
-        - "train_effective_rounds_remaining: 45 (class: assumption; remaining defense reserve)"
-    affected:
-      components:
-        - "threats.ambushers"
-        - "tactical credibility of survival"
-        - "pacing of Part 3"
-    simulation_impact:
-      runs_affected: "92 / 100"
-      fragility_score: 0.88
-    remediation_proposal:
-      proposal_id: "PR-002-AMBUSH"
-      patch: >
-        تأسيس مبرر موضوعي حتمي: وميض كشافات لدورية حدودية بعيدة شوهدت على خط الهضبة،
-        أو أن الهدف الحصري للكمين كان شخصاً محدداً (تصفية/استخلاص) وانتهت المهمة.
+      '
+    state_snapshot: train.locomotive.cabin.internal_latch_engaged = true
+  required:
+    invariant: 'سقاطة الإغلاق الميكانيكية الداخلية تتطلب إما وجود كائن داخل المقصورة
+      قام بإسقاطها، أو آلية ارتداد هيدروليكية صدمية موثقة أغلقتها، أو أن السائق هرب
+      وترك منفذاً بديلاً مفتوحاً.
 
-  - id: "WORLD-BUG-003"
-    title: "الفجوة الزمنية واستهلاك الصقيع بين 01:00 و 04:30"
-    type: "Thermodynamics_and_Biology"
-    severity: "MEDIUM_HIGH"
-    law_broken: "LAW-THERMO-01 & LAW-BIO-01"
-    observed:
-      description: >
-        مرور 210 دقيقة في النص بأسطر قليلة وتأملات مجردة، بينما تظل الشخصيات على قيد الحياة
-        وتحتفظ بقدرتها على التحدث بحرية والتصرف دون علامات الهذيان أو التيبس الطرفي الحاد.
-      state_snapshot: "environment.temp drops from -4.0°C to -8.0°C with zero heat source"
-    required:
-      invariant: >
-        التعرض لـ 3.5 ساعات في صاج مضلع غير معزول عند درجات بين -4°C و -8°C يفرض حتمياً دخول
-        الجميع في المرحلة الثانية من انخفاض الحرارة (Hypothermia Stage 2)، مع تيبس أصابع كامل
-        (motor_dexterity < 0.20)، تباطؤ كلامي، وهذيان للضعفاء كخليل وسلوم.
-      physical_minimum: "Cognitive degradation and motor skill collapse mandatory."
-    evidence:
-      telemetry_timestamp: "04:30:00 (Minute 570 - Pre-Dawn Cold Peak)"
-      telemetry:
-        - "external_temp_at_0430: -8.0°C"
-        - "car_03_temp_at_0430: -6.5°C"
-        - "insulation_r_value: 0.0"
-        - "heating_fuel_burned: 0"
-    affected:
-      components:
-        - "characters.*.physical.core_temp_c"
-        - "characters.*.physical.motor_dexterity"
-        - "dialogue_pace_and_lucidity"
-    simulation_impact:
-      runs_affected: "84 / 100"
-      fragility_score: 0.80
-    remediation_proposal:
-      proposal_id: "PR-003-COLD-DECAY"
-      patch: >
-        تجسيد ساعات الانتظار المتجمدة حسياً: تجمد البول في زوايا العربة، صراع النوم القاتل،
-        وثقل الألسن في نطق الكلمات قبيل موال عزيز وبعده.
+      '
+    physical_minimum: Causal agent or mechanical mechanism required to engage internal
+      gravity latch.
+  evidence:
+    telemetry_timestamp: 05:45:00 (Minute 645 - Engine Restart Attempt)
+    telemetry:
+    - 'door_state: latched_internally'
+    - 'cabin_glass: intact'
+    - 'driver_status: missing_or_dead'
+    - 'front_breach_detected: false'
+  affected:
+    components:
+    - train.locomotive.cabin
+    - timeline (05:45 engine restart sequence)
+    - causal logic of driver escape/fate
+  simulation_impact:
+    runs_affected: 100 / 100
+    fragility_score: 0.95
+  remediation_proposal:
+    proposal_id: PR-001-CABIN
+    patch: 'إضافة أثر مادي حتمي يكتشفه أبو علي عند الفجر: شرخ في الزجاج السفلي لنافذة
+      السائق المطلة على السكة مع سقوط حذاء السائق في مجرى الرمل، أو سماع ارتطام جثة
+      السائق المتصلبة بالصاج عند أول دوران للمكبس.
 
-  - id: "WORLD-BUG-004"
-    title: "اختراق حدود العزل السمعي بين العربة الأولى والعربة الثالثة"
-    type: "Acoustic_and_Epistemic"
-    severity: "MEDIUM"
-    law_broken: "LAW-ACOUST-03 (Inter-Car Acoustic Isolation)"
-    observed:
-      description: >
-        سماع الحراس في العربة الأولى لهمسات وحركات خافتة تجري في العربة الأخيرة ومقصورة العزل،
-        والاستجابة لها كما لو كانوا في غرفة واحدة.
-      state_snapshot: "acoustics.inter_car_isolation = breached"
-    required:
-      invariant: >
-        مع وجود بابين منزلقين ورياح شمالية غربية عاتية (38 كم/س)، يبلغ الفقد السمعي بين العربة الأولى
-        والثالثة > 35 dB؛ يستحيل سماع أي صوت دون 75 dB (لا يعبر سوى الرصاص والصراخ والطرق المعدني).
-      physical_minimum: "Acoustic attenuation prevents transmission of normal speech."
-    evidence:
-      telemetry_timestamp: "20:30:00 (Minute 90 - Inter-Car Monitoring)"
-      telemetry:
-        - "wind_speed: 38 km/h"
-        - "inter_car_doors: 2"
-        - "ambient_noise_draft_db: 65 dB"
-    affected:
-      components:
-        - "characters.خالد.epistemic_bubble"
-        - "characters.حناطة.epistemic_bubble"
-    simulation_impact:
-      runs_affected: "76 / 100"
-      fragility_score: 0.72
-    remediation_proposal:
-      proposal_id: "PR-004-ACOUSTICS"
-      patch: >
-        حصر معرفة خالد بما يجري في الخلف على الإشارات الحتمية: الطرق المتعمد على الصاج،
-        أو نقل الخبر عبر أبي علي الذي يتحرك في الممر بين العربات.
+      '
+    proposal_file: 04_STAGING/proposals/PR_001_cabin_latch.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 5
+    chapter: 3
+    anchor_text: الباب الحديدي المصفح
+    resolved_line: 1341
+- id: WORLD-BUG-002
+  title: انسحاب المهاجمين المفاجئ في عتمة منتصف الليل دون مبرر تكتيكي أو كلفة سالبة
+  type: Game_Theory_and_Tactics
+  severity: HIGH
+  law_broken: LAW-TACTICAL-01 (Predator Advantage Conservation)
+  observed:
+    description: 'توقف إطلاق النار فجأة عند الدقيقة 00:35 كما لو أن صماماً عملاقاً
+      قد أُغلق، وانسحب المهاجمون تماماً تاركين قطاراً معطلاً في العراء لا يملك سوى
+      بندقية واحدة.
 
-  - id: "WORLD-BUG-005"
-    title: "إصلاح أنبوب الوقود وشد السلك بالأصابع في الصقيع دون احتساب تآكل المهارات الدقيقة"
-    type: "Biomechanics"
-    severity: "MEDIUM_HIGH"
-    law_broken: "LAW-BIO-01 & LAW-PNEUM-02"
-    observed:
-      description: >
-        نزول سردار وأبي علي تحت الشاسيه وربط سلك معدني صلب (2 ملم) حول شق الأنبوب بسرعة وسلاسة،
-        رغم أن حرارة الحديد تبلغ -7°C وملامسته تؤدي لالتصاق الجلد والتيبس الحركي.
-      state_snapshot: "characters.سردار.physical.motor_dexterity assumed = 0.90 in extreme frost"
-    required:
-      invariant: >
-        بعد ساعات الصقيع، لا يمكن ثني سلك صلب 2 ملم بالأصابع المجردة؛ يتطلب الإصلاح بالضرورة
-        استخدام مفتاح الربط والزرادية (Pliers) لتدوير السلك، ومساندة جسدية ثنائية متناوبة.
-      physical_minimum: "Mechanical tools and physical assistance required for 2mm wire twisting."
-    evidence:
-      telemetry_timestamp: "05:00:00 (Minute 600 - Undercarriage Repair)"
-      telemetry:
-        - "surface_temp_chassis: -7.2°C"
-        - "unprotected_finger_skin_contact_limit: 15 seconds"
-        - "wire_stiffness_yield: 250 MPa"
-    affected:
-      components:
-        - "characters.سردار.physical"
-        - "characters.أبو_علي.physical"
-        - "repair_duration (must be >= 17 minutes)"
-    simulation_impact:
-      runs_affected: "87 / 100"
-      fragility_score: 0.85
-    remediation_proposal:
-      proposal_id: "PR-005-REPAIR-PHYSICS"
-      patch: >
-        إبراز صراع الأدوات تحت الشاسيه: استخدام زرادية أبي علي لشد السلك، لفه على عتلة المفتاح
-        الإنجليزي للتدوير بعزم ميكانيكي، واحتراق جلد أصابع سردار بالصقيع أثناء التثبيت.
+      '
+    state_snapshot: threats.ambushers.status = withdrawn_spontaneously
+  required:
+    invariant: 'طرف يملك التفوق التكتيكي المطلق (الذخيرة، العتمة، إحاطة الهدف، تجمد
+      الخصم) لا ينسحب إلا لظهور كلفة سالبة قاهرة (Threat/Cost Trigger) تكسر ميزان
+      القوى، أو لتحقق غايته بدقة.
 
-  - id: "WORLD-BUG-006"
-    title: "اجتياز مهدي لقوس نيران الكمين واختفاؤه دون بصمة تتبع فيزيائية"
-    type: "Causality_and_Continuity"
-    severity: "HIGH"
-    law_broken: "LAW-SPATIAL-02 (Mass and Spatial Trajectory Conservation)"
-    observed:
-      description: >
-        وثّق النص خروج مهدي بالقفز من الباب الجانبي المنزلق للعربة الوسطى بعد أن سحبه حناطة
-        (الجزء الثالث، الفصل 4، سطر 717)، لكن الخرق الفيزيائي الحتمي يكمن في كيفية نجاته
-        من القفز بمحاذاة السكة واجتيازه قوس نيران الكمين المنهمر على الجانبين واختفائه التام
-        في العراء دون أن يصاب برصاصة ودون أن يترك أي بصمة دم أو أثر حركي على الحصى.
-      state_snapshot: "characters.مهدي.location = unknown_void (post_escape)"
-    required:
-      invariant: >
-        حركة أي كتلة حيوية بشرية (>60 كغم) تقفز إلى فضاء اشتباك مكشوف محاط بقوس نيران رشاشة
-        تخضع لحتمية الاحتمال البالستي وترك آثار مادية ملموسة (انزلاق حصى، قطرات دم، أو تمزق قماش).
-      physical_minimum: "Ballistic survival probability and physical ground trace required."
-    evidence:
-      telemetry_timestamp: "00:15:00 (Minute 315 - Breach Confusion)"
-      text_attested_evidence:
-        - "exit_aperture: middle_car_sliding_side_door (source: Part 3, Ch 4, Lines 701-717: Hannata unlatched sliding door, Mahdi jumped out into darkness)"
-        - "ambush_firing_arc: covering both flanks (source: Part 3, Ch 1, Line 611 & Ch 4, Line 713)"
-      simulation_assumptions:
-        - "ballast_surface_trace: zero footprints or blood detected (class: assumption; physical anomaly in open gravel)"
-        - "ballistic_crossfire_exposure_seconds: 4.5 (class: assumption; exposure time between door threshold and dead zone)"
-    affected:
-      components:
-        - "characters.مهدي"
-        - "ballistic_credibility"
-        - "narrative_pacing_part_3"
-    simulation_impact:
-      runs_affected: "95 / 100"
-      fragility_score: 0.90
-    remediation_proposal:
-      proposal_id: "PR-006-MEHDI-EXIT"
-      patch: >
-        تأسيس الغطاء البيئي والبالستي للقفزة: استغلال كثافة دخان احتراق شحم المحور المتجه
-        مع الريح (سمت 135°)، واستتار مهدي بالزاوية الميتة لكتلة عجلات البوجي (Bogie) الضخمة
-        أثناء تدحرجه في منخفض الحصى المحاذي للسكة قبل الانسلال في سواد وادي الظل.
+      '
+    physical_minimum: External constraint or specific objective fulfillment required.
+  evidence:
+    telemetry_timestamp: 00:35:00 (Minute 335 - Ambush Cessation Point)
+    causal_consumption_trace:
+      initial_rounds_at_1900: 118
+      rounds_expended_in_ambush_0000_to_0035: 73
+      rounds_expended_breakdown:
+        abbas_weapon_rounds_fired: 3
+        khalid_weapon_rounds_fired: 28
+        wooden_crate_rounds_fired_by_sardar_and_guards: 42
+      train_effective_rounds_remaining: 45
+    text_attested_evidence:
+    - 'abbas_weapon_rounds_fired: 3 (source: Part 3, Ch 2, Lines 625 & 639; 2 shots
+      from platform + 1 under wheel, weapon jammed on 4th)'
+    - 'train_mobility: 0 (source: Part 1, Ch 6, Lines 179-228; locked by Westinghouse
+      fail-safe shoes)'
+    simulation_assumptions:
+    - 'ambushers_estimated_rounds: > 300 (class: assumption; inferred from intense
+      flanking crossfire)'
+    - 'ambient_temp: -4.0°C (class: assumption; derived from Jan 18 astronomical/meteorological
+      model)'
+    - 'train_effective_rounds_remaining: 45 (class: assumption; remaining defense
+      reserve)'
+  affected:
+    components:
+    - threats.ambushers
+    - tactical credibility of survival
+    - pacing of Part 3
+  simulation_impact:
+    runs_affected: 92 / 100
+    fragility_score: 0.88
+  remediation_proposal:
+    proposal_id: PR-002-AMBUSH
+    patch: 'تأسيس مبرر موضوعي حتمي: وميض كشافات لدورية حدودية بعيدة شوهدت على خط الهضبة،
+      أو أن الهدف الحصري للكمين كان شخصاً محدداً (تصفية/استخلاص) وانتهت المهمة.
 
-  - id: "WORLD-BUG-007"
-    title: "انزلاق التعداد البشري السردي قبل الكمين (عشرة رجال مقابل 14 راكباً)"
-    type: "Continuity_and_Headcount"
-    severity: "MEDIUM"
-    law_broken: "LAW-DEMO-01 (Demographic Mosaic and Headcount Conservation)"
-    observed:
-      description: >
-        يصف النص في الجزء الثاني، الفصل 6، السطر 577 «صوت تنفس متقطع لعشرة رجال محبوسين في بطن الحديد»
-        في تمام الساعة 23:50 قبيل بدء الكمين، في حين أن التعداد الحقيقي لركاب القطار في هذه اللحظة
-        هو 14 رجلاً حياً. الرقم 10 لا يصح فيزيائياً إلا بعد انتهاء الكمين وسقوط الشهداء الأربعة
-        (14 - مقتل عباس وسلوم وحسن كاز - هروب مهدي = 10 رجال متبقين)، وهو ما يؤكده النص لاحقاً بدقة
-        في الجزء الرابع، الفصل 3، السطر 1141 («أنفاس الرجال العشرة المتبقين»).
-      state_snapshot: "characters.alive_count_at_2350 = 14, but text_described = 10"
-    required:
-      invariant: >
-        حفظ الكتلة البشرية والتعداد السكاني يوجب التطابق الحتمي بين التعداد المنطوق أو الموصوف
-        وبين الواقع الفيزيائي للأجساد الحية الموجودة على متن العربات في تلك اللحظة الزمنية.
-      physical_minimum: "Headcount census must equal 14 living souls prior to minute 300 (00:00)."
-    evidence:
-      telemetry_timestamp: "23:50:00 (Minute 290 - Pre-Ambush Silence)"
-      text_attested_evidence:
-        - "pre_ambush_described_men: 10 (source: Part 2, Ch 6, Line 577: «صوت تنفس متقطع لعشرة رجال»)"
-        - "actual_living_souls_at_2350: 14 (source: Part 1, Ch 1..8: 5 guards + 1 technician + 1 platform guard + 7 detainees)"
-        - "post_ambush_actual_souls: 10 (source: Part 4, Ch 3, Line 1141: «أنفاس الرجال العشرة المتبقين»)"
-      simulation_assumptions:
-        - "authorial_anticipation_error: true (class: assumption; author inadvertently applied post-ambush headcount to pre-ambush scene)"
-    affected:
-      components:
-        - "narrative_headcount_integrity"
-        - "demographic_census"
-    simulation_impact:
-      runs_affected: "100 / 100"
-      fragility_score: 0.75
-    remediation_proposal:
-      proposal_id: "PR-007-HEADCOUNT"
-      patch: >
-        توثيق الزلة السردية، وفي أي معالجة تحريرية مستقبلية يُعدل الوصف في سطر 577 ليصبح:
-        «صوت تنفس متقطع لأربعة عشر رجلاً محبوسين في بطن الحديد» أو صياغة جمعية دون تحديد رقمي مسبق.
+      '
+    proposal_file: 04_STAGING/proposals/PR_002_ambush_withdrawal.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 3
+    chapter: 8
+    anchor_text: توقف إطلاق النار
+    resolved_line: 945
+- id: WORLD-BUG-003
+  title: الفجوة الزمنية واستهلاك الصقيع بين 01:00 و 04:30
+  type: Thermodynamics_and_Biology
+  severity: MEDIUM_HIGH
+  law_broken: LAW-THERMO-01 & LAW-BIO-01
+  observed:
+    description: 'مرور 210 دقيقة في النص بأسطر قليلة وتأملات مجردة، بينما تظل الشخصيات
+      على قيد الحياة وتحتفظ بقدرتها على التحدث بحرية والتصرف دون علامات الهذيان أو
+      التيبس الطرفي الحاد.
 
-  - id: "WORLD-BUG-008"
-    title: "المفارقة الزمنية لتقدير الفجر (ساعتان حوارياً مقابل شروق فلكي 06:48)"
-    type: "Chrono_and_Perception"
-    severity: "MEDIUM"
-    law_broken: "LAW-CHRONO-01 (Solar and Astronomical Chronology)"
-    observed:
-      description: >
-        يصرح خالد في الجزء الرابع، الفصل 3، السطر 1253 (عند قرابة الساعة 01:00 بعد انتهاء الكمين
-        وتضميد الجراح): «بقى ساعتين ويطلع الضو. لازم نقرر شنسوي بالحديد قبل لا تطلع الشمس وتكشفنا للكاع كلها»،
-        مما يفترض بزوغ الضوء عند ~03:00 وشروق الشمس عند ~03:30، بينما الحسابات الفلكية الصارمة لبادية
-        الحماد في 18 كانون الثاني/يناير تحدد الفجر الفلكي عند 05:25 والشروق عند 06:48 (فارق زمني 3.8 ساعات).
-      state_snapshot: "dialogue_implied_sunrise ~ 03:30 vs astronomical_sunrise = 06:48"
-    required:
-      invariant: >
-        اتساق الكرونوتوب والزمن الفيزيائي مع الحوار المنطوق، أو التوثيق الصريح للانضغاط الزمني
-        كعرض نفسي لصدمة القتال والصقيع الشديد، وتجنب أي تصحيح صامت في الجداول الحسابية.
-      physical_minimum: "Solar ephemeris alignment or explicit psychological temporal compression required."
-    evidence:
-      telemetry_timestamp: "01:00:00 (Minute 360 - Post-Ambush Regroup)"
-      text_attested_evidence:
-        - "khalid_perceived_time_to_light: 2.0 hours (source: Part 4, Ch 3, Line 1253: «بقى ساعتين ويطلع الضو»)"
-        - "current_scene_chrono_anchor: ~01:00 (source: Part 3, Ch 8, Line 943 to Part 4, Ch 1..3)"
-      simulation_assumptions:
-        - "astronomical_sunrise_hamad_jan18: 06:48:00 (class: assumption; based on standard solar ephemeris for lat 33.5°N)"
-        - "discrepancy_magnitude: +3.8 hours (class: assumption; difference between dialogue estimate and solar dawn)"
-    affected:
-      components:
-        - "characters.خالد.perception"
-        - "timeline_continuity"
-        - "chrono_spatial_system"
-    simulation_impact:
-      runs_affected: "100 / 100"
-      fragility_score: 0.70
-    remediation_proposal:
-      proposal_id: "PR-008-CHRONO-DISTORTION"
-      patch: >
-        توثيق مقولة خالد إما كـ "تشوه إدراكي ذاتي للزمن تحت وطأة الصقيع والصدمة" (Subjective Temporal
-        Compression)، أو كـ "زلة تسريع زمني للمؤلف" للربط بمشهد بزوغ رماد الفجر في الجزء الخامس فصل 1.
+      '
+    state_snapshot: environment.temp drops from -4.0°C to -8.0°C with zero heat source
+  required:
+    invariant: 'التعرض لـ 3.5 ساعات في صاج مضلع غير معزول عند درجات بين -4°C و -8°C
+      يفرض حتمياً دخول الجميع في المرحلة الثانية من انخفاض الحرارة (Hypothermia Stage
+      2)، مع تيبس أصابع كامل (motor_dexterity < 0.20)، تباطؤ كلامي، وهذيان للضعفاء
+      كخليل وسلوم.
 
+      '
+    physical_minimum: Cognitive degradation and motor skill collapse mandatory.
+  evidence:
+    telemetry_timestamp: 04:30:00 (Minute 570 - Pre-Dawn Cold Peak)
+    telemetry:
+    - 'external_temp_at_0430: -8.0°C'
+    - 'car_03_temp_at_0430: -6.5°C'
+    - 'insulation_r_value: 0.0'
+    - 'heating_fuel_burned: 0'
+  affected:
+    components:
+    - characters.*.physical.core_temp_c
+    - characters.*.physical.motor_dexterity
+    - dialogue_pace_and_lucidity
+  simulation_impact:
+    runs_affected: 84 / 100
+    fragility_score: 0.8
+  remediation_proposal:
+    proposal_id: PR-003-COLD-DECAY
+    patch: 'تجسيد ساعات الانتظار المتجمدة حسياً: تجمد البول في زوايا العربة، صراع
+      النوم القاتل، وثقل الألسن في نطق الكلمات قبيل موال عزيز وبعده.
+
+      '
+    proposal_file: 04_STAGING/proposals/PR_003_frost_gap.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 4
+    chapter: 3
+    anchor_text: صقيع
+    resolved_line: 1139
+- id: WORLD-BUG-004
+  title: اختراق حدود العزل السمعي بين العربة الأولى والعربة الثالثة
+  type: Acoustic_and_Epistemic
+  severity: MEDIUM
+  law_broken: LAW-ACOUST-03 (Inter-Car Acoustic Isolation)
+  observed:
+    description: 'سماع الحراس في العربة الأولى لهمسات وحركات خافتة تجري في العربة
+      الأخيرة ومقصورة العزل، والاستجابة لها كما لو كانوا في غرفة واحدة.
+
+      '
+    state_snapshot: acoustics.inter_car_isolation = breached
+  required:
+    invariant: 'مع وجود بابين منزلقين ورياح شمالية غربية عاتية (38 كم/س)، يبلغ الفقد
+      السمعي بين العربة الأولى والثالثة > 35 dB؛ يستحيل سماع أي صوت دون 75 dB (لا
+      يعبر سوى الرصاص والصراخ والطرق المعدني).
+
+      '
+    physical_minimum: Acoustic attenuation prevents transmission of normal speech.
+  evidence:
+    telemetry_timestamp: 20:30:00 (Minute 90 - Inter-Car Monitoring)
+    telemetry:
+    - 'wind_speed: 38 km/h'
+    - 'inter_car_doors: 2'
+    - 'ambient_noise_draft_db: 65 dB'
+  affected:
+    components:
+    - characters.خالد.epistemic_bubble
+    - characters.حناطة.epistemic_bubble
+  simulation_impact:
+    runs_affected: 76 / 100
+    fragility_score: 0.72
+  remediation_proposal:
+    proposal_id: PR-004-ACOUSTICS
+    patch: 'حصر معرفة خالد بما يجري في الخلف على الإشارات الحتمية: الطرق المتعمد على
+      الصاج، أو نقل الخبر عبر أبي علي الذي يتحرك في الممر بين العربات.
+
+      '
+    proposal_file: 04_STAGING/proposals/PR_004_intercar_acoustics.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 1
+    chapter: 5
+    anchor_text: حركة
+    resolved_line: 165
+- id: WORLD-BUG-005
+  title: إصلاح أنبوب الوقود وشد السلك بالأصابع في الصقيع دون احتساب تآكل المهارات
+    الدقيقة
+  type: Biomechanics
+  severity: MEDIUM_HIGH
+  law_broken: LAW-BIO-01 & LAW-PNEUM-02
+  observed:
+    description: 'نزول سردار وأبي علي تحت الشاسيه وربط سلك معدني صلب (2 ملم) حول شق
+      الأنبوب بسرعة وسلاسة، رغم أن حرارة الحديد تبلغ -7°C وملامسته تؤدي لالتصاق الجلد
+      والتيبس الحركي.
+
+      '
+    state_snapshot: characters.سردار.physical.motor_dexterity assumed = 0.90 in extreme
+      frost
+  required:
+    invariant: 'بعد ساعات الصقيع، لا يمكن ثني سلك صلب 2 ملم بالأصابع المجردة؛ يتطلب
+      الإصلاح بالضرورة استخدام مفتاح الربط والزرادية (Pliers) لتدوير السلك، ومساندة
+      جسدية ثنائية متناوبة.
+
+      '
+    physical_minimum: Mechanical tools and physical assistance required for 2mm wire
+      twisting.
+  evidence:
+    telemetry_timestamp: 05:00:00 (Minute 600 - Undercarriage Repair)
+    telemetry:
+    - 'surface_temp_chassis: -7.2°C'
+    - 'unprotected_finger_skin_contact_limit: 15 seconds'
+    - 'wire_stiffness_yield: 250 MPa'
+  affected:
+    components:
+    - characters.سردار.physical
+    - characters.أبو_علي.physical
+    - repair_duration (must be >= 17 minutes)
+  simulation_impact:
+    runs_affected: 87 / 100
+    fragility_score: 0.85
+  remediation_proposal:
+    proposal_id: PR-005-REPAIR-PHYSICS
+    patch: 'إبراز صراع الأدوات تحت الشاسيه: استخدام زرادية أبي علي لشد السلك، لفه
+      على عتلة المفتاح الإنجليزي للتدوير بعزم ميكانيكي، واحتراق جلد أصابع سردار بالصقيع
+      أثناء التثبيت.
+
+      '
+    proposal_file: 04_STAGING/proposals/PR_005_wire_rigidity.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 5
+    chapter: 2
+    anchor_text: شد من يمك وأنا أثبت البايب
+    resolved_line: 1303
+- id: WORLD-BUG-006
+  title: اجتياز مهدي لقوس نيران الكمين واختفاؤه دون بصمة تتبع فيزيائية
+  type: Causality_and_Continuity
+  severity: HIGH
+  law_broken: LAW-SPATIAL-02 (Mass and Spatial Trajectory Conservation)
+  observed:
+    description: 'وثّق النص خروج مهدي بالقفز من الباب الجانبي المنزلق للعربة الوسطى
+      بعد أن سحبه حناطة (الجزء الثالث، الفصل 4، سطر 717)، لكن الخرق الفيزيائي الحتمي
+      يكمن في كيفية نجاته من القفز بمحاذاة السكة واجتيازه قوس نيران الكمين المنهمر
+      على الجانبين واختفائه التام في العراء دون أن يصاب برصاصة ودون أن يترك أي بصمة
+      دم أو أثر حركي على الحصى.
+
+      '
+    state_snapshot: characters.مهدي.location = unknown_void (post_escape)
+  required:
+    invariant: 'حركة أي كتلة حيوية بشرية (>60 كغم) تقفز إلى فضاء اشتباك مكشوف محاط
+      بقوس نيران رشاشة تخضع لحتمية الاحتمال البالستي وترك آثار مادية ملموسة (انزلاق
+      حصى، قطرات دم، أو تمزق قماش).
+
+      '
+    physical_minimum: Ballistic survival probability and physical ground trace required.
+  evidence:
+    telemetry_timestamp: 00:15:00 (Minute 315 - Breach Confusion)
+    text_attested_evidence:
+    - 'exit_aperture: middle_car_sliding_side_door (source: Part 3, Ch 4, Lines 701-717:
+      Hannata unlatched sliding door, Mahdi jumped out into darkness)'
+    - 'ambush_firing_arc: covering both flanks (source: Part 3, Ch 1, Line 611 & Ch
+      4, Line 713)'
+    simulation_assumptions:
+    - 'ballast_surface_trace: zero footprints or blood detected (class: assumption;
+      physical anomaly in open gravel)'
+    - 'ballistic_crossfire_exposure_seconds: 4.5 (class: assumption; exposure time
+      between door threshold and dead zone)'
+  affected:
+    components:
+    - characters.مهدي
+    - ballistic_credibility
+    - narrative_pacing_part_3
+  simulation_impact:
+    runs_affected: 95 / 100
+    fragility_score: 0.9
+  remediation_proposal:
+    proposal_id: PR-006-MEHDI-EXIT
+    patch: 'تأسيس الغطاء البيئي والبالستي للقفزة: استغلال كثافة دخان احتراق شحم المحور
+      المتجه مع الريح (سمت 135°)، واستتار مهدي بالزاوية الميتة لكتلة عجلات البوجي
+      (Bogie) الضخمة أثناء تدحرجه في منخفض الحصى المحاذي للسكة قبل الانسلال في سواد
+      وادي الظل.
+
+      '
+    proposal_file: 04_STAGING/proposals/PR_006_telemetry_timestamps.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 3
+    chapter: 4
+    anchor_text: قفز مهدي
+    resolved_line: 717
+- id: WORLD-BUG-007
+  title: انزلاق التعداد البشري السردي قبل الكمين (عشرة رجال مقابل 14 راكباً)
+  type: Continuity_and_Headcount
+  severity: MEDIUM
+  law_broken: LAW-DEMO-01 (Demographic Mosaic and Headcount Conservation)
+  observed:
+    description: 'يصف النص في الجزء الثاني، الفصل 6، السطر 577 «صوت تنفس متقطع لعشرة
+      رجال محبوسين في بطن الحديد» في تمام الساعة 23:50 قبيل بدء الكمين، في حين أن
+      التعداد الحقيقي لركاب القطار في هذه اللحظة هو 14 رجلاً حياً. الرقم 10 لا يصح
+      فيزيائياً إلا بعد انتهاء الكمين وسقوط الشهداء الأربعة (14 - مقتل عباس وسلوم
+      وحسن كاز - هروب مهدي = 10 رجال متبقين)، وهو ما يؤكده النص لاحقاً بدقة في الجزء
+      الرابع، الفصل 3، السطر 1141 («أنفاس الرجال العشرة المتبقين»).
+
+      '
+    state_snapshot: characters.alive_count_at_2350 = 14, but text_described = 10
+  required:
+    invariant: 'حفظ الكتلة البشرية والتعداد السكاني يوجب التطابق الحتمي بين التعداد
+      المنطوق أو الموصوف وبين الواقع الفيزيائي للأجساد الحية الموجودة على متن العربات
+      في تلك اللحظة الزمنية.
+
+      '
+    physical_minimum: Headcount census must equal 14 living souls prior to minute
+      300 (00:00).
+  evidence:
+    telemetry_timestamp: 23:50:00 (Minute 290 - Pre-Ambush Silence)
+    text_attested_evidence:
+    - 'pre_ambush_described_men: 10 (source: Part 2, Ch 6, Line 577: «صوت تنفس متقطع
+      لعشرة رجال»)'
+    - 'actual_living_souls_at_2350: 14 (source: Part 1, Ch 1..8: 5 guards + 1 technician
+      + 1 platform guard + 7 detainees)'
+    - 'post_ambush_actual_souls: 10 (source: Part 4, Ch 3, Line 1141: «أنفاس الرجال
+      العشرة المتبقين»)'
+    simulation_assumptions:
+    - 'authorial_anticipation_error: true (class: assumption; author inadvertently
+      applied post-ambush headcount to pre-ambush scene)'
+  affected:
+    components:
+    - narrative_headcount_integrity
+    - demographic_census
+  simulation_impact:
+    runs_affected: 100 / 100
+    fragility_score: 0.75
+  remediation_proposal:
+    proposal_id: PR-007-HEADCOUNT
+    patch: 'توثيق الزلة السردية، وفي أي معالجة تحريرية مستقبلية يُعدل الوصف في سطر
+      577 ليصبح: «صوت تنفس متقطع لأربعة عشر رجلاً محبوسين في بطن الحديد» أو صياغة
+      جمعية دون تحديد رقمي مسبق.
+
+      '
+    proposal_file: 04_STAGING/proposals/PR_007_headcount_slip.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 2
+    chapter: 6
+    anchor_text: صوت تنفس متقطع لعشرة رجال
+    resolved_line: 577
+- id: WORLD-BUG-008
+  title: المفارقة الزمنية لتقدير الفجر (ساعتان حوارياً مقابل شروق فلكي 06:48)
+  type: Chrono_and_Perception
+  severity: MEDIUM
+  law_broken: LAW-CHRONO-01 (Solar and Astronomical Chronology)
+  observed:
+    description: 'يصرح خالد في الجزء الرابع، الفصل 3، السطر 1253 (عند قرابة الساعة
+      01:00 بعد انتهاء الكمين وتضميد الجراح): «بقى ساعتين ويطلع الضو. لازم نقرر شنسوي
+      بالحديد قبل لا تطلع الشمس وتكشفنا للكاع كلها»، مما يفترض بزوغ الضوء عند ~03:00
+      وشروق الشمس عند ~03:30، بينما الحسابات الفلكية الصارمة لبادية الحماد في 18 كانون
+      الثاني/يناير تحدد الفجر الفلكي عند 05:25 والشروق عند 06:48 (فارق زمني 3.8 ساعات).
+
+      '
+    state_snapshot: dialogue_implied_sunrise ~ 03:30 vs astronomical_sunrise = 06:48
+  required:
+    invariant: 'اتساق الكرونوتوب والزمن الفيزيائي مع الحوار المنطوق، أو التوثيق الصريح
+      للانضغاط الزمني كعرض نفسي لصدمة القتال والصقيع الشديد، وتجنب أي تصحيح صامت في
+      الجداول الحسابية.
+
+      '
+    physical_minimum: Solar ephemeris alignment or explicit psychological temporal
+      compression required.
+  evidence:
+    telemetry_timestamp: 01:00:00 (Minute 360 - Post-Ambush Regroup)
+    text_attested_evidence:
+    - 'khalid_perceived_time_to_light: 2.0 hours (source: Part 4, Ch 3, Line 1253:
+      «بقى ساعتين ويطلع الضو»)'
+    - 'current_scene_chrono_anchor: ~01:00 (source: Part 3, Ch 8, Line 943 to Part
+      4, Ch 1..3)'
+    simulation_assumptions:
+    - 'astronomical_sunrise_hamad_jan18: 06:48:00 (class: assumption; based on standard
+      solar ephemeris for lat 33.5°N)'
+    - 'discrepancy_magnitude: +3.8 hours (class: assumption; difference between dialogue
+      estimate and solar dawn)'
+  affected:
+    components:
+    - characters.خالد.perception
+    - timeline_continuity
+    - chrono_spatial_system
+  simulation_impact:
+    runs_affected: 100 / 100
+    fragility_score: 0.7
+  remediation_proposal:
+    proposal_id: PR-008-CHRONO-DISTORTION
+    patch: 'توثيق مقولة خالد إما كـ "تشوه إدراكي ذاتي للزمن تحت وطأة الصقيع والصدمة"
+      (Subjective Temporal Compression)، أو كـ "زلة تسريع زمني للمؤلف" للربط بمشهد
+      بزوغ رماد الفجر في الجزء الخامس فصل 1.
+
+      '
+    proposal_file: 04_STAGING/proposals/PR_008_perceived_dawn.md
+  status: IN_STAGING
+  semantic_anchor:
+    part: 4
+    chapter: 5
+    anchor_text: بقى ساعتين ويطلع الضو
+    resolved_line: 1253
+- id: WORLD-BUG-009
+  title: تناقض سببي ثلاثي لآلية عطل 19:00 وشظية رصاص تسبق الكمين بخمس ساعات
+  type: Causality_and_Thermodynamics
+  severity: CRITICAL
+  status: IN_STAGING
+  law_broken: LAW-THERMO-01 & LAW-PNEUM-01
+  semantic_anchor:
+    part: 5
+    chapter: 2
+    anchor_text: أنبوب الوقود المضغوط المغذي للمكبس الرئيس كان قد انشطر طولياً بفعل
+      شظية رصاص مرتدة
+    resolved_line: 1297
+  observed:
+    description: 'العطل الذي أوقف القطار عند 19:00 موصوف في متن الأساس بآليتين متعارضتين:
+
+      1. سطر 187: «انفرط عمود نقل الحركة الرئيس أو انحشرت تروس المكابس في كتلة واحدة».
+
+      2. سطر 1297: «أنبوب الوقود المضغوط المغذي للمكبس الرئيس كان قد انشطر طولياً
+      بفعل شظية رصاص مرتدة، مما قطع تدفق الديزل وأدى إلى انحشار صمام ضغط الهواء الذي
+      يحرر المكابح».
+
+      التناقض السببي الصريح: الكمين لم يبدأ إلا عند 00:00 (سطر 617 وما بعده)، والقطار
+      متوقف منذ 19:00.
+
+      فكيف ينشطر الأنبوب «بفعل شظية رصاص» قبل أول طلقة بخمس ساعات؟
+
+      كما أن قانون [LAW-PNEUM-01] يجعل إطباق المكابح ناتجاً عن تفريغ ضغط الهواء دون
+      3.5 بار وليس انقطاع الديزل.'
+    state_snapshot: train.locomotive.fuel_line.fracture_type = 'thermal_contraction_crack'
+      (calibrated), while text baseline attributes breach to bullet shrapnel at 19:00
+  required:
+    invariant: توحيد آلية العطل على سبب مادي حتمي يسبق توقف القطار عند 19:00 (الإجهاد
+      الحراري للصاج المنكمش)، وفصل منظومة فرامل الهواء ويستنغهاوس عن دائرة تغذية الوقود.
+    physical_minimum: 'Causal chronological precedence: cause must precede effect
+      (shrapnel at 00:00 cannot cause stall at 19:00).'
+  evidence:
+    telemetry_timestamp: 19:00:00 (Minute 0 - Catastrophic Engine Stall)
+    text_attested_evidence:
+    - 'stall_description_1: Part 1, Ch 6, Line 187: «انفرط عمود نقل الحركة الرئيس
+      أو انحشرت تروس المكابس في كتلة واحدة»'
+    - 'stall_description_2: Part 5, Ch 2, Line 1297: «أنبوب الوقود... انشطر طولياً
+      بفعل شظية رصاص مرتدة»'
+    - 'ambush_start: Part 3, Ch 1, Line 617 (Minute 300 / 00:00:00)'
+    simulation_assumptions:
+    - 'causal_inversion_magnitude: 5.0 hours (class: assumption; discrepancy between
+      ambush time and stall time)'
+  affected:
+    components:
+    - train.locomotive.fuel_line
+    - train.locomotive.braking_system
+    - timeline_causality
+  simulation_impact:
+    runs_affected: 100 / 100
+    fragility_score: 0.98
+  remediation_proposal:
+    proposal_id: PR-009-FUEL-LINE
+    proposal_file: 04_STAGING/proposals/PR_009_fuel_line_shrapnel_anomaly.md
+    patch: 'تعديل سطر 1297 في بيئة Staging ليصبح: «أنبوب الوقود المضغوط المغذي للمكبس
+      الرئيس كان قد انشطر طولياً بفعل الإجهاد الحراري المتكرر للصاج المنكمش واهتزازات
+      السكة، مما فرغ ضغط أنبوب الهواء وأطبق المكابح الأوتوماتيكية».'
+- id: WORLD-BUG-010
+  title: الالتباس المكاني للبرميل الأزرق (القاطرة مقابل العربة الأولى مقابل العربة
+    الوسطى)
+  type: Spatial_and_Topology
+  severity: MEDIUM
+  status: IN_STAGING
+  law_broken: LAW-SPATIAL-02 & LAW-SOC-02
+  semantic_anchor:
+    part: 4
+    chapter: 5
+    anchor_text: البرميل مال الماي... جيبه هنا بالوسطى
+    resolved_line: 1251
+  observed:
+    description: 'برميل الماء الأزرق (14 لتراً) — الحامل الرمزي والفيزيائي للعدالة
+      التراجيدية والبقاء المشترك — يتنقل في المتن بين ثلاثة مواضع متنافرة دون توثيق
+      لحركة نقله المادية:
+
+      1. سطر 37 (أبو علي): «المي بالعربة الوسطى خلص. البرميل الكبير بالقاطرة فارغ».
+
+      2. سطر 39 (خالد): «البرميل مال الحرس بي نص» (في العربة الأولى).
+
+      3. سطر 1251 (خالد، الجزء الرابع): «البرميل مال الماي... جيبه هنا بالوسطى»، في
+      حين أن الدستور يقرر تثبيته بطوق حديدي في العربة الأولى (X=2.4m, Y=3.5m).'
+    state_snapshot: inventory.water_supply.location = ambiguous (Car 01 vs Locomotive
+      vs Car 02)
+  required:
+    invariant: حفظ الموقع المكاني للكتلة المادية (برميل ماء بكتلة > 15 كغم) يستوجب
+      تثبيتاً كانونياً واحداً في فضاء العربات، وتوثيق أي نقل بين العربات كفعل مادي
+      محكوم بجهد بشري واجتياز الأبواب المنزلقة.
+    physical_minimum: Unique canonical coordinate for 14L water vessel across closed
+      cars.
+  evidence:
+    telemetry_timestamp: 01:05:00 (Minute 365 - Post-Ambush Thirst Management)
+    text_attested_evidence:
+    - 'locomotive_barrel: Part 1, Ch 2, Line 37: «البرميل الكبير بالقاطرة فارغ»'
+    - 'guards_barrel: Part 1, Ch 2, Line 39: «البرميل مال الحرس بي نص»'
+    - 'middle_car_command: Part 4, Ch 5, Line 1251: «البرميل مال الماي... جيبه هنا
+      بالوسطى»'
+    simulation_assumptions:
+    - 'barrel_mass_kg: 15.2 (class: assumption; 14L water + 1.2kg polyethylene vessel)'
+  affected:
+    components:
+    - inventory.water_supply
+    - train.cars.car_01.inventory
+    - semiotics.blue_water_barrel
+  simulation_impact:
+    runs_affected: 90 / 100
+    fragility_score: 0.7
+  remediation_proposal:
+    proposal_id: PR-010-WATER-BARREL
+    proposal_file: 04_STAGING/proposals/PR_010_water_barrel_location.md
+    patch: 'تثبيت الموقع الكانوني للبرميل في العربة الأولى (مربوطاً بالطوق الحديدي)،
+      وتعديل سطر 1251 في Staging ليصبح: «جيب طاسة الماي من برميل الأولى لهنا بالوسطى»
+      ليتطابق مع ميكانيكا التقنين والتوزيع (100 مل).'
