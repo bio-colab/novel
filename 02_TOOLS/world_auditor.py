@@ -18,6 +18,16 @@ This script performs deterministic invariant auditing across:
 8. Acoustic Epistemic Boundary: Enforces LAW-ACOUST-03 inter-car attenuation (>35 dB loss).
 9. Chrono-Spatial Telemetry: Enforces timestamp format and temporal validity [0..645 minutes].
 10. Train Spatial Topology: Enforces non-overlapping, continuous car intervals within train length envelope.
+And orchestrates 9 specialized subsystem verification engines:
+  11. Dialogue Auditor: Epistemic knowledge boundaries and psychological stress tics.
+  12. Sensory Linter: Atmospheric illumination and sensory consistency.
+  13. Chrono-Event Engine: Temporal progression and bio-thermal causality.
+  14. Pacing Visualizer: Action/tension rhythm and micro-event cadence.
+  15. Socio-Demography Analyzer: Demographic mosaic, power inversion, and use-value primacy.
+  16. Historical-Political Analyzer: Analog era isolation, state erosion, and prison trajectory.
+  17. Meta-Auditor: Statutory reference completeness across all cited laws.
+  18. Grounding Auditor: Telemetry calibration, headcount invariant, and solar ephemeris.
+  19. Moral Entropy Monitor: Existential typology, entropy curves, causal debts, and funerary dignity (LAW-ETHIC-01..03).
 
 Exit Code:
   0: All invariants passed with zero violations.
@@ -505,6 +515,24 @@ class WorldAuditor:
                 self.violations.extend(grounding.violations)
         except Exception as e:
             self.warnings.append(f"Could not run GroundingAuditor: {e}")
+
+        # 9. Moral Entropy & Existential Solidarity Monitor
+        try:
+            from moral_entropy_monitor import MoralEntropyMonitor
+            moral_monitor = MoralEntropyMonitor()
+            if moral_monitor.load_data():
+                moral_monitor.audit_moral_typology_quadrants()
+                moral_monitor.audit_moral_entropy_curve()
+                moral_monitor.audit_causal_moral_debt()
+                moral_monitor.audit_funerary_dignity_preservation()
+                if not moral_monitor.violations:
+                    self.passes.append("Moral Entropy & Existential Engine: 100% moral typology, thermodynamic entropy curve, causal debts, and funerary dignity (LAW-ETHIC-01..03) verified.")
+                else:
+                    self.violations.extend(moral_monitor.violations)
+            else:
+                self.violations.extend(moral_monitor.violations)
+        except Exception as e:
+            self.warnings.append(f"Could not run MoralEntropyMonitor: {e}")
 
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:

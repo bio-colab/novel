@@ -52,8 +52,12 @@ jobs:
       - name: Run Grounding & Telemetry Calibration Auditor
         run: python 02_TOOLS/grounding_auditor.py
 
+      - name: Run Moral Entropy & Existential Solidarity Monitor
+        run: python 02_TOOLS/moral_entropy_monitor.py
+
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py
+
 
 
 
