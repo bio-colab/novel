@@ -12,7 +12,7 @@ neurological displacement rituals (Tics) of characters across the text:
 1. Neurological Displacement Audit (LAW-BIO-02): Verifies that character tics
    occur during acute stress, calculating tic manifestation density per 1,000 words.
 2. Panic Dialogue Fragmentation: Verifies that dialogue spoken under extreme terror
-   collapses into breathless, fragmented syntax (average words/line <= 10).
+   collapses into breathless, fragmented syntax (average words/sentence <= 8.0).
 3. Defense Mechanism Concordance: Verifies that characters maintain their specific
    psychological defense archetypes (e.g. Hajji Ammar's bureaucratic denial,
    Khalid's stoic command authority, Abu al-Loul's somatic panic).

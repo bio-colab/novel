@@ -96,15 +96,26 @@ class HistoricalPoliticalAnalyzer:
         Validates LAW-POL-01:
         Confirms absolute ZERO occurrences of digital or post-analog modern technology.
         """
+        # Verify statutory laws exist in PHYSICAL_LAWS.md
+        laws_verified = False
+        if os.path.exists(LAWS_PATH):
+            with open(LAWS_PATH, "r", encoding="utf-8") as f:
+                content = f.read()
+                laws_verified = all(
+                    f"[{law}]" in content
+                    for law in ["LAW-POL-01", "LAW-POL-02", "LAW-POL-03"]
+                )
+
         violations = {}
         for pattern in DIGITAL_ANACHRONISMS:
             matches = len(re.findall(pattern, self.raw_text))
             if matches > 0:
                 violations[pattern] = matches
 
-        passed = len(violations) == 0
+        passed = len(violations) == 0 and laws_verified
         return {
             "passed": passed,
+            "laws_codified": laws_verified,
             "anachronisms_detected": len(violations),
             "violations": violations
         }

@@ -46,6 +46,10 @@ jobs:
       - name: Run Historical & Political Analyzer
         run: python 02_TOOLS/historical_political_analyzer.py
 
+      - name: Run Meta-Auditor Legal & Reference Integrity Check
+        run: python 02_TOOLS/meta_auditor.py
+
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py
+
 

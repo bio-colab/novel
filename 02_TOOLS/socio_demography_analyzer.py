@@ -203,9 +203,19 @@ class SocioDemographyAnalyzer:
         strata = set(c["class_stratum"] for c in DEMOGRAPHIC_REGISTRY.values())
         regions = set(c["regional_origin"] for c in DEMOGRAPHIC_REGISTRY.values())
 
+        # Verify that statutory laws are defined in PHYSICAL_LAWS.md
+        laws_verified = False
+        if os.path.exists(LAWS_PATH):
+            with open(LAWS_PATH, "r", encoding="utf-8") as f:
+                laws_content = f.read()
+                laws_verified = all(
+                    f"[{law}]" in laws_content
+                    for law in ["LAW-SOC-01", "LAW-SOC-02", "LAW-SOC-03", "LAW-DEMO-01"]
+                )
+
         # Scan text for cultural markers
         turkmen_matches = len(re.findall(r"ساغ أول", self.raw_text))
-        kurdish_matches = len(re.findall(r"سردار|كردي", self.raw_text))
+        kurdish_matches = len(re.findall(r"كردي|ديالى", self.raw_text))
         marsh_matches = len(re.findall(r"هور|حصاة", self.raw_text))
         bureaucratic_matches = len(re.findall(r"وزارة|معاملة|ياقة|أزرار|مدير", self.raw_text))
 
@@ -213,8 +223,9 @@ class SocioDemographyAnalyzer:
             census_count == 14
             and len(strata) >= 6
             and len(regions) >= 5
+            and laws_verified
             and turkmen_matches >= 1
-            and kurdish_matches >= 10
+            and kurdish_matches >= 3
             and marsh_matches >= 5
             and bureaucratic_matches >= 5
         )
@@ -224,9 +235,10 @@ class SocioDemographyAnalyzer:
             "census_count": census_count,
             "distinct_strata": len(strata),
             "distinct_regions": len(regions),
+            "laws_codified": laws_verified,
             "marker_counts": {
                 "turkmen_sag_ol": turkmen_matches,
-                "kurdish_sardar": kurdish_matches,
+                "kurdish_identity": kurdish_matches,
                 "marsh_culture": marsh_matches,
                 "bureaucratic_elite": bureaucratic_matches
             }

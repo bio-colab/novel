@@ -87,14 +87,25 @@ class EpistemicTracker:
         car_02_occupants = set(cars.get("car_02_middle", {}).get("occupants", []))
         car_03_occupants = set(cars.get("car_03_rear", {}).get("occupants", []))
 
-        # Facts that are physically restricted to specific cars at baseline t0
+        # Facts that are physically restricted to specific localized characters at baseline t0
         restricted_facts = {
-            "خطة_هروب_مهدي": car_02_occupants,
-            "حالة_سلوم_المحتضر": car_03_occupants,
-            "نية_حناطة_بالفرار": {"حناطة"},
-            "حقيقة_مقصورة_السائق_الداخلية": set()  # Known to NO ONE (blind spot)
+            "اللحظة_القادمة_هي_لحظة_القفز": {"مهدي"},
+            "الباب_الخلفي_مخلوع_جزئياً": {"سلوم"},
+            "الولد_سيموت_إن_لم_يُغطَّ": {"بشير"},
+            "أنبوب_الديزل_منكسر": {"أبو_علي"}
         }
 
+        # 1. Positive Verification: Authorized holders actually possess their localized truths
+        for fact, authorized_knowers in restricted_facts.items():
+            for ak in authorized_knowers:
+                ak_data = characters.get(ak, {})
+                ak_knowns = set(ak_data.get("epistemic_bubble", {}).get("known_truths", []))
+                if fact not in ak_knowns:
+                    self.violations.append(
+                        f"[Epistemic Incompleteness] Authorized holder '{ak}' missing localized truth '{fact}'."
+                    )
+
+        # 2. Negative Isolation: Unauthorized characters cannot possess unshared localized truths
         leaks_detected = 0
         for fact, authorized_knowers in restricted_facts.items():
             for name, data in characters.items():
@@ -105,8 +116,8 @@ class EpistemicTracker:
                         f"[Omniscience Leak] '{name}' in '{data.get('location')}' possesses localized fact '{fact}' without transmission vector."
                     )
 
-        if leaks_detected == 0:
-            self.passes.append("Omniscience Isolation: Zero unphysical knowledge leaks detected across car boundaries.")
+        if leaks_detected == 0 and not self.violations:
+            self.passes.append("Omniscience Isolation: Zero unphysical knowledge leaks detected across car boundaries (4/4 localized truths audited).")
 
     def check_transmission_channel_physics(self):
         """Verify transmission channels: Sight, Hearing, Speech, Evidence"""

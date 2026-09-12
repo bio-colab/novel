@@ -381,7 +381,7 @@ class WorldAuditor:
         self.check_acoustic_epistemic_bounds()
         self.check_chrono_spatial_telemetry()
         self.check_train_topology_and_envelope()
-        self.check_subsystem_engines()
+        return self.check_subsystem_engines()
 
     def check_subsystem_engines(self):
         """Invoke and verify the three core narrative subsystem engines"""
@@ -474,6 +474,17 @@ class WorldAuditor:
                 self.violations.append("HistoricalPoliticalAnalyzer detected anachronism or geopolitical trajectory violation.")
         except Exception as e:
             self.warnings.append(f"Could not run HistoricalPoliticalAnalyzer: {e}")
+
+        # 7. Meta-Auditor: Statutory Reference Integrity
+        try:
+            from meta_auditor import MetaAuditor
+            meta = MetaAuditor()
+            if meta.audit_reference_integrity():
+                self.passes.append(f"Meta-Auditor: 100% of statutory law citations across codebase match canonical definitions in PHYSICAL_LAWS.md ({len(meta.citations)} laws audited).")
+            else:
+                self.violations.extend(meta.violations)
+        except Exception as e:
+            self.warnings.append(f"Could not run MetaAuditor: {e}")
 
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
