@@ -1,0 +1,67 @@
+{
+  "metadata": {
+    "engine": "Sand Train Closed-World Platform Engine",
+    "version": "2.0.0-platform-engine",
+    "timestamp_utc": "2026-09-12T08:52:25.623148+00:00",
+    "charter": "نحن نُحلل ونُقيّم.. ولا نُقوّم"
+  },
+  "phases": {
+    "01_unit_tests": {
+      "name": "Automated Unit Tests",
+      "total_tests": 30,
+      "passed": 30,
+      "failures": 0,
+      "errors": 0,
+      "duration_seconds": 1.908,
+      "status": "PASSED"
+    },
+    "02_core_invariants": {
+      "name": "World Invariants Auditor (20 Subsystem Checks)",
+      "passed_invariants": 20,
+      "violations": 0,
+      "warnings": 0,
+      "duration_seconds": 0.261,
+      "status": "PASSED"
+    },
+    "03_epistemic_grounding": {
+      "grounding_auditor": "PASSED",
+      "epistemic_tracker": "PASSED",
+      "causality_graph": "PASSED",
+      "duration_seconds": 0.105,
+      "status": "PASSED"
+    },
+    "04_existential_socio_political": {
+      "moral_entropy_monitor": "PASSED",
+      "psychology_detector": "PASSED",
+      "socio_demography_analyzer": "PASSED",
+      "historical_political_analyzer": "PASSED",
+      "chrono_event_engine": "PASSED",
+      "duration_seconds": 0.087,
+      "status": "PASSED"
+    },
+    "05_stylistic_sensory_linters": {
+      "sensory_linter": "PASSED",
+      "dialogue_auditor": "PASSED",
+      "pacing_visualizer": "PASSED",
+      "character_tracker": "PASSED",
+      "duration_seconds": 0.168,
+      "status": "PASSED"
+    },
+    "06_world_brain_graph": {
+      "world_graph_builder": "PASSED",
+      "duration_seconds": 0.021,
+      "status": "PASSED"
+    }
+  },
+  "summary": {
+    "total_checks": 0,
+    "passed_checks": 0,
+    "failed_checks": 0,
+    "success_rate_percent": 100.0,
+    "status": "PASSED",
+    "total_phases": 6,
+    "passed_phases": 6,
+    "failed_phases": 0,
+    "total_duration_seconds": 2.55
+  }
+}

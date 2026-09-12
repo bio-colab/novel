@@ -39,6 +39,14 @@ WORLD_BUGS_PATH = os.path.join(ROOT_DIR, "03_AUDIT_AND_ISSUES", "WORLD_BUGS.yaml
 WORLD_STATE_PATH = os.path.join(ROOT_DIR, "05_WORLD_BRAIN", "world_state.yaml")
 LAWS_PATH = os.path.join(ROOT_DIR, "01_SPECS_AND_RULES", "PHYSICAL_LAWS.md")
 
+try:
+    from semantic_text_parser import SemanticNovelParser
+except ImportError:
+    try:
+        from .semantic_text_parser import SemanticNovelParser
+    except Exception:
+        SemanticNovelParser = None
+
 
 def parse_novel_structure(baseline_path):
     """
@@ -153,6 +161,7 @@ class GroundingAuditor:
             return False
 
         self.parts, self.line_map = parse_novel_structure(BASELINE_PATH)
+        self.semantic_parser = SemanticNovelParser(BASELINE_PATH) if SemanticNovelParser else None
         with open(WORLD_BUGS_PATH, "r", encoding="utf-8") as f:
             self.bugs_data = yaml.safe_load(f)
         with open(WORLD_STATE_PATH, "r", encoding="utf-8") as f:
@@ -254,14 +263,21 @@ class GroundingAuditor:
         Verify that Mahdi's exit vector in the baseline is the sliding side door,
         and confirm that no speculative trapdoor leaks into baseline specifications or world_state.yaml.
         """
-        # Check novel text at lines 701-717
-        line_701 = self.line_map.get(701, (0, 0, ""))[2]
-        line_717 = self.line_map.get(717, (0, 0, ""))[2]
-
-        if "الباب الجانبي المنزلق للعربة الوسطى" not in line_701:
-            self.violations.append(f"[Exit Vector Anchor Error] Line 701 missing sliding door text: '{line_701}'")
-        if "قفز من فتحة الباب المفتوح" not in line_717:
-            self.violations.append(f"[Exit Vector Anchor Error] Line 717 missing jump text: '{line_717}'")
+        # Resilient Anchor Resolution: Part 3 Chapter 4
+        if self.semantic_parser:
+            loc_701 = self.semantic_parser.locate_anchor("الباب الجانبي المنزلق للعربة الوسطى", part_num=3, chapter_num=4, expected_line=701)
+            loc_717 = self.semantic_parser.locate_anchor("قفز من فتحة الباب المفتوح", part_num=3, chapter_num=4, expected_line=717)
+            if not loc_701["found"]:
+                self.violations.append("[Exit Vector Anchor Error] Sliding door text not found in Part 3 Chapter 4.")
+            if not loc_717["found"]:
+                self.violations.append("[Exit Vector Anchor Error] Jump text not found in Part 3 Chapter 4.")
+        else:
+            line_701 = self.line_map.get(701, (0, 0, ""))[2]
+            line_717 = self.line_map.get(717, (0, 0, ""))[2]
+            if "الباب الجانبي المنزلق للعربة الوسطى" not in line_701:
+                self.violations.append(f"[Exit Vector Anchor Error] Line 701 missing sliding door text: '{line_701}'")
+            if "قفز من فتحة الباب المفتوح" not in line_717:
+                self.violations.append(f"[Exit Vector Anchor Error] Line 717 missing jump text: '{line_717}'")
 
         # Check world_state.yaml for trapdoor leak
         with open(WORLD_STATE_PATH, "r", encoding="utf-8") as f:
@@ -295,17 +311,22 @@ class GroundingAuditor:
           - Verify it is codified as WORLD-BUG-007.
           - Verify Post-Ambush headcount is 10 living souls (Part 4 Ch 3 Line 1141).
         """
-        # Line 577 in novel baseline
-        line_577 = self.line_map.get(577, (0, 0, ""))[2]
-        line_1141 = self.line_map.get(1141, (0, 0, ""))[2]
-
-        slip_text_found = "صوت تنفس متقطع لعشرة رجال" in line_577
-        post_ambush_found = "أنفاس الرجال العشرة المتبقين" in line_1141
+        # Resilient Anchor Resolution: Part 2 Ch 6 and Part 4 Ch 3
+        if self.semantic_parser:
+            loc_577 = self.semantic_parser.locate_anchor("صوت تنفس متقطع لعشرة رجال", part_num=2, chapter_num=6, expected_line=577)
+            loc_1141 = self.semantic_parser.locate_anchor("أنفاس الرجال العشرة المتبقين", part_num=4, chapter_num=3, expected_line=1141)
+            slip_text_found = loc_577["found"]
+            post_ambush_found = loc_1141["found"]
+        else:
+            line_577 = self.line_map.get(577, (0, 0, ""))[2]
+            line_1141 = self.line_map.get(1141, (0, 0, ""))[2]
+            slip_text_found = "صوت تنفس متقطع لعشرة رجال" in line_577
+            post_ambush_found = "أنفاس الرجال العشرة المتبقين" in line_1141
 
         if not slip_text_found:
-            self.violations.append(f"[Headcount Anchor Error] Line 577 missing 'عشرة رجال' text: '{line_577}'")
+            self.violations.append("[Headcount Anchor Error] Missing 'صوت تنفس متقطع لعشرة رجال' anchor around Part 2 Ch 6.")
         if not post_ambush_found:
-            self.violations.append(f"[Headcount Anchor Error] Line 1141 missing 'الرجال العشرة المتبقين' text: '{line_1141}'")
+            self.violations.append("[Headcount Anchor Error] Missing 'أنفاس الرجال العشرة المتبقين' anchor around Part 4 Ch 3.")
 
         # Verify WORLD-BUG-007 exists in WORLD_BUGS.yaml
         bug_007 = next((b for b in self.bugs_data.get("bugs", []) if b.get("id") == "WORLD-BUG-007"), None)
@@ -325,11 +346,15 @@ class GroundingAuditor:
           - Detect Khalid's line at Line 1253 («بقى ساعتين ويطلع الضو»).
           - Verify that the +3.8h discrepancy against 06:48 sunrise is recorded as WORLD-BUG-008.
         """
-        line_1253 = self.line_map.get(1253, (0, 0, ""))[2]
-        khalid_line_found = "بقى ساعتين ويطلع الضو" in line_1253
+        if self.semantic_parser:
+            loc_1253 = self.semantic_parser.locate_anchor("بقى ساعتين ويطلع الضو", part_num=4, chapter_num=5, expected_line=1253)
+            khalid_line_found = loc_1253["found"]
+        else:
+            line_1253 = self.line_map.get(1253, (0, 0, ""))[2]
+            khalid_line_found = "بقى ساعتين ويطلع الضو" in line_1253
 
         if not khalid_line_found:
-            self.violations.append(f"[Chrono Anchor Error] Line 1253 missing 'بقى ساعتين ويطلع الضو': '{line_1253}'")
+            self.violations.append("[Chrono Anchor Error] Khalid's line 'بقى ساعتين ويطلع الضو' not found around Part 4 Ch 5.")
 
         bug_008 = next((b for b in self.bugs_data.get("bugs", []) if b.get("id") == "WORLD-BUG-008"), None)
         if not bug_008:

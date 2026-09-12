@@ -25,7 +25,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run World Invariants Auditor
+      - name: Run Python Automated Unit Tests Suite
+        run: python -m unittest discover -s tests -v
+
+      - name: Run Master Platform Orchestrator (All Phases & Linters)
+        run: python 02_TOOLS/master_auditor.py --ci
+
+      - name: Run World Invariants Core Auditor
         run: python 02_TOOLS/world_auditor.py
 
       - name: Run Epistemic State Tracker
@@ -57,6 +63,14 @@ jobs:
 
       - name: Verify World Brain Graph Generation
         run: python 02_TOOLS/world_graph_builder.py
+
+      - name: Upload Master Audit Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: master-audit-report
+          path: 03_AUDIT_AND_ISSUES/MASTER_AUDIT_REPORT.json
+
 
 
 
