@@ -15,9 +15,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Verify Manuscript Baseline Sanctity (SHA-256)
+      - name: Verify Manuscript Baseline Sanctity (SHA-256 LF-Normalized)
         run: |
-          echo "A173202BB1BF875B3EF371ACE387B107418E7292BA58CC79F751DE087FF607EC *00_BASELINE/novel_baseline.md" | sha256sum --check
+          python -c "import hashlib; d = open('00_BASELINE/novel_baseline.md', 'rb').read().replace(b'\r\n', b'\n'); h = hashlib.sha256(d).hexdigest().upper(); assert h == '75AC9D6A1D2B71B677D3119B2E6D6A922AFD4A1B3DC046B5D2841B3C198316B0', f'Hash mismatch: {h}'; print('Baseline SHA-256 Verified:', h)"
 
       - name: Verify Clean Root Workspace (No Duplicate RTF)
         run: |

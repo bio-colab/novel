@@ -359,15 +359,18 @@ class MasterAuditor:
         failed_checks = 0
         checks_log = []
 
-        # Check 1: Baseline Sanctity Hash (SHA-256)
+        # Check 1: Baseline Sanctity Hash (SHA-256 LF-Normalized)
         baseline_path = os.path.join(ROOT_DIR, "00_BASELINE", "novel_baseline.md")
-        expected_hash = "A173202BB1BF875B3EF371ACE387B107418E7292BA58CC79F751DE087FF607EC"
+        expected_hash = "75AC9D6A1D2B71B677D3119B2E6D6A922AFD4A1B3DC046B5D2841B3C198316B0"
         if os.path.exists(baseline_path):
             with open(baseline_path, "rb") as f:
-                actual_hash = hashlib.sha256(f.read()).hexdigest().upper()
+                raw_bytes = f.read()
+            # Normalize CRLF to LF to guarantee cross-platform determinism across Linux, macOS, and Windows
+            normalized_bytes = raw_bytes.replace(b"\r\n", b"\n")
+            actual_hash = hashlib.sha256(normalized_bytes).hexdigest().upper()
             if actual_hash == expected_hash:
                 passed_checks += 1
-                checks_log.append("✅ Baseline SHA-256 integrity verified (100% frozen ground truth).")
+                checks_log.append("✅ Baseline SHA-256 integrity verified (100% frozen ground truth, LF-normalized).")
             else:
                 failed_checks += 1
                 checks_log.append(f"❌ Baseline hash mismatch: {actual_hash} != {expected_hash}")

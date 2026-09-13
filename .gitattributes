@@ -1,0 +1,19 @@
+﻿# Enforce consistent LF line endings across all platforms (Windows, Linux, macOS)
+* text=auto eol=lf
+
+# Explicitly ensure baseline manuscript and text files are always LF
+00_BASELINE/* text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.html text eol=lf
+
+# Binary files
+*.rtf binary
+*.png binary
+*.jpg binary
+*.ico binary

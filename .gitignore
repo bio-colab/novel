@@ -16,3 +16,7 @@ Desktop.ini
 # Temporary scratch
 *.tmp
 *.bak
+
+# Generated simulation runtime ledgers (regenerated dynamically by simulation_runner.py)
+06_SIMULATION_ENGINE/output/events_log.json
+06_SIMULATION_ENGINE/output/events_log.jsonl

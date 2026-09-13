@@ -1,0 +1,84 @@
+﻿# ==============================================================================
+# SIMULATION ENGINE CONSTANTS (ثوابت ومعايير المحاكاة الفيزيائية المغلقة)
+# Project: «قطار الرمل» (Sand Train) - Narrative Engineering Simulation Engine
+# Framework Charter: «نحن نُحلل ونُقيّم.. ولا نُقوّم»
+#
+# EPISTEMIC TAXONOMY (التأصيل الإبستيمولوجي الصريح):
+# 1. ثوابت النموذج الحتمي (Model Simulation Invariants):
+#    هذه القيم تمثل معايير النموذج الرياضي الحاكم للبيئة الفيزيائية والبيوميكانيكية
+#    المغلقة (الدستور الفيزيائي PHYSICAL_LAWS.md).
+# 2. القياسات النصية التجريبية (Empirical Text Measurements):
+#    القياسات المستخرجة آلياً من متن الرواية بواسطة المحلل الدلالي ومدفقات الحواس
+#    والحوارات (المفردات، الترددات، التوزيع الإحصائي، والمراسي النصية).
+# ==============================================================================
+
+version: "1.0.0"
+novel_id: "sand_train"
+timeline_total_minutes: 645  # 19:00 -> 05:45
+
+environment:
+  ambient_initial_temp_c: 0.0
+  ambient_temp_floor_c: -8.0
+  radiation_cooling:
+    alpha: 0.60
+    exponent: 1.15
+    floor_minute: 570  # 04:30
+  wind:
+    speed_kmh: 38.0
+    wind_chill_offset_c: -5.4
+  illumination:
+    starlight_lux: 0.8
+    astronomical_dawn_minute: 502  # 05:22
+    dawn_lux: 2.5
+    sunrise_minute: 588           # 06:48 (astronomical progression)
+    sunrise_lux: 45.0
+
+thermodynamics_cars:
+  car_01_insulated_base_temp_c: 4.2
+  car_02_middle_base_temp_c: 2.0
+  car_03_bare_sheet_base_temp_c: 1.0
+  thermal_inertia_lag_exponent: 1.10
+  thermal_inertia_coefficient: 0.45
+
+biometrics_and_neurology:
+  living_souls_headcount: 14
+  normal_core_temp_c: 36.8
+  critical_core_temp_floor_c: 31.5
+  core_decay_healthy_per_min: 0.0035
+  core_decay_trauma_per_min: 0.0050
+  finger_initial_temp_c: 24.5
+  finger_cooling_duration_mins: 450.0
+  motor_dexterity:
+    warm_threshold_c: 20.0
+    chilled_threshold_c: 10.0
+    numb_threshold_c: 2.0
+    frozen_floor_dexterity: 0.02
+  shivering_stages:
+    none_threshold_c: 36.2
+    moderate_threshold_c: 35.0
+    violent_threshold_c: 33.5
+    exhaustion_threshold_c: 31.0
+    torpor_threshold_c: 31.0
+
+resources:
+  ammunition:
+    total_initial_rounds: 118
+    caliber: "7.62x39mm"
+    distribution:
+      خالد: 28
+      عباس: 27
+      حناطة: 28
+      مخزن_طوارئ: 35
+  water:
+    total_initial_liters: 14.0
+    canonical_container_car: "car_01"
+    respiration_loss_l_per_min_per_person: 0.000667
+
+moral_entropy:
+  initial_solidarity_index: 0.85
+  solidarity_floor: 0.30
+  decay_rate: 0.07
+  decay_exponent: 0.95
+  rebound_events:
+    minute_420_aziz_mawwal_boost: 0.18
+    minute_570_fuel_repair_boost: 0.12
