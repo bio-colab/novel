@@ -536,6 +536,25 @@ class MasterAuditor:
                 failed_checks += 1
                 details.append("❌ Entity Catalog YAML missing in 05_WORLD_BRAIN.")
 
+            # Check 6: Event Sourcing Ledger & Replay Engine Fidelity
+            events_json_path = os.path.join(out_dir, "events_log.json")
+            events_jsonl_path = os.path.join(out_dir, "events_log.jsonl")
+            total_checks += 1
+            if os.path.exists(events_json_path) and os.path.exists(events_jsonl_path):
+                with open(events_json_path, "r", encoding="utf-8") as ef:
+                    evts_data = json.load(ef)
+                evt_count = len(evts_data)
+                rep_status = sdata.get("event_sourcing", {}).get("replay_verification", {})
+                if evt_count >= 1900 and rep_status.get("status") == "PASSED":
+                    passed_checks += 1
+                    details.append(f"✅ Event Sourcing & Replay Engine: {evt_count} discrete events logged; 100% full-state reconstruction verified (0 discrepancies).")
+                else:
+                    failed_checks += 1
+                    details.append(f"❌ Event Sourcing Replay failed or incomplete ({evt_count} events, status: {rep_status.get('status')}).")
+            else:
+                failed_checks += 1
+                details.append("❌ Event Sourcing ledger files (events_log.json/jsonl) missing.")
+
         except Exception as e:
             total_checks += 1
             failed_checks += 1

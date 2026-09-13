@@ -25,7 +25,8 @@ class SimulationEvent(BaseModel):
         "ACTION_ATTEMPT",
         "MORAL_CHOICE",
         "RESOURCE_CONSUMPTION",
-        "ENVIRONMENT_UPDATE"
+        "ENVIRONMENT_UPDATE",
+        "MORAL_TRANSITION"
     ] = Field(..., description="Categorical event type")
     payload: Dict[str, Any] = Field(default_factory=dict, description="Event-specific physics/narrative parameters")
     affected_entities: List[str] = Field(default_factory=list, description="IDs of affected characters or cars")

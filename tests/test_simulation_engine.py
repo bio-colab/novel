@@ -43,6 +43,7 @@ from systems.resources import ResourcesSystem
 from systems.moral_entropy import MoralEntropySystem
 from ticker import EventSourcedTicker
 from constraints import NarrativeConstraintGenerator
+from replayer import EventReplayer
 
 
 class TestSimulationEngine(unittest.TestCase):
@@ -297,6 +298,67 @@ class TestSimulationEngine(unittest.TestCase):
                 category=EntityCategory.PROP,
                 mass_kg=-5.0
             )
+
+    def test_12_event_sourcing_physical_transitions_logged(self):
+        """Validates that minute-by-minute physical state transitions are emitted as first-class events."""
+        registry = EntityRegistry()
+        registry.initialize_default_entities()
+        ticker = EventSourcedTicker(registry)
+
+        # Run 60 minutes
+        ticker.run_simulation(total_minutes=60)
+        # At least 61 minutes * 3 physical events = 183 events
+        self.assertGreaterEqual(len(ticker.events_log), 180)
+
+        # Check event types exist across timeline
+        types = {e.event_type for e in ticker.events_log}
+        self.assertIn("THERMAL_STEP", types)
+        self.assertIn("BIO_DECAY", types)
+        self.assertIn("MORAL_TRANSITION", types)
+
+        # Minute 0 initial thermal event
+        evt_0 = next(e for e in ticker.events_log if e.minute == 0 and e.event_type == "THERMAL_STEP")
+        self.assertEqual(evt_0.payload["ambient_temp_c"], 0.0)
+
+    def test_13_event_replayer_full_reconstruction_and_zero_discrepancy(self):
+        """Verifies that EventReplayer reconstructs the entire world state purely from events with 100% fidelity."""
+        registry = EntityRegistry()
+        registry.initialize_default_entities()
+        ticker = EventSourcedTicker(registry)
+
+        # Canonical key event: Abbas fires 3 rounds at minute 315
+        key_events = {
+            315: [
+                {
+                    "type": "BALLISTIC_DISCHARGE",
+                    "payload": {"shooter": "عباس", "rounds": 3, "caliber": "7.62x39mm"},
+                    "affected": ["عباس", "car_01_guard"],
+                    "law": "LAW-AMMO-01"
+                }
+            ]
+        }
+
+        ticker.run_simulation(total_minutes=645, key_events=key_events)
+        self.assertGreaterEqual(len(ticker.events_log), 1935)
+
+        # Reconstruct state from scratch using EventReplayer
+        replayed_reg, ctx = EventReplayer.replay(ticker.events_log)
+        self.assertEqual(ctx["applied_events_count"], len(ticker.events_log))
+        self.assertEqual(ctx["final_minute"], 645)
+
+        # Check specific state facts in replayed registry
+        self.assertEqual(replayed_reg.resources["ammo"].distribution["عباس"], 24)
+        self.assertEqual(replayed_reg.environment["ambient_temp_c"], -8.0)
+
+        # Assert zero discrepancies between simulated and replayed states
+        is_identical, discrepancies = EventReplayer.verify_fidelity(
+            registry,
+            ticker.moral_system.solidarity_index,
+            replayed_reg,
+            ctx["solidarity_index"]
+        )
+        self.assertTrue(is_identical)
+        self.assertEqual(len(discrepancies), 0)
 
 
 if __name__ == "__main__":

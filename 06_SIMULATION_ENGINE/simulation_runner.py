@@ -31,11 +31,13 @@ try:
     from .ticker import EventSourcedTicker
     from .constraints import NarrativeConstraintGenerator
     from .schemas.validation import validate_law_compliance
+    from .replayer import EventReplayer
 except ImportError:
     from registry import EntityRegistry
     from ticker import EventSourcedTicker
     from constraints import NarrativeConstraintGenerator
     from schemas.validation import validate_law_compliance
+    from replayer import EventReplayer
 
 
 class SimulationRunner:
@@ -129,18 +131,34 @@ class SimulationRunner:
         summary_path = os.path.join(self.output_dir, "simulation_summary.json")
         constraints_path = os.path.join(self.output_dir, "narrative_constraints.json")
         catalog_json_path = os.path.join(self.output_dir, "entities_catalog.json")
+        events_json_path = os.path.join(self.output_dir, "events_log.json")
+        events_jsonl_path = os.path.join(self.output_dir, "events_log.jsonl")
 
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         catalog_yaml_path = os.path.join(base_dir, "05_WORLD_BRAIN", "entities_catalog.yaml")
 
-        # Full canonical entity catalog export
+        # 1. Full canonical entity catalog export
         catalog = self.registry.export_catalog()
-
         with open(catalog_json_path, "w", encoding="utf-8") as f:
             json.dump(catalog, f, ensure_ascii=False, indent=2)
 
         with open(catalog_yaml_path, "w", encoding="utf-8") as f:
             yaml.dump(catalog, f, allow_unicode=True, sort_keys=False)
+
+        # 2. Immutable Event Sourcing Ledger exports
+        self.ticker.export_events_json(events_json_path)
+        self.ticker.export_events_jsonl(events_jsonl_path)
+
+        # 3. Deterministic Event Replay Verification (Full State Reconstruction from Event Ledger)
+        replayed_registry, replay_ctx = EventReplayer.replay(self.ticker.events_log)
+        replay_ok, discrepancies = EventReplayer.verify_fidelity(
+            self.registry,
+            self.ticker.moral_system.solidarity_index,
+            replayed_registry,
+            replay_ctx["solidarity_index"]
+        )
+
+        all_compliant = ammo_ok and water_ok and fuel_ok and replay_ok
 
         summary_data = {
             "simulation_engine": "Sand Train Event-Sourced Chrono-Simulator",
@@ -153,6 +171,16 @@ class SimulationRunner:
                 "water_reserve": "COMPLIANT" if water_ok else water_viols,
                 "fuel_line": "COMPLIANT" if fuel_ok else fuel_viols,
                 "status": "PASSED" if all_compliant else "FAILED"
+            },
+            "event_sourcing": {
+                "total_events_recorded": len(self.ticker.events_log),
+                "events_log_file": "output/events_log.json",
+                "events_log_jsonl": "output/events_log.jsonl",
+                "replay_verification": {
+                    "status": "PASSED" if replay_ok else "FAILED",
+                    "applied_events_count": replay_ctx["applied_events_count"],
+                    "discrepancies": discrepancies
+                }
             },
             "entities_catalog": {
                 "total_entities_count": catalog["metadata"]["total_entities_count"],
@@ -170,7 +198,8 @@ class SimulationRunner:
             json.dump({"constraint_cards": cards}, f, ensure_ascii=False, indent=2)
 
         print(f"  ✅ Simulation Completed: 645 minutes advanced ({duration:.2f}s).")
-        print(f"  📝 Total Events Recorded: {len(self.ticker.events_log)} events.")
+        print(f"  📝 Total Events Recorded: {len(self.ticker.events_log)} discrete events in immutable ledger.")
+        print(f"  🔁 Event Sourcing Replay: {'100% VERIFIED (Zero Discrepancies)' if replay_ok else 'FAILED'}")
         print(f"  🎯 Constraint Cards Generated: {len(cards)} advisory cards.")
         print(f"  🏷️ Canonical Entities Indexed: {catalog['metadata']['total_entities_count']} (14 Char, 5 Veh, 15 Prop, 5 Loc).")
         print(f"  ⚖️ Physical Law Compliance: {'100% COMPLIANT' if all_compliant else 'VIOLATIONS DETECTED'}")

@@ -62,9 +62,69 @@ class EventSourcedTicker:
         ResourcesSystem.process_respiration(self.registry, minute)
         solidarity = self.moral_system.update(self.registry, minute)
 
-        # 2. Process any external / narrative events at this exact minute
+        # 2. Emit Physical State Transition Events into Append-Only Ledger
+        thermal_event = SimulationEvent(
+            event_id=f"EVT-{minute:03d}-01-THERMAL",
+            minute=minute,
+            time_clock=clock_str,
+            event_type="THERMAL_STEP",
+            payload={
+                "ambient_temp_c": ambient_temp,
+                "wind_chill_effective_c": env_state["wind_chill_effective_c"],
+                "lux": env_state["lux"],
+                "cars": {cid: car["interior_temp_c"] for cid, car in self.registry.cars.items()},
+                "characters": {
+                    name: {
+                        "core_temp_c": c["biomechanics"].core_temp_c,
+                        "fingers_temp_c": c["biomechanics"].fingers_temp_c
+                    }
+                    for name, c in self.registry.characters.items()
+                }
+            },
+            affected_entities=list(self.registry.cars.keys()) + list(self.registry.characters.keys()),
+            law_cited="LAW-THERMO-01"
+        )
+        self.events_log.append(thermal_event)
+
+        bio_event = SimulationEvent(
+            event_id=f"EVT-{minute:03d}-02-BIO",
+            minute=minute,
+            time_clock=clock_str,
+            event_type="BIO_DECAY",
+            payload={
+                "characters": {
+                    name: {
+                        "motor_dexterity": c["biomechanics"].motor_dexterity,
+                        "stamina": c["biomechanics"].stamina,
+                        "shivering_stage": c["biomechanics"].shivering_stage,
+                        "respiration_loss_l": c["biomechanics"].respiration_water_loss_l,
+                        "is_alive": c["biomechanics"].is_alive,
+                        "tic_active": c["psychology"].tic_trigger_active
+                    }
+                    for name, c in self.registry.characters.items()
+                }
+            },
+            affected_entities=list(self.registry.characters.keys()),
+            law_cited="LAW-BIO-01"
+        )
+        self.events_log.append(bio_event)
+
+        moral_event = SimulationEvent(
+            event_id=f"EVT-{minute:03d}-03-MORAL",
+            minute=minute,
+            time_clock=clock_str,
+            event_type="MORAL_TRANSITION",
+            payload={
+                "solidarity_index": solidarity
+            },
+            affected_entities=list(self.registry.characters.keys()),
+            law_cited="LAW-ETHIC-01"
+        )
+        self.events_log.append(moral_event)
+
+        # 3. Process any external / narrative events at this exact minute
         if external_events:
-            for evt_raw in external_events:
+            for idx, evt_raw in enumerate(external_events, start=4):
                 etype = evt_raw.get("type", "ACTION_ATTEMPT")
                 payload = evt_raw.get("payload", {})
                 affected = evt_raw.get("affected", [])
@@ -78,7 +138,7 @@ class EventSourcedTicker:
 
                 # Log event in event-sourcing ledger
                 sim_event = SimulationEvent(
-                    event_id=f"EVT-{minute:03d}-{len(self.events_log):03d}",
+                    event_id=f"EVT-{minute:03d}-{idx:02d}-{etype[:7]}",
                     minute=minute,
                     time_clock=clock_str,
                     event_type=etype,
@@ -88,7 +148,7 @@ class EventSourcedTicker:
                 )
                 self.events_log.append(sim_event)
 
-        # 3. Snapshot state at milestone intervals (every 15 minutes or when events occur)
+        # 4. Snapshot state at milestone intervals (every 15 minutes or when events occur)
         if minute % 15 == 0 or external_events or minute == 645:
             snap = self.registry.snapshot()
             snap["solidarity_index"] = solidarity
@@ -101,3 +161,16 @@ class EventSourcedTicker:
         for m in range(total_minutes + 1):
             minute_events = key_events.get(m, None)
             self.advance_minute(m, minute_events)
+
+    def export_events_json(self, file_path: str):
+        """Exports full immutable event ledger as standard JSON."""
+        import json
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump([e.model_dump() for e in self.events_log], f, ensure_ascii=False, indent=2)
+
+    def export_events_jsonl(self, file_path: str):
+        """Exports full immutable event ledger as high-throughput JSON Lines."""
+        import json
+        with open(file_path, "w", encoding="utf-8") as f:
+            for e in self.events_log:
+                f.write(json.dumps(e.model_dump(), ensure_ascii=False) + "\n")

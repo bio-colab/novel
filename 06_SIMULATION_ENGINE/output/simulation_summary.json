@@ -2,13 +2,23 @@
   "simulation_engine": "Sand Train Event-Sourced Chrono-Simulator",
   "timeline_span_minutes": 645,
   "wall_clock_range": "19:00:00 -> 05:45:00",
-  "total_events_logged": 6,
+  "total_events_logged": 1944,
   "state_snapshots_count": 44,
   "law_compliance": {
     "ammo_pool": "COMPLIANT",
     "water_reserve": "COMPLIANT",
     "fuel_line": "COMPLIANT",
     "status": "PASSED"
+  },
+  "event_sourcing": {
+    "total_events_recorded": 1944,
+    "events_log_file": "output/events_log.json",
+    "events_log_jsonl": "output/events_log.jsonl",
+    "replay_verification": {
+      "status": "PASSED",
+      "applied_events_count": 1944,
+      "discrepancies": []
+    }
   },
   "entities_catalog": {
     "total_entities_count": 39,
@@ -26,5 +36,5 @@
     "lux": 45.0
   },
   "final_solidarity_index": 0.6,
-  "duration_seconds": 0.091
+  "duration_seconds": 0.122
 }
