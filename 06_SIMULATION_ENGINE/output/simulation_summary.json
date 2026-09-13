@@ -10,6 +10,15 @@
     "fuel_line": "COMPLIANT",
     "status": "PASSED"
   },
+  "entities_catalog": {
+    "total_entities_count": 39,
+    "breakdown": {
+      "characters_count": 14,
+      "vehicles_count": 5,
+      "props_count": 15,
+      "landmarks_count": 5
+    }
+  },
   "final_environment": {
     "ambient_temp_c": -8.0,
     "wind_speed_kmh": 38.0,
@@ -17,5 +26,5 @@
     "lux": 45.0
   },
   "final_solidarity_index": 0.6,
-  "duration_seconds": 0.089
+  "duration_seconds": 0.091
 }

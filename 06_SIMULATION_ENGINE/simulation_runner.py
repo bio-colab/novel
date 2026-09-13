@@ -11,6 +11,7 @@ Framework Charter: «نحن نُحلل ونُقيّم.. ولا نُقوّم»
 import os
 import sys
 import json
+import yaml
 import time
 from typing import Dict, Any
 
@@ -127,6 +128,19 @@ class SimulationRunner:
         os.makedirs(self.output_dir, exist_ok=True)
         summary_path = os.path.join(self.output_dir, "simulation_summary.json")
         constraints_path = os.path.join(self.output_dir, "narrative_constraints.json")
+        catalog_json_path = os.path.join(self.output_dir, "entities_catalog.json")
+
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        catalog_yaml_path = os.path.join(base_dir, "05_WORLD_BRAIN", "entities_catalog.yaml")
+
+        # Full canonical entity catalog export
+        catalog = self.registry.export_catalog()
+
+        with open(catalog_json_path, "w", encoding="utf-8") as f:
+            json.dump(catalog, f, ensure_ascii=False, indent=2)
+
+        with open(catalog_yaml_path, "w", encoding="utf-8") as f:
+            yaml.dump(catalog, f, allow_unicode=True, sort_keys=False)
 
         summary_data = {
             "simulation_engine": "Sand Train Event-Sourced Chrono-Simulator",
@@ -139,6 +153,10 @@ class SimulationRunner:
                 "water_reserve": "COMPLIANT" if water_ok else water_viols,
                 "fuel_line": "COMPLIANT" if fuel_ok else fuel_viols,
                 "status": "PASSED" if all_compliant else "FAILED"
+            },
+            "entities_catalog": {
+                "total_entities_count": catalog["metadata"]["total_entities_count"],
+                "breakdown": catalog["metadata"]["breakdown"]
             },
             "final_environment": self.registry.environment,
             "final_solidarity_index": self.ticker.moral_system.solidarity_index,
@@ -154,8 +172,9 @@ class SimulationRunner:
         print(f"  ✅ Simulation Completed: 645 minutes advanced ({duration:.2f}s).")
         print(f"  📝 Total Events Recorded: {len(self.ticker.events_log)} events.")
         print(f"  🎯 Constraint Cards Generated: {len(cards)} advisory cards.")
+        print(f"  🏷️ Canonical Entities Indexed: {catalog['metadata']['total_entities_count']} (14 Char, 5 Veh, 15 Prop, 5 Loc).")
         print(f"  ⚖️ Physical Law Compliance: {'100% COMPLIANT' if all_compliant else 'VIOLATIONS DETECTED'}")
-        print(f"  📁 Artifacts Saved: 06_SIMULATION_ENGINE/output/")
+        print(f"  📁 Artifacts Saved: 06_SIMULATION_ENGINE/output/ & 05_WORLD_BRAIN/")
         print("━" * 80)
 
         return 0 if all_compliant else 1

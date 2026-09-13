@@ -501,6 +501,41 @@ class MasterAuditor:
                 failed_checks += 1
                 details.append("❌ Narrative constraints output missing or empty.")
 
+            # Check 4: Canonical entities catalog JSON integrity
+            catalog_json_path = os.path.join(out_dir, "entities_catalog.json")
+            total_checks += 1
+            if os.path.exists(catalog_json_path) and os.path.getsize(catalog_json_path) > 100:
+                with open(catalog_json_path, "r", encoding="utf-8") as f:
+                    cat_data = json.load(f)
+                total_ents = cat_data.get("metadata", {}).get("total_entities_count", 0)
+                bdown = cat_data.get("metadata", {}).get("breakdown", {})
+                if total_ents >= 35 and bdown.get("characters_count") == 14 and bdown.get("vehicles_count") == 5:
+                    passed_checks += 1
+                    details.append(f"✅ Entity Catalog JSON: {total_ents} canonical entities indexed (14 souls, 5 vehicles, {bdown.get('props_count')} props, {bdown.get('landmarks_count')} landmarks).")
+                else:
+                    failed_checks += 1
+                    details.append(f"❌ Entity Catalog JSON incomplete: {total_ents} entities indexed.")
+            else:
+                failed_checks += 1
+                details.append("❌ Entity Catalog JSON output missing or empty.")
+
+            # Check 5: Canonical entities catalog YAML sync in 05_WORLD_BRAIN
+            catalog_yaml_path = os.path.join(ROOT_DIR, "05_WORLD_BRAIN", "entities_catalog.yaml")
+            total_checks += 1
+            if os.path.exists(catalog_yaml_path) and os.path.getsize(catalog_yaml_path) > 100:
+                with open(catalog_yaml_path, "r", encoding="utf-8") as f:
+                    cat_yaml = yaml.safe_load(f)
+                y_ents = cat_yaml.get("metadata", {}).get("total_entities_count", 0)
+                if y_ents >= 35:
+                    passed_checks += 1
+                    details.append(f"✅ Entity Catalog YAML: Synchronized at 05_WORLD_BRAIN/entities_catalog.yaml ({y_ents} entities).")
+                else:
+                    failed_checks += 1
+                    details.append(f"❌ Entity Catalog YAML count mismatch: {y_ents} < 35.")
+            else:
+                failed_checks += 1
+                details.append("❌ Entity Catalog YAML missing in 05_WORLD_BRAIN.")
+
         except Exception as e:
             total_checks += 1
             failed_checks += 1

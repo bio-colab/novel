@@ -26,7 +26,9 @@ from schemas import (
     SimulationEvent,
     validate_law_compliance,
     assert_law_compliance,
-    LawViolationError
+    LawViolationError,
+    EntityModel,
+    EntityCategory
 )
 from components import (
     PositionComponent,
@@ -208,6 +210,93 @@ class TestSimulationEngine(unittest.TestCase):
         card_04 = next(c for c in cards if c["card_id"] == "CARD-04-UNDER-CHASSIS-WIRE")
         self.assertFalse(card_04["action_evaluation"]["is_strictly_feasible"])
         self.assertIn("PR-005", card_04["action_evaluation"]["author_advisory_note"])
+
+    def test_09_entity_taxonomy_and_id_uniqueness(self):
+        """Validates canonical entity taxonomy, uniqueness and cross-index resolution."""
+        registry = EntityRegistry()
+        registry.initialize_default_entities()
+
+        self.assertGreaterEqual(len(registry.entities), 39)
+        self.assertEqual(len(registry.entities_by_category[EntityCategory.CHARACTER]), 14)
+        self.assertEqual(len(registry.entities_by_category[EntityCategory.VEHICLE]), 5)
+        self.assertEqual(len(registry.entities_by_category[EntityCategory.PROP]), 15)
+        self.assertEqual(len(registry.entities_by_category[EntityCategory.LANDMARK]), 5)
+
+        # ID Uniqueness
+        all_ids = list(registry.entities.keys())
+        self.assertEqual(len(all_ids), len(set(all_ids)))
+
+        all_nums = list(registry.entities_by_numeric_id.keys())
+        self.assertEqual(len(all_nums), len(set(all_nums)))
+
+        # Cross-index lookups
+        khalid_by_str = registry.get_entity("ENT-CHAR-1001")
+        khalid_by_int = registry.get_entity(1001)
+        khalid_by_name = registry.get_entity("خالد")
+        self.assertIsNotNone(khalid_by_str)
+        self.assertEqual(khalid_by_str, khalid_by_int)
+        self.assertEqual(khalid_by_str, khalid_by_name)
+
+    def test_10_entity_spatial_containment_and_props(self):
+        """Verifies spatial containment and character prop possession queries."""
+        registry = EntityRegistry()
+        registry.initialize_default_entities()
+
+        # Car 01 props
+        car_01_props = registry.get_props_in_car("ENT-VEH-2002")
+        self.assertGreaterEqual(len(car_01_props), 8)
+        prop_ids = [p.entity_id for p in car_01_props]
+        self.assertIn("ENT-PROP-3001", prop_ids)  # Blue water barrel
+        self.assertIn("ENT-PROP-3005", prop_ids)  # Ammo crate
+
+        # Items held by characters
+        khalid_items = registry.get_items_held_by("ENT-CHAR-1001")
+        self.assertEqual(len(khalid_items), 1)
+        self.assertEqual(khalid_items[0].entity_id, "ENT-PROP-3002")  # Khalid's rifle
+
+        abu_ali_items = registry.get_items_held_by("ENT-CHAR-1002")
+        abu_ali_ids = [item.entity_id for item in abu_ali_items]
+        self.assertIn("ENT-PROP-3008", abu_ali_ids)  # Wire cutter
+        self.assertIn("ENT-PROP-3012", abu_ali_ids)  # Diesel rag
+
+    def test_11_entity_schema_validation_rejection(self):
+        """Ensures strict Pydantic rejection of invalid taxonomy IDs and malformed records."""
+        # 1. Reject invalid prefix regex
+        with self.assertRaises(ValidationError):
+            EntityModel(
+                entity_id="ENT-ALIEN-9999",
+                numeric_id=9999,
+                canonical_name="فضائي",
+                category=EntityCategory.CHARACTER
+            )
+
+        # 2. Reject mismatch between string number and integer ID
+        with self.assertRaises(ValidationError):
+            EntityModel(
+                entity_id="ENT-CHAR-1001",
+                numeric_id=1002,  # Mismatch!
+                canonical_name="خالد",
+                category=EntityCategory.CHARACTER
+            )
+
+        # 3. Reject category range violation (e.g. VEHICLE given CHARACTER ID range)
+        with self.assertRaises(ValidationError):
+            EntityModel(
+                entity_id="ENT-VEH-1001",  # VEHICLE must be in 2001..2099
+                numeric_id=1001,
+                canonical_name="عربة خطأ",
+                category=EntityCategory.VEHICLE
+            )
+
+        # 4. Reject negative mass
+        with self.assertRaises(ValidationError):
+            EntityModel(
+                entity_id="ENT-PROP-3001",
+                numeric_id=3001,
+                canonical_name="برميل سالب",
+                category=EntityCategory.PROP,
+                mass_kg=-5.0
+            )
 
 
 if __name__ == "__main__":

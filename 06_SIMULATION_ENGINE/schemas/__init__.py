@@ -9,11 +9,13 @@ try:
     from .resources import AmmoPoolModel, WaterReserveModel, FuelLineModel
     from .events import SimulationEvent, BallisticEventPayload, AcousticEventPayload
     from .validation import validate_law_compliance, assert_law_compliance, LawViolationError
+    from .entity import EntityModel, EntityCategory
 except (ImportError, ValueError):
     from schemas.biostate import BiostateModel
     from schemas.resources import AmmoPoolModel, WaterReserveModel, FuelLineModel
     from schemas.events import SimulationEvent, BallisticEventPayload, AcousticEventPayload
     from schemas.validation import validate_law_compliance, assert_law_compliance, LawViolationError
+    from schemas.entity import EntityModel, EntityCategory
 
 __all__ = [
     "BiostateModel",
@@ -25,5 +27,7 @@ __all__ = [
     "AcousticEventPayload",
     "validate_law_compliance",
     "assert_law_compliance",
-    "LawViolationError"
+    "LawViolationError",
+    "EntityModel",
+    "EntityCategory"
 ]

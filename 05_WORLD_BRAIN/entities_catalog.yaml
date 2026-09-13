@@ -1,0 +1,596 @@
+metadata:
+  schema_version: 1.0.0
+  novel_id: sand_train
+  charter: «نحن نُحلل ونُقيّم.. ولا نُقوّم»
+  total_entities_count: 39
+  breakdown:
+    characters_count: 14
+    vehicles_count: 5
+    props_count: 15
+    landmarks_count: 5
+characters:
+- entity_id: ENT-CHAR-1001
+  numeric_id: 1001
+  canonical_name: خالد
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 2.2
+    y_m: 18.2
+  mass_kg: 78.0
+  temperature_c: 36.8
+  material_type: flesh
+  properties:
+    role: قائد مفرزة الحراسة
+    tic: ندبة_الفك
+    weapon: ENT-PROP-3002
+- entity_id: ENT-CHAR-1002
+  numeric_id: 1002
+  canonical_name: أبو_علي
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 1.4
+    y_m: 17.5
+  mass_kg: 68.0
+  temperature_c: 36.6
+  material_type: flesh
+  properties:
+    role: عامل خدمة القطار
+    tic: مسح_الكفين_ببنطال_الديزل
+    held_tool: ENT-PROP-3008
+- entity_id: ENT-CHAR-1003
+  numeric_id: 1003
+  canonical_name: أبو_اللول
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 0.6
+    y_m: 23.0
+  mass_kg: 72.0
+  temperature_c: 36.4
+  material_type: flesh
+  properties:
+    role: حارس
+    tic: مسح_العرق_ونزيف_الأنف
+    injury: fractured_nasal_bone
+- entity_id: ENT-CHAR-1004
+  numeric_id: 1004
+  canonical_name: حناطة
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 0.6
+    y_m: 26.2
+  mass_kg: 70.0
+  temperature_c: 36.5
+  material_type: flesh
+  properties:
+    role: حارس متوتر
+    tic: الضحكة_الهستيرية_وفرك_الكفين
+    weapon: ENT-PROP-3004
+- entity_id: ENT-CHAR-1005
+  numeric_id: 1005
+  canonical_name: عباس
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2005
+  coordinates:
+    x_m: 1.4
+    y_m: 56.4
+  mass_kg: 75.0
+  temperature_c: 35.8
+  material_type: flesh
+  properties:
+    role: حارس المنصة الخلفية
+    tic: إدارة_الحصاة_الصوانية
+    weapon: ENT-PROP-3003
+- entity_id: ENT-CHAR-1006
+  numeric_id: 1006
+  canonical_name: سردار
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2003
+  coordinates:
+    x_m: 2.2
+    y_m: 31.0
+  mass_kg: 82.0
+  temperature_c: 36.7
+  material_type: flesh
+  properties:
+    role: سجين ومقاتل سابق وخبير ميكانيك
+    tic: فحص_مفاصل_القبضتين
+    shackled: true
+- entity_id: ENT-CHAR-1007
+  numeric_id: 1007
+  canonical_name: عزيز
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2003
+  coordinates:
+    x_m: 2.2
+    y_m: 35.0
+  mass_kg: 65.0
+  temperature_c: 36.2
+  material_type: flesh
+  properties:
+    role: سجين صامت
+    tic: إبهام_عزيز_وسبابة_الدم
+- entity_id: ENT-CHAR-1008
+  numeric_id: 1008
+  canonical_name: خليل
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2003
+  coordinates:
+    x_m: 0.6
+    y_m: 33.5
+  mass_kg: 74.0
+  temperature_c: 36.0
+  material_type: flesh
+  properties:
+    role: سجين تركماني وقور
+    tic: حذاء_خليل_الأسود
+- entity_id: ENT-CHAR-1009
+  numeric_id: 1009
+  canonical_name: بسام
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 2.2
+    y_m: 23.0
+  mass_kg: 69.0
+  temperature_c: 36.6
+  material_type: flesh
+  properties:
+    role: سجين ممرض
+    tic: الضغط_على_منبت_الظفر
+    held_item: ENT-PROP-3009
+- entity_id: ENT-CHAR-1010
+  numeric_id: 1010
+  canonical_name: سلوم
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2004
+  coordinates:
+    x_m: 1.2
+    y_m: 46.5
+  mass_kg: 48.0
+  temperature_c: 35.5
+  material_type: flesh
+  properties:
+    role: فتى سجين مهمش
+    tic: جيب_سلوم_الفارغ
+    frostbite: true
+- entity_id: ENT-CHAR-1011
+  numeric_id: 1011
+  canonical_name: بشير
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2004
+  coordinates:
+    x_m: 0.5
+    y_m: 45.0
+  mass_kg: 71.0
+  temperature_c: 36.1
+  material_type: flesh
+  properties:
+    role: سجين كتوم
+    tic: ورقة_بشير_المطوية
+- entity_id: ENT-CHAR-1012
+  numeric_id: 1012
+  canonical_name: حجي_عمار
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 0.6
+    y_m: 18.2
+  mass_kg: 85.0
+  temperature_c: 36.3
+  material_type: flesh
+  properties:
+    role: المدير العام السابق
+    tic: الزر_المخلوع_والساعة_المفقودة
+- entity_id: ENT-CHAR-1013
+  numeric_id: 1013
+  canonical_name: حسن_كاز
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2003
+  coordinates:
+    x_m: 0.6
+    y_m: 37.5
+  mass_kg: 76.0
+  temperature_c: 36.5
+  material_type: flesh
+  properties:
+    role: مهرب وبائع عملة
+    tic: رزمة_الدنانير_المشتتة
+- entity_id: ENT-CHAR-1014
+  numeric_id: 1014
+  canonical_name: مهدي
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2003
+  coordinates:
+    x_m: 2.4
+    y_m: 40.0
+  mass_kg: 70.0
+  temperature_c: 36.8
+  material_type: flesh
+  properties:
+    role: السجين الشبح
+    tic: السكون_الحيواني
+    stealth_status: calculating_jump
+vehicles:
+- entity_id: ENT-VEH-2001
+  numeric_id: 2001
+  canonical_name: قاطرة الديزل الهيدروليكية Class 48
+  category: VEHICLE
+  parent_entity_id: null
+  location_id: ENT-LOC-4001
+  coordinates: null
+  mass_kg: 82000.0
+  temperature_c: null
+  material_type: structural_steel
+  properties:
+    model: diesel_hydraulic_class_48
+    engine_status: stalled
+    length_m: 16.2
+- entity_id: ENT-VEH-2002
+  numeric_id: 2002
+  canonical_name: العربة الأولى (الإدارة والحراسة)
+  category: VEHICLE
+  parent_entity_id: null
+  location_id: ENT-LOC-4001
+  coordinates: null
+  mass_kg: 18000.0
+  temperature_c: null
+  material_type: steel_and_wood
+  properties:
+    train_car_id: car_01
+    length_m: 12.0
+    y_start_m: 17.0
+    y_end_m: 29.0
+- entity_id: ENT-VEH-2003
+  numeric_id: 2003
+  canonical_name: العربة الوسطى (التكدس والسجناء)
+  category: VEHICLE
+  parent_entity_id: null
+  location_id: ENT-LOC-4001
+  coordinates: null
+  mass_kg: 17500.0
+  temperature_c: null
+  material_type: steel_and_sheet_metal
+  properties:
+    train_car_id: car_02
+    length_m: 12.0
+    y_start_m: 29.8
+    y_end_m: 41.8
+- entity_id: ENT-VEH-2004
+  numeric_id: 2004
+  canonical_name: العربة الأخيرة (الصاج العاري والعزل)
+  category: VEHICLE
+  parent_entity_id: null
+  location_id: ENT-LOC-4001
+  coordinates: null
+  mass_kg: 17000.0
+  temperature_c: null
+  material_type: corrugated_steel
+  properties:
+    train_car_id: car_03
+    length_m: 12.0
+    y_start_m: 42.6
+    y_end_m: 54.6
+- entity_id: ENT-VEH-2005
+  numeric_id: 2005
+  canonical_name: المنصة الخلفية المكشوفة
+  category: VEHICLE
+  parent_entity_id: null
+  location_id: ENT-LOC-4001
+  coordinates: null
+  mass_kg: 3500.0
+  temperature_c: null
+  material_type: steel_gangway
+  properties:
+    train_car_id: car_platform
+    length_m: 2.0
+    y_start_m: 55.4
+    y_end_m: 57.4
+props:
+- entity_id: ENT-PROP-3001
+  numeric_id: 3001
+  canonical_name: برميل البولي إيثيلين الأزرق (مستودع الماء)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 2.4
+    y_m: 20.5
+  mass_kg: 16.5
+  temperature_c: null
+  material_type: polyethylene
+  properties:
+    volume_liters: 14.0
+    current_liters: 14.0
+    state: liquid_subzero_verge
+- entity_id: ENT-PROP-3002
+  numeric_id: 3002
+  canonical_name: بندقية كلاشنكوف خالد
+  category: PROP
+  parent_entity_id: ENT-CHAR-1001
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 3.8
+  temperature_c: null
+  material_type: milled_steel_and_wood
+  properties:
+    caliber: 7.62x39mm
+    rounds: 28
+    capacity: 30
+- entity_id: ENT-PROP-3003
+  numeric_id: 3003
+  canonical_name: بندقية كلاشنكوف عباس
+  category: PROP
+  parent_entity_id: ENT-CHAR-1005
+  location_id: ENT-VEH-2005
+  coordinates: null
+  mass_kg: 3.8
+  temperature_c: null
+  material_type: milled_steel_and_wood
+  properties:
+    caliber: 7.62x39mm
+    rounds: 30
+    capacity: 30
+- entity_id: ENT-PROP-3004
+  numeric_id: 3004
+  canonical_name: بندقية كلاشنكوف حناطة
+  category: PROP
+  parent_entity_id: ENT-CHAR-1004
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 3.8
+  temperature_c: null
+  material_type: milled_steel_and_wood
+  properties:
+    caliber: 7.62x39mm
+    rounds: 28
+    capacity: 30
+- entity_id: ENT-PROP-3005
+  numeric_id: 3005
+  canonical_name: صندوق الذخيرة الخشبي (مخزن الطوارئ)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 2.4
+    y_m: 21.8
+  mass_kg: 5.2
+  temperature_c: null
+  material_type: pine_wood_and_tin
+  properties:
+    caliber: 7.62x39mm
+    rounds: 60
+    sealed: true
+- entity_id: ENT-PROP-3006
+  numeric_id: 3006
+  canonical_name: سلك الحديد الصلب (2 ملم)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2003
+  coordinates:
+    x_m: 2.2
+    y_m: 31.0
+  mass_kg: 0.85
+  temperature_c: null
+  material_type: galvanized_steel_wire
+  properties:
+    diameter_mm: 2.0
+    length_m: 4.5
+    yield_strength_mpa: 450.0
+- entity_id: ENT-PROP-3007
+  numeric_id: 3007
+  canonical_name: مفتاح الربط الإنجليزي (12 بوصة)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates:
+    x_m: 0.6
+    y_m: 26.2
+  mass_kg: 1.2
+  temperature_c: null
+  material_type: cast_iron
+  properties:
+    size_inches: 12
+    condition: functional_rusted
+- entity_id: ENT-PROP-3008
+  numeric_id: 3008
+  canonical_name: كماشة قطع الأسلاك (أبو علي)
+  category: PROP
+  parent_entity_id: ENT-CHAR-1002
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 0.45
+  temperature_c: null
+  material_type: tool_steel
+  properties:
+    condition: functional
+    cutting_capacity_mm: 3.0
+- entity_id: ENT-PROP-3009
+  numeric_id: 3009
+  canonical_name: حقيبة الإسعافات الطبية (بسام)
+  category: PROP
+  parent_entity_id: ENT-CHAR-1009
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 1.5
+  temperature_c: null
+  material_type: canvas
+  properties:
+    gauze_rolls: 3
+    alcohol_disinfectant_ml: 250
+    splints: 2
+- entity_id: ENT-PROP-3010
+  numeric_id: 3010
+  canonical_name: قفل الكابينة الداخلي (المزلاج النحاسي)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  coordinates: null
+  mass_kg: 0.65
+  temperature_c: null
+  material_type: brass
+  properties:
+    status: engaged_locked
+    breach_resistance: high
+- entity_id: ENT-PROP-3011
+  numeric_id: 3011
+  canonical_name: شظية الهاون العالقة في أنبوب الوقود
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  coordinates: null
+  mass_kg: 0.12
+  temperature_c: null
+  material_type: cast_iron_fragment
+  properties:
+    textual_baseline_line: 1297
+    audit_ref: WORLD-BUG-009
+    breach_gap_mm: 14
+- entity_id: ENT-PROP-3012
+  numeric_id: 3012
+  canonical_name: خرقة الديزل الزيتية (أبو علي)
+  category: PROP
+  parent_entity_id: ENT-CHAR-1002
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 0.18
+  temperature_c: null
+  material_type: cotton_saturated_with_diesel
+  properties:
+    diesel_saturation_percent: 80.0
+    purpose: seal_wrap_and_insulation
+- entity_id: ENT-PROP-3013
+  numeric_id: 3013
+  canonical_name: علبة سجائر سومر المبتلة (حناطة)
+  category: PROP
+  parent_entity_id: ENT-CHAR-1004
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 0.05
+  temperature_c: null
+  material_type: cardboard_and_tobacco
+  properties:
+    brand: سومر
+    cigarettes_remaining: 7
+    damp: true
+- entity_id: ENT-PROP-3014
+  numeric_id: 3014
+  canonical_name: إبريق الشاي المهشم (العربة الأولى)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2002
+  coordinates: null
+  mass_kg: 0.4
+  temperature_c: null
+  material_type: enameled_steel
+  properties:
+    condition: dented_dry
+    tea_remains: frozen_leaves
+- entity_id: ENT-PROP-3015
+  numeric_id: 3015
+  canonical_name: حذاء السائق المتروك (كابينة القاطرة)
+  category: PROP
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  coordinates: null
+  mass_kg: 0.7
+  temperature_c: null
+  material_type: leather_and_rubber
+  properties:
+    side: right
+    size: 42
+    evidence_of: hasty_abandonment
+landmarks:
+- entity_id: ENT-LOC-4001
+  numeric_id: 4001
+  canonical_name: نقطة التوقف القسري (الكيلومتر 312.4)
+  category: LANDMARK
+  parent_entity_id: null
+  location_id: null
+  coordinates:
+    lat_deg: 31.2333
+    lon_deg: 42.5833
+  mass_kg: 0.0
+  temperature_c: null
+  material_type: gravel_desert_soil
+  properties:
+    kilometer_point: 312.4
+    elevation_m: 612.0
+    region: بادية الحماد
+- entity_id: ENT-LOC-4002
+  numeric_id: 4002
+  canonical_name: محطة قطار بادوش
+  category: LANDMARK
+  parent_entity_id: null
+  location_id: null
+  coordinates:
+    lat_deg: 36.4167
+    lon_deg: 42.9833
+  mass_kg: 0.0
+  temperature_c: null
+  material_type: concrete_and_steel
+  properties:
+    role: point_of_origin
+    status: militarized_terminal
+- entity_id: ENT-LOC-4003
+  numeric_id: 4003
+  canonical_name: سجن البير الصحراوي
+  category: LANDMARK
+  parent_entity_id: null
+  location_id: null
+  coordinates:
+    lat_deg: 30.5
+    lon_deg: 43.1
+  mass_kg: 0.0
+  temperature_c: null
+  material_type: reinforced_concrete
+  properties:
+    distance_from_stall_km: 142.0
+    kilometer_point: 454.4
+- entity_id: ENT-LOC-4004
+  numeric_id: 4004
+  canonical_name: مخفر تل الصوان المهجور
+  category: LANDMARK
+  parent_entity_id: null
+  location_id: null
+  coordinates:
+    lat_deg: 31.7
+    lon_deg: 42.2
+  mass_kg: 0.0
+  temperature_c: null
+  material_type: adobe_and_mudbrick
+  properties:
+    distance_from_stall_km: 68.0
+    kilometer_point: 244.4
+- entity_id: ENT-LOC-4005
+  numeric_id: 4005
+  canonical_name: تلة الرصد وحافة الكمين
+  category: LANDMARK
+  parent_entity_id: null
+  location_id: null
+  coordinates:
+    bearing_deg: 250.0
+    distance_m: 850.0
+  mass_kg: 0.0
+  temperature_c: null
+  material_type: flint_ridge
+  properties:
+    elevation_m: 25.0
+    ambush_posture: silent_encirclement

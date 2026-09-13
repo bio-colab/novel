@@ -2,17 +2,17 @@
   "metadata": {
     "engine": "Sand Train Closed-World Platform Engine",
     "version": "2.0.0-platform-engine",
-    "timestamp_utc": "2026-09-13T07:06:50.540324+00:00",
+    "timestamp_utc": "2026-09-13T07:18:01.527784+00:00",
     "charter": "نحن نُحلل ونُقيّم.. ولا نُقوّم"
   },
   "phases": {
     "01_unit_tests": {
       "name": "Automated Unit Tests",
-      "total_tests": 44,
-      "passed": 44,
+      "total_tests": 47,
+      "passed": 47,
       "failures": 0,
       "errors": 0,
-      "duration_seconds": 2.923,
+      "duration_seconds": 3.005,
       "status": "PASSED"
     },
     "02_core_invariants": {
@@ -20,14 +20,14 @@
       "passed_invariants": 20,
       "violations": 0,
       "warnings": 0,
-      "duration_seconds": 0.3,
+      "duration_seconds": 0.303,
       "status": "PASSED"
     },
     "03_epistemic_grounding": {
       "grounding_auditor": "PASSED",
       "epistemic_tracker": "PASSED",
       "causality_graph": "PASSED",
-      "duration_seconds": 0.127,
+      "duration_seconds": 0.12,
       "status": "PASSED"
     },
     "04_existential_socio_political": {
@@ -36,7 +36,7 @@
       "socio_demography_analyzer": "PASSED",
       "historical_political_analyzer": "PASSED",
       "chrono_event_engine": "PASSED",
-      "duration_seconds": 0.103,
+      "duration_seconds": 0.133,
       "status": "PASSED"
     },
     "05_stylistic_sensory_linters": {
@@ -44,12 +44,12 @@
       "dialogue_auditor": "PASSED",
       "pacing_visualizer": "PASSED",
       "character_tracker": "PASSED",
-      "duration_seconds": 0.17,
+      "duration_seconds": 0.22,
       "status": "PASSED"
     },
     "06_world_brain_graph": {
       "world_graph_builder": "PASSED",
-      "duration_seconds": 0.019,
+      "duration_seconds": 0.017,
       "status": "PASSED"
     },
     "07_governance_and_sanctity": {
@@ -57,7 +57,7 @@
       "total_checks": 12,
       "passed_checks": 12,
       "failed_checks": 0,
-      "duration_seconds": 0.038,
+      "duration_seconds": 0.044,
       "status": "PASSED",
       "details": [
         "✅ Baseline SHA-256 integrity verified (100% frozen ground truth).",
@@ -76,27 +76,29 @@
     },
     "08_chrono_simulation_engine": {
       "name": "Chrono-Simulation Engine & Digital Twin",
-      "total_checks": 3,
-      "passed_checks": 3,
+      "total_checks": 5,
+      "passed_checks": 5,
       "failed_checks": 0,
-      "duration_seconds": 0.101,
+      "duration_seconds": 0.19,
       "status": "PASSED",
       "details": [
         "✅ Simulation runner exited cleanly (645 minutes advanced).",
         "✅ Simulation summary: 100% statutory law compliance verified.",
-        "✅ Narrative constraints: 5 advisory cards generated for author."
+        "✅ Narrative constraints: 5 advisory cards generated for author.",
+        "✅ Entity Catalog JSON: 39 canonical entities indexed (14 souls, 5 vehicles, 15 props, 5 landmarks).",
+        "✅ Entity Catalog YAML: Synchronized at 05_WORLD_BRAIN/entities_catalog.yaml (39 entities)."
       ]
     }
   },
   "summary": {
-    "total_checks": 92,
-    "passed_checks": 92,
+    "total_checks": 97,
+    "passed_checks": 97,
     "failed_checks": 0,
     "success_rate_percent": 100.0,
     "status": "PASSED",
     "total_phases": 8,
     "passed_phases": 8,
     "failed_phases": 0,
-    "total_duration_seconds": 3.782
+    "total_duration_seconds": 4.034
   }
 }
