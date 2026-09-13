@@ -22,6 +22,8 @@ Purpose:
     6. Secondary World Brain & Knowledge Graph Verifier (world_graph_builder.py).
     7. Governance, Baseline Sanctity & Staging Gate (SHA-256 baseline verification,
        workspace hygiene, author blessing staging validation).
+    8. Chrono-Simulation Engine & Digital Twin (06_SIMULATION_ENGINE with Pydantic v2,
+       645-minute event-sourced ticker, and narrative constraint cards).
 
 Outputs:
   - Rich Terminal CLI Dashboard with structured execution phases and timings.
@@ -434,6 +436,97 @@ class MasterAuditor:
 
         return all_passed
 
+    def run_phase_chrono_simulation_engine(self) -> bool:
+        """Phase 8: Executes Event-Sourced Chrono-Simulation Engine & Digital Twin."""
+        t0 = time.time()
+        print("\n" + "━" * 80)
+        print("  PHASE 8: CHRONO SIMULATION ENGINE & DIGITAL TWIN (التوأم الرقمي ومحاكي النبضات)")
+        print("━" * 80)
+
+        SIM_DIR = os.path.join(ROOT_DIR, "06_SIMULATION_ENGINE")
+        if SIM_DIR not in sys.path:
+            sys.path.insert(0, SIM_DIR)
+
+        total_checks = 0
+        passed_checks = 0
+        failed_checks = 0
+        details = []
+
+        try:
+            from simulation_runner import SimulationRunner
+            runner = SimulationRunner()
+            exit_code = runner.run()
+
+            out_dir = os.path.join(SIM_DIR, "output")
+            summary_path = os.path.join(out_dir, "simulation_summary.json")
+            constraints_path = os.path.join(out_dir, "narrative_constraints.json")
+
+            # Check 1: Runner exit code
+            total_checks += 1
+            if exit_code == 0:
+                passed_checks += 1
+                details.append("✅ Simulation runner exited cleanly (645 minutes advanced).")
+            else:
+                failed_checks += 1
+                details.append(f"❌ Simulation runner failed with exit code {exit_code}.")
+
+            # Check 2: Simulation summary JSON valid
+            total_checks += 1
+            if os.path.exists(summary_path) and os.path.getsize(summary_path) > 100:
+                with open(summary_path, "r", encoding="utf-8") as f:
+                    sdata = json.load(f)
+                if sdata.get("law_compliance", {}).get("status") == "PASSED":
+                    passed_checks += 1
+                    details.append("✅ Simulation summary: 100% statutory law compliance verified.")
+                else:
+                    failed_checks += 1
+                    details.append("❌ Simulation summary reported law compliance violations.")
+            else:
+                failed_checks += 1
+                details.append("❌ Simulation summary output missing or empty.")
+
+            # Check 3: Narrative constraint cards valid
+            total_checks += 1
+            if os.path.exists(constraints_path) and os.path.getsize(constraints_path) > 100:
+                with open(constraints_path, "r", encoding="utf-8") as f:
+                    cdata = json.load(f)
+                cards = cdata.get("constraint_cards", [])
+                if len(cards) >= 5:
+                    passed_checks += 1
+                    details.append(f"✅ Narrative constraints: {len(cards)} advisory cards generated for author.")
+                else:
+                    failed_checks += 1
+                    details.append(f"❌ Incomplete constraint cards count: {len(cards)} < 5.")
+            else:
+                failed_checks += 1
+                details.append("❌ Narrative constraints output missing or empty.")
+
+        except Exception as e:
+            total_checks += 1
+            failed_checks += 1
+            details.append(f"❌ Chrono Simulation Engine Exception: {e}")
+
+        duration = time.time() - t0
+        all_passed = (failed_checks == 0 and total_checks > 0)
+
+        self.results["phases"]["08_chrono_simulation_engine"] = {
+            "name": "Chrono-Simulation Engine & Digital Twin",
+            "total_checks": total_checks,
+            "passed_checks": passed_checks,
+            "failed_checks": failed_checks,
+            "duration_seconds": round(duration, 3),
+            "status": "PASSED" if all_passed else "FAILED",
+            "details": details
+        }
+
+        if all_passed:
+            print(f"  ✅ Chrono-Simulation & Digital Twin: {passed_checks}/{total_checks} checks passed ({duration:.2f}s).")
+        else:
+            print(f"  ❌ Chrono-Simulation Engine Violations: {failed_checks} check(s) failed.")
+            self.phase_failures += 1
+
+        return all_passed
+
     def generate_report(self) -> None:
         """Serializes aggregated results into 03_AUDIT_AND_ISSUES/MASTER_AUDIT_REPORT.json."""
         self.results["summary"]["status"] = "PASSED" if self.phase_failures == 0 else "FAILED"
@@ -506,6 +599,12 @@ class MasterAuditor:
         passed_checks += p7.get("passed_checks", 0)
         failed_checks += p7.get("failed_checks", 0)
 
+        # Phase 8: Chrono Simulation Engine
+        p8 = self.results["phases"].get("08_chrono_simulation_engine", {})
+        total_checks += p8.get("total_checks", 0)
+        passed_checks += p8.get("passed_checks", 0)
+        failed_checks += p8.get("failed_checks", 0)
+
         success_rate = (passed_checks / total_checks * 100.0) if total_checks > 0 else 0.0
 
         self.results["summary"]["total_checks"] = total_checks
@@ -522,7 +621,7 @@ class MasterAuditor:
         self.start_time = time.time()
 
         print("\n" + "═" * 80)
-        print("  SAND TRAIN PLATFORM ENGINE: UNIFIED MASTER AUDITOR (v2.1.0)")
+        print("  SAND TRAIN PLATFORM ENGINE: UNIFIED MASTER AUDITOR (v2.2.0-digital-twin)")
         print("  ميثاق المنظومة: «نحن نُحلل ونُقيّم.. ولا نُقوّم»")
         print("═" * 80)
 
@@ -533,6 +632,7 @@ class MasterAuditor:
         p5 = self.run_phase_stylistic_sensory_linters()
         p6 = self.run_phase_world_brain_graph()
         p7 = self.run_phase_governance_and_sanctity()
+        p8 = self.run_phase_chrono_simulation_engine()
 
         self.total_duration = time.time() - self.start_time
         self.generate_report()

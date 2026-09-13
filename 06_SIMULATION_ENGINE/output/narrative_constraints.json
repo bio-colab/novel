@@ -1,0 +1,127 @@
+{
+  "constraint_cards": [
+    {
+      "card_id": "CARD-01-STALL-COLD",
+      "minute": 15,
+      "wall_clock": "19:15:00",
+      "chapter": "الجزء الأول / الفصل السادس",
+      "title": "صدمة التوقف الأولى وتفقد القاطرة",
+      "character": "أبو_علي",
+      "ambient_temp_c": -0.12,
+      "biomechanics": {
+        "core_temp_c": 36.75,
+        "fingers_temp_c": 23.75,
+        "motor_dexterity": 0.983,
+        "shivering_stage": "none"
+      },
+      "action_evaluation": {
+        "intended_action": "فحص المحرك ولمس حديد القاطرة البارد",
+        "required_dexterity": 0.7,
+        "is_strictly_feasible": true,
+        "physical_constraints": [
+          "عتمة ليلية شبه تامة: التهديف البصري مستحيل بدون وميض النيران أو ضوء كشاف."
+        ],
+        "author_advisory_note": "الفعل ممكن ومطابق تماماً لحدود الفيزياء والمحيط البيئي."
+      }
+    },
+    {
+      "card_id": "CARD-02-AMBUSH-SHOOTING",
+      "minute": 315,
+      "wall_clock": "00:15:00",
+      "chapter": "الجزء الثالث / الفصل الثاني",
+      "title": "اشتباك الكمين الليلي وإطلاق النار من المنصة",
+      "character": "عباس",
+      "ambient_temp_c": -4.04,
+      "biomechanics": {
+        "core_temp_c": 35.7,
+        "fingers_temp_c": 5.92,
+        "motor_dexterity": 0.322,
+        "shivering_stage": "moderate_shivering"
+      },
+      "action_evaluation": {
+        "intended_action": "تلقيم البندقية والضغط على الزناد بأصابع متصلبة",
+        "required_dexterity": 0.4,
+        "is_strictly_feasible": false,
+        "physical_constraints": [
+          "عتمة ليلية شبه تامة: التهديف البصري مستحيل بدون وميض النيران أو ضوء كشاف."
+        ],
+        "author_advisory_note": "الفعل يتطلب مهارة حركية (0.4) تتجاوز طاقة الشخصية الحالية (0.322). يُنصح باستخدام أداة مساعدة، أو عزم الجذع، أو الاستعانة برفيق (مثل مقترح PR-005)."
+      }
+    },
+    {
+      "card_id": "CARD-03-NIGHT-MAWWAL",
+      "minute": 420,
+      "wall_clock": "02:00:00",
+      "chapter": "الجزء الرابع / الفصل الرابع",
+      "title": "موال عزيز وانتقال الصوت بين العربات",
+      "character": "عزيز",
+      "ambient_temp_c": -5.62,
+      "biomechanics": {
+        "core_temp_c": 35.33,
+        "fingers_temp_c": -1.75,
+        "motor_dexterity": 0.05,
+        "shivering_stage": "moderate_shivering"
+      },
+      "action_evaluation": {
+        "intended_action": "الغناء بنبرة شجية وانعكاس الصوت في تجويف العربة",
+        "required_dexterity": 0.0,
+        "is_strictly_feasible": true,
+        "physical_constraints": [
+          "تصلب شبه تام في أطراف الأصابع: الحركات الدقيقة (عقد، خياطة، فتح أقفال صغيرة) ممتنعة بيوميكانيكياً.",
+          "عتمة ليلية شبه تامة: التهديف البصري مستحيل بدون وميض النيران أو ضوء كشاف."
+        ],
+        "author_advisory_note": "الفعل ممكن ومطابق تماماً لحدود الفيزياء والمحيط البيئي."
+      }
+    },
+    {
+      "card_id": "CARD-04-UNDER-CHASSIS-WIRE",
+      "minute": 570,
+      "wall_clock": "04:30:00",
+      "chapter": "الجزء الخامس / الفصل الثاني",
+      "title": "شد سلك الحديد حول أنبوب الوقود في ذروة الصقيع (-8°C)",
+      "character": "سردار",
+      "ambient_temp_c": -8.0,
+      "biomechanics": {
+        "core_temp_c": 33.95,
+        "fingers_temp_c": -6.0,
+        "motor_dexterity": 0.05,
+        "shivering_stage": "shivering_exhaustion"
+      },
+      "action_evaluation": {
+        "intended_action": "عقد السلك المعدني حول شق أنبوب الديزل بالأصابع",
+        "required_dexterity": 0.55,
+        "is_strictly_feasible": false,
+        "physical_constraints": [
+          "تصلب شبه تام في أطراف الأصابع: الحركات الدقيقة (عقد، خياطة، فتح أقفال صغيرة) ممتنعة بيوميكانيكياً.",
+          "إنهاك ارتعاشي: ثبات السلاح مفقود ورجفان العضلات يمنع التهديف الدقيق."
+        ],
+        "author_advisory_note": "الفعل يتطلب مهارة حركية (0.55) تتجاوز طاقة الشخصية الحالية (0.05). يُنصح باستخدام أداة مساعدة، أو عزم الجذع، أو الاستعانة برفيق (مثل مقترح PR-005)."
+      }
+    },
+    {
+      "card_id": "CARD-05-LEVER-PUMP-RESTART",
+      "minute": 645,
+      "wall_clock": "05:45:00",
+      "chapter": "الجزء الخامس / الفصل الثالث",
+      "title": "تشغيل مضخة التحضير اليدوية بكتلة الجذع",
+      "character": "أبو_علي",
+      "ambient_temp_c": -8.0,
+      "biomechanics": {
+        "core_temp_c": 34.54,
+        "fingers_temp_c": -6.0,
+        "motor_dexterity": 0.05,
+        "shivering_stage": "shivering_exhaustion"
+      },
+      "action_evaluation": {
+        "intended_action": "سحب ذراع مضخة التحضير بالخرقة ووزن الجسد",
+        "required_dexterity": 0.05,
+        "is_strictly_feasible": true,
+        "physical_constraints": [
+          "تصلب شبه تام في أطراف الأصابع: الحركات الدقيقة (عقد، خياطة، فتح أقفال صغيرة) ممتنعة بيوميكانيكياً.",
+          "إنهاك ارتعاشي: ثبات السلاح مفقود ورجفان العضلات يمنع التهديف الدقيق."
+        ],
+        "author_advisory_note": "الفعل ممكن ومطابق تماماً لحدود الفيزياء والمحيط البيئي."
+      }
+    }
+  ]
+}

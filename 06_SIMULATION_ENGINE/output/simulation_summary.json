@@ -1,0 +1,21 @@
+{
+  "simulation_engine": "Sand Train Event-Sourced Chrono-Simulator",
+  "timeline_span_minutes": 645,
+  "wall_clock_range": "19:00:00 -> 05:45:00",
+  "total_events_logged": 6,
+  "state_snapshots_count": 44,
+  "law_compliance": {
+    "ammo_pool": "COMPLIANT",
+    "water_reserve": "COMPLIANT",
+    "fuel_line": "COMPLIANT",
+    "status": "PASSED"
+  },
+  "final_environment": {
+    "ambient_temp_c": -8.0,
+    "wind_speed_kmh": 38.0,
+    "wind_chill_effective_c": -13.4,
+    "lux": 45.0
+  },
+  "final_solidarity_index": 0.6,
+  "duration_seconds": 0.086
+}
