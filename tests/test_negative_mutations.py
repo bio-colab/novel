@@ -13,7 +13,9 @@ DETECT violations, rather than simply confirming pre-existing valid states.
 
 import os
 import sys
+import io
 import unittest
+import unittest.mock
 import hashlib
 from pydantic import ValidationError
 
@@ -36,52 +38,51 @@ from schemas import (
 from registry import EntityRegistry
 from ticker import EventSourcedTicker
 from replayer import EventReplayer
+from world_auditor import WorldAuditor
+from moral_entropy_monitor import MoralEntropyMonitor
+from master_auditor import MasterAuditor
 
 
 class TestNegativeMutations(unittest.TestCase):
-    """Falsifiability & Violation Detection Suite (Mutation Tests)."""
+    """Falsifiability & Violation Detection Suite (True E2E Mutation Tests)."""
 
     def test_mutation_01_spatial_collision_detected(self):
-        """Mutation: Place two characters at identical (X, Y) coordinates without overlap documentation."""
-        from world_auditor import WorldAuditor
+        """Mutation E2E: Place two characters at identical (X, Y) coordinates and assert WorldAuditor catches it."""
         auditor = WorldAuditor()
         auditor.load_files()
         
         # Inject artificial collision: assign Bassam the exact coordinates of Khalid
-        mutated_characters = dict(auditor.world_state.get("characters", {}))
-        self.assertIn("خالد", mutated_characters)
-        self.assertIn("بسام", mutated_characters)
+        self.assertIn("خالد", auditor.world_state["characters"])
+        self.assertIn("بسام", auditor.world_state["characters"])
         
-        khalid_coords = mutated_characters["خالد"]["coordinates"]
-        mutated_characters["بسام"]["coordinates"] = dict(khalid_coords)
+        khalid_coords = auditor.world_state["characters"]["خالد"]["coordinates"]
+        auditor.world_state["characters"]["بسام"]["coordinates"] = dict(khalid_coords)
         
-        # Run spatial collision check on mutated data
-        collisions = []
-        chars = list(mutated_characters.items())
-        for i in range(len(chars)):
-            for j in range(i + 1, len(chars)):
-                c1_name, c1_data = chars[i]
-                c2_name, c2_data = chars[j]
-                if c1_data.get("coordinates") == c2_data.get("coordinates"):
-                    collisions.append((c1_name, c2_name))
+        # Run the real WorldAuditor spatial collision pipeline
+        auditor.check_spatial_collision()
         
-        # Assert violation is DETECTED
-        self.assertGreater(len(collisions), 0)
-        self.assertIn(("خالد", "بسام"), collisions)
+        # Assert WorldAuditor actively catches and records the violation
+        self.assertTrue(
+            any("[Spatial Collision]" in v and "بسام" in v and "خالد" in v for v in auditor.violations),
+            f"WorldAuditor must detect spatial collision in violations: {auditor.violations}"
+        )
 
     def test_mutation_02_zone_boundary_escape_detected(self):
-        """Mutation: Teleport character outside designated car physical boundaries."""
-        registry = EntityRegistry()
-        registry.initialize_default_entities()
+        """Mutation E2E: Teleport character outside designated car physical boundaries and assert WorldAuditor catches it."""
+        auditor = WorldAuditor()
+        auditor.load_files()
         
-        # Khalid is in car_01_guard (y: 17.0 -> 29.0). Mutate Y coordinate to 45.0 (Car 3 zone)
-        char = registry.get_character("خالد")
-        char["position"].y_m = 45.0
+        # Khalid is assigned to car_01_guard (y: 17.0m -> 29.0m). Mutate Y coordinate to 45.0m (Car 3 zone)
+        auditor.world_state["characters"]["خالد"]["coordinates"]["y_m"] = 45.0
         
-        # Verify boundary violation against Car 01
-        car_01 = registry.cars.get("car_01_guard") or next(c for c in registry.cars.values() if "01" in str(c.get("id")))
-        is_within = car_01["y_start_m"] <= char["position"].y_m <= car_01["y_end_m"]
-        self.assertFalse(is_within, "Auditor must detect character escaped car boundary!")
+        # Run the real WorldAuditor zone confinement pipeline
+        auditor.check_zone_confinement()
+        
+        # Assert WorldAuditor actively catches and records the boundary escape
+        self.assertTrue(
+            any("[Boundary Error]" in v and "خالد" in v and "outside car bounds" in v for v in auditor.violations),
+            f"WorldAuditor must detect boundary escape in violations: {auditor.violations}"
+        )
 
     def test_mutation_03_biothermal_impossible_combination_rejected(self):
         """Mutation: Violate LAW-BIO-01 by claiming high fine motor dexterity with frozen fingers."""
@@ -143,14 +144,26 @@ class TestNegativeMutations(unittest.TestCase):
         self.assertTrue(any("WORLD-BUG-010" in v for v in viols_mutated))
 
     def test_mutation_06_fictitious_law_citation_caught(self):
-        """Mutation: Cite a non-existent law and assert reference integrity failure."""
-        from meta_auditor import MetaAuditor
-        auditor = MetaAuditor()
-        auditor.load_defined_laws()
+        """Mutation E2E: Cite a non-existent law in WORLD_BUGS and assert WorldAuditor pipeline flags it."""
+        auditor = WorldAuditor()
+        auditor.load_files()
         
-        fictitious_citation = "LAW-GRAVITY-WARP-99"
-        # Verify that fictitious citation is NOT in canonical laws
-        self.assertNotIn(fictitious_citation, auditor.defined_laws)
+        # Inject fictitious law into the auditor's active bugs data
+        fictitious_citation = "LAW-FICTION-99"
+        auditor.world_bugs["bugs"].append({
+            "id": "WORLD-BUG-MUTATION-TEST",
+            "title": "Fictitious law test bug",
+            "law_broken": f"Violation of {fictitious_citation}"
+        })
+        
+        # Run the real WorldAuditor reference integrity check
+        auditor.check_laws_reference_integrity()
+        
+        # Assert WorldAuditor actively records the unresolved citation
+        self.assertTrue(
+            any("[Laws Reference Error]" in v and fictitious_citation in v for v in auditor.violations),
+            f"WorldAuditor must flag unresolved fictitious law in violations: {auditor.violations}"
+        )
 
     def test_mutation_07_event_ledger_tampering_caught_by_replayer(self):
         """Mutation: Artificially alter an event in the event sourcing ledger and assert Replayer catches it."""
@@ -183,21 +196,34 @@ class TestNegativeMutations(unittest.TestCase):
         self.assertTrue(any("عباس" in v for v in viols_tampered))
 
     def test_mutation_08_headcount_drop_detected(self):
-        """Mutation: Simulate dropping a soul from the 14 characters matrix."""
-        registry = EntityRegistry()
-        registry.initialize_default_entities()
-        self.assertEqual(len(registry.characters), 14)
-
-        # Mutate by removing one character (e.g. Mahdi)
-        mutated_chars = dict(registry.characters)
-        del mutated_chars["مهدي"]
-        self.assertEqual(len(mutated_chars), 13)
-
-        # Headcount invariant test
-        self.assertNotEqual(len(mutated_chars), 14, "Auditor must detect headcount drop below 14!")
+        """Mutation E2E: Drop a character from the 14 occupants matrix and assert MoralEntropyMonitor detects it."""
+        monitor = MoralEntropyMonitor()
+        monitor.load_data()
+        
+        # Mutate by removing Mahdi from moral typology quadrants (14 -> 13)
+        monitor.MORAL_QUADRANTS = {
+            k: {
+                "name_ar": v["name_ar"],
+                "description": v["description"],
+                "characters": [c for c in v["characters"] if c != "مهدي"],
+                "governing_law": v["governing_law"]
+            }
+            for k, v in monitor.MORAL_QUADRANTS.items()
+        }
+        
+        # Run the real MoralEntropyMonitor typology and census audit
+        result = monitor.audit_moral_typology_quadrants()
+        
+        # Assert MoralEntropyMonitor actively catches the headcount deviation
+        self.assertFalse(result["passed"], "Moral audit must fail when headcount is 13!")
+        self.assertEqual(result["total_census"], 13)
+        self.assertTrue(
+            any("[Moral Census]" in v and "13" in v and "expected exactly 14" in v for v in monitor.violations),
+            f"MoralEntropyMonitor must flag census violation: {monitor.violations}"
+        )
 
     def test_mutation_09_baseline_sanctity_tamper_caught(self):
-        """Mutation: Alter 1 single byte of baseline text and assert SHA-256 integrity failure."""
+        """Mutation E2E: Tamper with baseline manuscript and assert MasterAuditor governance gate rejects it."""
         baseline_path = os.path.join(ROOT_DIR, "00_BASELINE", "novel_baseline.md")
         with open(baseline_path, "rb") as f:
             valid_bytes = f.read().replace(b"\r\n", b"\n")
@@ -205,10 +231,27 @@ class TestNegativeMutations(unittest.TestCase):
         canonical_hash = "75AC9D6A1D2B71B677D3119B2E6D6A922AFD4A1B3DC046B5D2841B3C198316B0"
         self.assertEqual(hashlib.sha256(valid_bytes).hexdigest().upper(), canonical_hash)
 
-        # Mutate by appending one byte
+        # Mathematical inequality assertion
         tampered_bytes = valid_bytes + b" "
-        tampered_hash = hashlib.sha256(tampered_bytes).hexdigest().upper()
-        self.assertNotEqual(tampered_hash, canonical_hash, "Tampered baseline must be rejected!")
+        self.assertNotEqual(hashlib.sha256(tampered_bytes).hexdigest().upper(), canonical_hash)
+
+        # End-to-End Governance Gate Assertion in MasterAuditor
+        auditor = MasterAuditor()
+        orig_open = open
+
+        def mocked_open(path, *args, **kwargs):
+            if "novel_baseline.md" in str(path):
+                return io.BytesIO(b"Tampered Baseline Content by Mutation Test")
+            return orig_open(path, *args, **kwargs)
+
+        with unittest.mock.patch("builtins.open", side_effect=mocked_open):
+            gate_passed = auditor.run_phase_governance_and_sanctity()
+            self.assertFalse(gate_passed, "MasterAuditor governance gate must strictly reject tampered baseline content!")
+
+        phase_summary = auditor.results["phases"]["07_governance_and_sanctity"]
+        self.assertEqual(phase_summary["status"], "FAILED")
+        self.assertGreater(phase_summary["failed_checks"], 0)
+        self.assertTrue(any("Baseline hash mismatch" in line for line in phase_summary["details"]))
 
 
 if __name__ == "__main__":
