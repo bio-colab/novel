@@ -33,7 +33,8 @@ from schemas import (
     FuelLineModel,
     EntityModel,
     EntityCategory,
-    validate_law_compliance
+    validate_law_compliance,
+    SimulationEvent
 )
 from registry import EntityRegistry
 from ticker import EventSourcedTicker
@@ -41,6 +42,9 @@ from replayer import EventReplayer
 from world_auditor import WorldAuditor
 from moral_entropy_monitor import MoralEntropyMonitor
 from master_auditor import MasterAuditor
+from causality_graph import CausalityGraphAnalyzer
+from epistemic_tracker import EpistemicTracker
+from chrono_event_engine import ChronoEventEngine, NARRATIVE_ACTIONS_TO_EVALUATE
 
 
 class TestNegativeMutations(unittest.TestCase):
@@ -252,6 +256,108 @@ class TestNegativeMutations(unittest.TestCase):
         self.assertEqual(phase_summary["status"], "FAILED")
         self.assertGreater(phase_summary["failed_checks"], 0)
         self.assertTrue(any("Baseline hash mismatch" in line for line in phase_summary["details"]))
+
+    def test_mutation_10_causal_dag_cycle_detected(self):
+        """Mutation E2E: Inject circular causal loop into narrative DAG and assert CausalityGraphAnalyzer catches it."""
+        analyzer = CausalityGraphAnalyzer()
+        analyzer.build_graph()
+        self.assertTrue(analyzer.verify_dag_acyclicity(), "Baseline DAG must be strictly acyclic")
+
+        # Inject circular causal cycle: Engine restart (EVT-016) causes Sabotage (EVT-001)
+        analyzer.adj["EVT-016-ENGINE_RESTART"].append("EVT-001-SABOTAGE")
+        analyzer.in_degree["EVT-001-SABOTAGE"] += 1
+        analyzer.violations.clear()
+
+        # Run real CausalityGraphAnalyzer acyclicity check
+        is_dag_mutated = analyzer.verify_dag_acyclicity()
+        self.assertFalse(is_dag_mutated, "Causality graph must reject circular causality loops!")
+        self.assertTrue(
+            any("[Causal Loop Detected]" in v for v in analyzer.violations),
+            f"Analyzer must detect causal loop violation: {analyzer.violations}"
+        )
+
+    def test_mutation_11_illegal_omniscience_leak_detected(self):
+        """Mutation E2E: Grant Khalid in Car 1 illegal knowledge of Mahdi's jump plan and assert EpistemicTracker catches leak."""
+        tracker = EpistemicTracker()
+        tracker.load_world_state()
+
+        # Leak localized secret of Mahdi (Car 2) to Khalid (Car 1) without physical transmission vector
+        secret_fact = "اللحظة_القادمة_هي_لحظة_القفز"
+        tracker.world_state["characters"]["خالد"]["epistemic_bubble"]["known_truths"].append(secret_fact)
+
+        # Run real EpistemicTracker inter-car omniscience leak audit
+        tracker.check_inter_car_omniscience_leaks()
+        self.assertTrue(
+            any("[Omniscience Leak]" in v and "خالد" in v and secret_fact in v for v in tracker.violations),
+            f"EpistemicTracker must flag illegal omniscience leak: {tracker.violations}"
+        )
+
+    def test_mutation_12_epistemic_contradiction_detected(self):
+        """Mutation E2E: Place identical fact in known_truths and blind_spots and assert EpistemicTracker flags contradiction."""
+        tracker = EpistemicTracker()
+        tracker.load_world_state()
+
+        # Inject contradiction in Abu Ali's bubble: both knowing and being blind to broken diesel line
+        contradictory_fact = "أنبوب_الديزل_منكسر"
+        tracker.world_state["characters"]["أبو_علي"]["epistemic_bubble"]["blind_spots"].append(contradictory_fact)
+
+        # Run real EpistemicTracker integrity audit
+        tracker.check_epistemic_bubbles_integrity()
+        self.assertTrue(
+            any("[Epistemic Contradiction]" in v and "أبو_علي" in v for v in tracker.violations),
+            f"EpistemicTracker must detect epistemic contradiction: {tracker.violations}"
+        )
+
+    def test_mutation_13_impossible_task_duration_and_dexterity_rejected(self):
+        """Mutation E2E: Inject high dexterity task at peak frost without tools and assert ChronoEventEngine catches collapse."""
+        engine = ChronoEventEngine()
+
+        # Inject an impossible action: Bassam performing delicate surgery at minute 500 (03:00) requiring dexterity 0.90
+        # (while physical dexterity collapsed to 0.08 due to sub-zero temperatures)
+        original_actions = list(NARRATIVE_ACTIONS_TO_EVALUATE)
+        NARRATIVE_ACTIONS_TO_EVALUATE.append({
+            "id": "ACT-MUTATION-IMPOSSIBLE-SURGERY",
+            "minute": 500,
+            "time": "03:00:00",
+            "character": "بسام",
+            "action": "خياطة شريان دقيق بأصابع عارية متجمدة في الصقيع",
+            "required_dexterity": 0.90,
+            "requires_tools": False
+        })
+        try:
+            engine.evaluate_narrative_actions()
+            self.assertTrue(
+                any("[Unphysical Action Error]" in v and "بسام" in v for v in engine.violations),
+                f"ChronoEventEngine must catch unphysical action exceeding biomechanical limits: {engine.violations}"
+            )
+        finally:
+            NARRATIVE_ACTIONS_TO_EVALUATE.clear()
+            NARRATIVE_ACTIONS_TO_EVALUATE.extend(original_actions)
+
+    def test_mutation_14_temporal_event_ordering_regression_caught(self):
+        """Mutation E2E: Feed out-of-order temporal events (t2 < t1) and assert EventReplayer rejects timeline regression."""
+        evt1 = SimulationEvent(
+            event_id="EVT-TEST-01",
+            minute=100,
+            time_clock="20:40:00",
+            event_type="ENVIRONMENT_UPDATE",
+            payload={"ambient_temp_c": -1.0}
+        )
+        # Mutated: Event 2 has minute 50 (temporal inversion / time travel backward)
+        evt2 = SimulationEvent(
+            event_id="EVT-TEST-02",
+            minute=50,
+            time_clock="19:50:00",
+            event_type="ENVIRONMENT_UPDATE",
+            payload={"ambient_temp_c": 0.0}
+        )
+
+        # Run real EventReplayer.replay and assert strict temporal ordering enforcement
+        with self.assertRaises(ValueError) as ctx:
+            EventReplayer.replay([evt1, evt2])
+
+        self.assertIn("Temporal Ordering Violation", str(ctx.exception))
+        self.assertIn("EVT-TEST-02", str(ctx.exception))
 
 
 if __name__ == "__main__":

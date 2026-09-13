@@ -2,17 +2,17 @@
   "metadata": {
     "engine": "Sand Train Closed-World Platform Engine",
     "version": "2.0.0-platform-engine",
-    "timestamp_utc": "2026-09-13T08:35:48.105717+00:00",
+    "timestamp_utc": "2026-09-13T08:44:51.683947+00:00",
     "charter": "نحن نُحلل ونُقيّم.. ولا نُقوّم"
   },
   "phases": {
     "01_unit_tests": {
       "name": "Automated Unit Tests",
-      "total_tests": 58,
-      "passed": 58,
+      "total_tests": 63,
+      "passed": 63,
       "failures": 0,
       "errors": 0,
-      "duration_seconds": 3.727,
+      "duration_seconds": 4.487,
       "status": "PASSED"
     },
     "02_core_invariants": {
@@ -20,14 +20,14 @@
       "passed_invariants": 20,
       "violations": 0,
       "warnings": 0,
-      "duration_seconds": 0.299,
+      "duration_seconds": 0.318,
       "status": "PASSED"
     },
     "03_epistemic_grounding": {
       "grounding_auditor": "PASSED",
       "epistemic_tracker": "PASSED",
       "causality_graph": "PASSED",
-      "duration_seconds": 0.13,
+      "duration_seconds": 0.12,
       "status": "PASSED"
     },
     "04_existential_socio_political": {
@@ -36,7 +36,7 @@
       "socio_demography_analyzer": "PASSED",
       "historical_political_analyzer": "PASSED",
       "chrono_event_engine": "PASSED",
-      "duration_seconds": 0.098,
+      "duration_seconds": 0.104,
       "status": "PASSED"
     },
     "05_stylistic_sensory_linters": {
@@ -44,12 +44,12 @@
       "dialogue_auditor": "PASSED",
       "pacing_visualizer": "PASSED",
       "character_tracker": "PASSED",
-      "duration_seconds": 0.164,
+      "duration_seconds": 0.178,
       "status": "PASSED"
     },
     "06_world_brain_graph": {
       "world_graph_builder": "PASSED",
-      "duration_seconds": 0.019,
+      "duration_seconds": 0.017,
       "status": "PASSED"
     },
     "07_governance_and_sanctity": {
@@ -57,7 +57,7 @@
       "total_checks": 12,
       "passed_checks": 12,
       "failed_checks": 0,
-      "duration_seconds": 0.042,
+      "duration_seconds": 0.064,
       "status": "PASSED",
       "details": [
         "✅ Baseline SHA-256 integrity verified (100% frozen ground truth, LF-normalized).",
@@ -79,7 +79,7 @@
       "total_checks": 6,
       "passed_checks": 6,
       "failed_checks": 0,
-      "duration_seconds": 0.804,
+      "duration_seconds": 0.728,
       "status": "PASSED",
       "details": [
         "✅ Simulation runner exited cleanly (645 minutes advanced).",
@@ -92,14 +92,14 @@
     }
   },
   "summary": {
-    "total_checks": 109,
-    "passed_checks": 109,
+    "total_checks": 114,
+    "passed_checks": 114,
     "failed_checks": 0,
     "success_rate_percent": 100.0,
     "status": "PASSED",
     "total_phases": 8,
     "passed_phases": 8,
     "failed_phases": 0,
-    "total_duration_seconds": 5.291
+    "total_duration_seconds": 6.024
   }
 }

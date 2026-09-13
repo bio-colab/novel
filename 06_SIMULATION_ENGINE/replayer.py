@@ -137,7 +137,13 @@ class EventReplayer:
             "final_minute": 0
         }
 
+        prev_minute = -1
         for event in events:
+            if event.minute < prev_minute:
+                raise ValueError(
+                    f"Temporal Ordering Violation: event '{event.event_id}' at minute {event.minute} precedes previous event minute {prev_minute}."
+                )
+            prev_minute = event.minute
             if target_minute is not None and event.minute > target_minute:
                 break
             cls.apply_event(initial_registry, event, context)
