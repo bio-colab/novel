@@ -1,0 +1,67 @@
+schema_version: "1.0.0"
+world_id: "{{WORLD_ID}}"
+title: "{{WORLD_TITLE}}"
+genre: "{{GENRE}}"
+
+chronotope:
+  setting: "Default Dramatic Setting (e.g. Enclosed Chamber / Vessel / Outpost)"
+  coordinates: "0.0, 0.0"
+  historical_epoch: "analog_closed_system"
+  start_timestamp: "202X-01-01T00:00:00"
+  total_duration_minutes: 360
+  timestep_minutes: 1.0
+
+environment:
+  temperature_celsius:
+    initial: 20.0
+    min: 0.0
+    max: 30.0
+  humidity_percent:
+    min: 20
+    max: 80
+  wind:
+    speed_kmh: 0.0
+    direction_degrees: 0.0
+    gust_kmh: 0.0
+  lux_ambient:
+    min: 1.0
+    max: 100.0
+
+spatial_topology:
+  coordinate_type: "3D_bounded_box"
+  total_envelope_meters: 30.0
+  zones:
+    - id: "zone_alpha"
+      name: "Chamber Alpha (Main Stage)"
+      bounds_meters: [0.0, 15.0]
+      acoustic_isolation_db: 25.0
+      thermal_conduction_factor: 1.0
+    - id: "zone_beta"
+      name: "Chamber Beta (Secondary Stage)"
+      bounds_meters: [15.0, 30.0]
+      acoustic_isolation_db: 30.0
+      thermal_conduction_factor: 1.2
+
+resource_ledger:
+  initial_inventories:
+    - resource_id: "water_supply_primary"
+      category: "water"
+      amount: 20.0
+      unit: "liters"
+      location_zone_id: "zone_alpha"
+      consumption_rate_per_hour_per_capita: 0.05
+    - resource_id: "energy_battery_bank"
+      category: "fuel"
+      amount: 100.0
+      unit: "kwh"
+      location_zone_id: "zone_alpha"
+
+headcount_target:
+  initial_total: 2
+  demographic_breakdown:
+    protagonists: 1
+    antagonists: 1
+
+rules_manifest_ref: "rules_manifest.yaml"
+entities_catalog_ref: "entities_catalog.yaml"
+causality_graph_ref: "causality_graph.yaml"

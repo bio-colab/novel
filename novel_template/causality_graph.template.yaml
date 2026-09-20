@@ -1,0 +1,19 @@
+schema_version: "1.0.0"
+world_id: "{{WORLD_ID}}"
+total_events: 2
+
+events:
+  - id: "EVT-001-INCITING_INCIDENT"
+    time: "00:00:00"
+    minute: 0
+    name: "وقوع الحادث المحفز وبدء العزل"
+    type: "Physical_Action"
+    causes:
+      - "EVT-002-SYSTEM_LOCKDOWN"
+
+  - id: "EVT-002-SYSTEM_LOCKDOWN"
+    time: "00:05:00"
+    minute: 5
+    name: "انغلاق منافذ الطوارئ وانقطاع التواصل الخارجي"
+    type: "Mechanical_State"
+    causes: []

@@ -1,0 +1,49 @@
+metadata:
+  schema_version: "1.0.0"
+  novel_id: "{{WORLD_ID}}"
+  charter: "نحن نُحلل ونُقيّم.. ولا نُقوّم"
+  total_entities_count: 4
+  breakdown:
+    characters_count: 2
+    vehicles_count: 1
+    props_count: 1
+    landmarks_count: 0
+
+characters:
+  - entity_id: "ENT-CHAR-1001"
+    numeric_id: 1001
+    canonical_name: "البطل_الأول"
+    category: "CHARACTER"
+    parent_entity_id: null
+    location_id: "ENT-VEH-2001"
+    properties:
+      role: "قائد المهمة"
+      affordance_anchor: "جالس_قرب_لوحة_التحكم_الرئيسية"
+      tic: "فحص_مؤشر_الأكسجين_المتكرر"
+
+  - entity_id: "ENT-CHAR-1002"
+    numeric_id: 1002
+    canonical_name: "الخصم_أو_المساعد"
+    category: "CHARACTER"
+    parent_entity_id: null
+    location_id: "ENT-VEH-2001"
+    properties:
+      role: "المسؤول التقني"
+      affordance_anchor: "مستند_إلى_باب_العزل_الخلفي"
+      tic: "النقر_المتوتر_على_مفتاح_الصيانة"
+
+vehicles:
+  - entity_id: "ENT-VEH-2001"
+    canonical_name: "المركبة_أو_الحجرة_الرئيسية"
+    category: "VEHICLE"
+    properties:
+      type: "closed_vessel"
+
+props:
+  - entity_id: "ENT-PROP-3001"
+    canonical_name: "مفتاح_الطوارئ_الرئيسي"
+    category: "PROP"
+    properties:
+      material: "hardened_steel"
+
+landmarks: []
