@@ -187,6 +187,10 @@ class DeclarativeInvariantEvaluator:
             with open(self.manifest_path, "r", encoding="utf-8") as f:
                 self.manifest_data = yaml.safe_load(f) or {}
 
+    def load_rules(self, rules_list: List[Dict[str, Any]]) -> None:
+        """Dynamically load or override rules in the evaluator."""
+        self.rules_data = {"rules": rules_list}
+
     def resolve_parameter_value(self, path_str: str, custom_state: Optional[Dict[str, Any]] = None) -> Any:
         """Resolves a parameter path across dynamic world state."""
         state = custom_state if custom_state is not None else self.world_state

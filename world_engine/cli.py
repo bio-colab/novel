@@ -16,7 +16,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -37,34 +37,48 @@ TEMPLATE_DIR = PROJECT_ROOT / "novel_template"
 DEFAULT_MANIFEST_PATH = PROJECT_ROOT / "05_WORLD_BRAIN" / "world_manifest.yaml"
 
 
-def cmd_audit(args: argparse.Namespace) -> int:
-    """Execute holistic schema validation and invariant evaluation on a world."""
-    manifest_path = Path(args.manifest) if args.manifest else DEFAULT_MANIFEST_PATH
+def audit_world(manifest_path: Path) -> Dict[str, Any]:
+    """Execute holistic schema validation, DAG verification, and invariant evaluation on a world manifest."""
+    manifest_path = Path(manifest_path).resolve()
+    result: Dict[str, Any] = {
+        "manifest_path": str(manifest_path),
+        "is_valid": True,
+        "manifest_valid": False,
+        "rules_valid": False,
+        "entities_valid": False,
+        "cross_references_valid": False,
+        "schema_errors": [],
+        "cross_ref_errors": [],
+        "dag_valid": False,
+        "events_count": 0,
+        "rules_evaluated": 0,
+        "triggered_rules": 0,
+        "invariants_passed": 0,
+        "invariants_checked": 0,
+        "invariant_violations": [],
+    }
 
-    print("===========================================================================")
-    print("  WORLD ENGINE CLI: UNIFIED AUDIT (مدقق نظام تشغيل العوالم الموحد)")
-    print("===========================================================================")
-    print(f"Auditing world manifest: {manifest_path}")
+    if not manifest_path.exists():
+        result["is_valid"] = False
+        result["schema_errors"].append(f"Manifest file not found: {manifest_path}")
+        return result
 
-    # 1. Schema Validation
+    # 1. Schema & Contract Validation
     validator = WorldSchemaValidator()
     report = validator.validate_world_contract(manifest_path)
-
-    print("\n--- 1. SCHEMA & CONTRACT VALIDATION ---")
-    print(f"  • World Manifest Schema:  {'✅ VALID' if report['manifest_valid'] else '❌ INVALID'}")
-    print(f"  • Rules Manifest Schema:   {'✅ VALID' if report['rules_valid'] else '❌ INVALID'}")
-    print(f"  • Entities Catalog Schema: {'✅ VALID' if report['entities_valid'] else '❌ INVALID'}")
-    print(f"  • Cross-References Check:  {'✅ VALID' if report['cross_references_valid'] else '❌ INVALID'}")
+    result["manifest_valid"] = report["manifest_valid"]
+    result["rules_valid"] = report["rules_valid"]
+    result["entities_valid"] = report["entities_valid"]
+    result["cross_references_valid"] = report["cross_references_valid"]
+    result["schema_errors"] = report["errors"]
 
     if report["errors"]:
-        print("\n--- SCHEMA ERRORS ---")
-        for e in report["errors"]:
-            print(f"  ❌ {e}")
-        return 1
+        result["is_valid"] = False
+        return result
 
     # 2. Causality Graph Acyclicity Check
     world_dir = manifest_path.parent
-    workspace_root = manifest_path.resolve().parent.parent
+    workspace_root = manifest_path.parent.parent
     manifest = validator.load_yaml(manifest_path)
     causality_ref = manifest.get("causality_graph_ref")
     if causality_ref:
@@ -74,9 +88,10 @@ def cmd_audit(args: argparse.Namespace) -> int:
         if c_path.exists():
             dag_verifier = CausalityDAGVerifier.from_yaml_file(c_path)
             is_acyclic, order = dag_verifier.verify_dag_acyclicity()
-            print("\n--- 2. CAUSALITY DAG CHECK ---")
-            print(f"  • Event Chain Acyclicity: {'✅ ACYCLIC (100% Causal)' if is_acyclic else '❌ CYCLIC'}")
-            print(f"  • Verified Events Count:  {len(dag_verifier.nodes)}")
+            result["dag_valid"] = is_acyclic
+            result["events_count"] = len(dag_verifier.nodes)
+            if not is_acyclic:
+                result["is_valid"] = False
 
     # 3. Declarative Invariant Evaluation
     rules_ref = manifest.get("rules_manifest_ref")
@@ -93,16 +108,54 @@ def cmd_audit(args: argparse.Namespace) -> int:
         manifest_path=manifest_path
     )
     eval_report = evaluator.evaluate_all()
-
-    print("\n--- 3. DECLARATIVE INVARIANT EVALUATION ---")
-    print(f"  • Rules Evaluated:       {eval_report.total_rules}")
-    print(f"  • Active Triggered Laws: {eval_report.triggered_rules}")
-    print(f"  • Invariants Passed:     {eval_report.invariants_passed} / {eval_report.invariants_checked}")
-    print(f"  • Invariant Violations:  {eval_report.violations_count}")
+    result["rules_evaluated"] = eval_report.total_rules
+    result["triggered_rules"] = eval_report.triggered_rules
+    result["invariants_passed"] = eval_report.invariants_passed
+    result["invariants_checked"] = eval_report.invariants_checked
+    result["invariant_violations"] = eval_report.violations
 
     if eval_report.violations:
+        result["is_valid"] = False
+
+    return result
+
+
+def cmd_audit(args: argparse.Namespace) -> int:
+    """Execute holistic schema validation and invariant evaluation on a world."""
+    manifest_path = Path(args.manifest) if args.manifest else DEFAULT_MANIFEST_PATH
+
+    print("===========================================================================")
+    print("  WORLD ENGINE CLI: UNIFIED AUDIT (مدقق نظام تشغيل العوالم الموحد)")
+    print("===========================================================================")
+    print(f"Auditing world manifest: {manifest_path}")
+
+    report = audit_world(manifest_path)
+
+    print("\n--- 1. SCHEMA & CONTRACT VALIDATION ---")
+    print(f"  • World Manifest Schema:  {'✅ VALID' if report['manifest_valid'] else '❌ INVALID'}")
+    print(f"  • Rules Manifest Schema:   {'✅ VALID' if report['rules_valid'] else '❌ INVALID'}")
+    print(f"  • Entities Catalog Schema: {'✅ VALID' if report['entities_valid'] else '❌ INVALID'}")
+    print(f"  • Cross-References Check:  {'✅ VALID' if report['cross_references_valid'] else '❌ INVALID'}")
+
+    if report["schema_errors"]:
+        print("\n--- SCHEMA ERRORS ---")
+        for e in report["schema_errors"]:
+            print(f"  ❌ {e}")
+        return 1
+
+    print("\n--- 2. CAUSALITY DAG CHECK ---")
+    print(f"  • Event Chain Acyclicity: {'✅ ACYCLIC (100% Causal)' if report['dag_valid'] else '❌ CYCLIC'}")
+    print(f"  • Verified Events Count:  {report['events_count']}")
+
+    print("\n--- 3. DECLARATIVE INVARIANT EVALUATION ---")
+    print(f"  • Rules Evaluated:       {report['rules_evaluated']}")
+    print(f"  • Active Triggered Laws: {report['triggered_rules']}")
+    print(f"  • Invariants Passed:     {report['invariants_passed']} / {report['invariants_checked']}")
+    print(f"  • Invariant Violations:  {len(report['invariant_violations'])}")
+
+    if report["invariant_violations"]:
         print("\n--- INVARIANT VIOLATIONS ---")
-        for v in eval_report.violations:
+        for v in report["invariant_violations"]:
             print(f"  ❌ [{v.severity}] {v.rule_id}: {v.message}")
         return 1
 

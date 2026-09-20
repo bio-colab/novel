@@ -1,0 +1,64 @@
+metadata:
+  schema_version: "1.0.0"
+  novel_id: "orbital_station"
+  charter: "نحن نُحلل ونُقيّم.. ولا نُقوّم"
+  total_entities_count: 5
+  breakdown:
+    characters_count: 2
+    vehicles_count: 1
+    props_count: 2
+    landmarks_count: 0
+
+characters:
+  - entity_id: "ENT-CHAR-201"
+    numeric_id: 201
+    canonical_name: "د_إيلينا_روستوفا"
+    category: "CHARACTER"
+    parent_entity_id: null
+    location_id: "zone_airlock_inner"
+    mass_kg: 62.0
+    temperature_c: 36.8
+    material_type: "human_tissue"
+    properties:
+      role: "أخصائية حمولة وفيزياء فلكية"
+      affordance_anchor: "متشبثة_بمقبض_خزانة_البزات_EVA"
+      tic: "تثبيت_نظارة_الرؤية_وتسارع_الشهيق"
+
+  - entity_id: "ENT-CHAR-202"
+    numeric_id: 202
+    canonical_name: "القائد_طارق_منصور"
+    category: "CHARACTER"
+    parent_entity_id: null
+    location_id: "zone_airlock_outer"
+    mass_kg: 78.0
+    temperature_c: 37.0
+    material_type: "human_tissue"
+    properties:
+      role: "مهندس طيران وقائد مناوبة المحطة"
+      affordance_anchor: "طافٍ_قرب_صمام_التفريغ_اليدوي"
+      tic: "عض_الشفة_السفلى_واختبار_حبل_الأمان"
+
+vehicles:
+  - entity_id: "ENT-VEH-101"
+    canonical_name: "محطة_أورورا_المدارية"
+    category: "VEHICLE"
+    properties:
+      type: "modular_space_station"
+
+props:
+  - entity_id: "ENT-PROP-301"
+    canonical_name: "بزة_النجاة_الفضائية_EVA_01"
+    category: "PROP"
+    properties:
+      type: "hard_suit"
+      capacity: 1
+      location: "zone_airlock_inner"
+
+  - entity_id: "ENT-PROP-302"
+    canonical_name: "صمام_التفريغ_اليدوي_للطوارئ"
+    category: "PROP"
+    properties:
+      type: "differential_valve"
+      status: "leaking"
+
+landmarks: []

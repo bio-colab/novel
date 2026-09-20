@@ -1,0 +1,38 @@
+# ==============================================================================
+# WORLD STATE SNAPSHOT: Orbital Station Aurora-9
+# Snapshot ID: STATE-INITIAL-T0
+# ==============================================================================
+
+metadata:
+  schema_version: "1.0.0"
+  world_id: "orbital_station"
+  snapshot_id: "STATE-INITIAL-T0"
+  timeline_minute: 0
+
+environment:
+  ambient_temperature_c: 18.5
+  ambient_humidity_percent: 45.0
+  illumination_lux: 80.0
+
+airlock_pressure_kpa: 101.3
+chamber_pressure_kpa: 101.3
+suit_occupants_count: 0
+tether_engaged: true
+drift_velocity_mps: 0.0
+
+outer_hatch:
+  mechanical_lock: true
+  seal_integrity_percent: 94.0
+
+unsealed_occupant:
+  unconscious: false
+  heart_rate_bpm: 88
+
+suit_eva_01:
+  occupant_count: 0
+  oxygen_supply_bar: 200.0
+  power_reserve_percent: 100.0
+
+timeline:
+  elapsed_time_minutes: 0.0
+  decompression_warning: false

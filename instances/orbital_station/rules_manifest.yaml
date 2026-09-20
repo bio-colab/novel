@@ -1,0 +1,76 @@
+schema_version: "1.0.0"
+domain_count: 4
+
+rules:
+  - id: "LAW-PNEUM-01"
+    name: "حد فقدان الوعي بنقص ضغط الأكسجين الجزئي (Hypoxia Decompression Invariant)"
+    domain: "pneumatics"
+    description: "عند انخفاض الضغط الكلي داخل غرفة العزل إلى ما دون 50.0 kPa دون ارتداء بزة الفضاء المحكمة، يهبط الضغط الجزئي للأكسجين دون 10 kPa مما يؤدي حتمياً إلى غيبوبة نقص الأكسجين (Loss of Useful Consciousness) خلال 60 ثانية."
+    mathematical_expression: "P_total < 50.0 kPa and not suit_sealed => t_useful_consciousness <= 60 s"
+    trigger:
+      description: "هبوط ضغط غرفة العزل إلى ما دون 50 kPa"
+      conditions:
+        - parameter: "airlock_pressure_kpa"
+          operator: "<"
+          value: 50.0
+          unit: "kpa"
+    invariants:
+      - target: "unsealed_occupant.unconscious"
+        assertion: "فقدان الوعي الحتمي للشخص غير المحمي بالبزة"
+        operator: "=="
+        expected_value: true
+    severity: "FATAL"
+
+  - id: "LAW-BIO-01"
+    name: "حصرية بزة النجاة الفضائية وتفاضل البقاء (Single EVA Suit Occupancy Invariant)"
+    domain: "biology"
+    description: "بزة النجاة المدارية EVA-01 ذات تصميم ميكانيكي صلب يستحيل فيزيائياً أن يرتديها أكثر من شخص واحد في نفس الوقت؛ أي محاولة لاقتسامها تفضي إلى عجز الإغلاق وتفريغ الضغط المميت."
+    mathematical_expression: "sum(char.equipped_eva_01) <= 1"
+    trigger:
+      description: "فحص إشغال بزة النجاة الفضائية"
+      conditions:
+        - parameter: "suit_occupants_count"
+          operator: ">="
+          value: 1
+    invariants:
+      - target: "suit_eva_01.occupant_count"
+        assertion: "عدم تجاوز سعة البزة (شخص واحد كحد أقصى)"
+        operator: "<="
+        expected_value: 1
+    severity: "FATAL"
+
+  - id: "LAW-KIN-01"
+    name: "ارتداد الحركة وحفظ كمية الحركة في انعدام الجاذبية (Zero-G Newton Momentum)"
+    domain: "kinetics"
+    description: "في بيئة المدار منعدمة الجاذبية الصغرى، أي دفع أو تصارع جسدي دون تثبيت القدمين في المقابض ينقل كمية حركة معاكسة مساوية تماماً وفق قانون نيوتن الثالث."
+    mathematical_expression: "m1 * v1 + m2 * v2 = 0"
+    trigger:
+      description: "حركة اندفاعية دون تثبيت"
+      conditions:
+        - parameter: "tether_engaged"
+          operator: "=="
+          value: false
+    invariants:
+      - target: "drift_velocity_mps"
+        assertion: "انعدام السكون وحدوث ارتداد حركي فوري"
+        operator: ">"
+        expected_value: 0.0
+    severity: "VIOLATION"
+
+  - id: "LAW-ELECTRO-01"
+    name: "عزل صمام التفريغ وقفل الضغط التفاضلي (Airlock Differential Pressure Interlock)"
+    domain: "electromechanics"
+    description: "آلية القفل الميكانيكية تمنع فتح البوابة الخارجية للغرفة إذا كان فرق الضغط عن الفراغ أكبر من 5 kPa، لمنع الاندفاع الانفجاري للهواء وموت الطاقم فورياً."
+    mathematical_expression: "Delta_P > 5.0 kPa => outer_hatch_locked == True"
+    trigger:
+      description: "محاولة فتح البوابة الخارجية مع وجود ضغط داخلي"
+      conditions:
+        - parameter: "chamber_pressure_kpa"
+          operator: ">="
+          value: 5.0
+    invariants:
+      - target: "outer_hatch.mechanical_lock"
+        assertion: "انغلاق مزلاج الأمان ومنع الفتح اليدوي"
+        operator: "=="
+        expected_value: true
+    severity: "FATAL"

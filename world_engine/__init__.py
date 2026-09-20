@@ -17,7 +17,11 @@ from world_engine.evaluator import (
     DeclarativeEvaluationReport,
 )
 from world_engine.validator import WorldSchemaValidator
-from world_engine.dag import CausalityDAGVerifier
+from world_engine.dag import (
+    CausalityDAGVerifier,
+    CausalityDAGValidator,
+    CausalCycleError,
+)
 
 __version__ = "1.0.0"
 __all__ = [
@@ -28,4 +32,6 @@ __all__ = [
     "DeclarativeEvaluationReport",
     "WorldSchemaValidator",
     "CausalityDAGVerifier",
+    "CausalityDAGValidator",
+    "CausalCycleError",
 ]

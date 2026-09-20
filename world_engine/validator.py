@@ -162,22 +162,7 @@ class WorldSchemaValidator:
             report["warnings"].append("No entities_catalog_ref declared in manifest.")
 
         # 4. Cross-Reference Consistency
-        cross_errors = []
-        zones = {z["id"] for z in manifest.get("spatial_topology", {}).get("zones", [])}
-        inventories = manifest.get("resource_ledger", {}).get("initial_inventories", [])
-        for inv in inventories:
-            loc = inv.get("location_zone_id")
-            if loc and loc not in zones:
-                cross_errors.append(f"Resource {inv.get('resource_id')} placed in non-existent zone '{loc}'")
-
-        headcount_spec = manifest.get("headcount_target", {})
-        if headcount_spec and entities_data:
-            target_souls = headcount_spec.get("initial_total")
-            actual_souls = len(entities_data.get("characters", []))
-            if target_souls != actual_souls:
-                cross_errors.append(
-                    f"Headcount mismatch: manifest targets {target_souls} souls, but entities catalog has {actual_souls}"
-                )
+        cross_errors = self.validate_cross_references(manifest, entities_data)
 
         causality_ref = manifest.get("causality_graph_ref")
         if causality_ref:
@@ -198,3 +183,41 @@ class WorldSchemaValidator:
         )
         report["overall_success"] = overall_ok
         return report
+
+    def validate_cross_references(
+        self,
+        manifest: Dict[str, Any],
+        entities_data: Optional[Dict[str, Any]] = None
+    ) -> List[str]:
+        """Verify cross-reference consistency between spatial zones, inventories, and characters."""
+        cross_errors: List[str] = []
+        zones = {z["id"] for z in manifest.get("spatial_topology", {}).get("zones", [])}
+
+        # Check resource inventories
+        inventories = manifest.get("resource_ledger", {}).get("initial_inventories", [])
+        for inv in inventories:
+            loc = inv.get("location_zone_id")
+            if loc and loc not in zones:
+                cross_errors.append(f"Resource {inv.get('resource_id')} placed in non-existent zone '{loc}'")
+
+        # Check character locations and headcount
+        if entities_data:
+            vehicle_ids = {v["entity_id"] for v in entities_data.get("vehicles", [])}
+            valid_locations = zones | vehicle_ids
+            for char in entities_data.get("characters", []):
+                loc = char.get("location_id")
+                if loc and loc not in valid_locations:
+                    cross_errors.append(
+                        f"Character {char.get('entity_id')} ({char.get('canonical_name')}) located in unmapped zone/vehicle '{loc}'"
+                    )
+
+            headcount_spec = manifest.get("headcount_target", {})
+            if headcount_spec:
+                target_souls = headcount_spec.get("initial_total")
+                actual_souls = len(entities_data.get("characters", []))
+                if target_souls != actual_souls:
+                    cross_errors.append(
+                        f"Headcount mismatch: manifest targets {target_souls} souls, but entities catalog has {actual_souls}"
+                    )
+
+        return cross_errors

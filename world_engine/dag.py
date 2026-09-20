@@ -13,9 +13,14 @@ from __future__ import annotations
 
 from collections import defaultdict, deque
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import yaml
+
+
+class CausalCycleError(Exception):
+    """Raised when a circular causal loop is detected in narrative events."""
+    pass
 
 
 class CausalityDAGVerifier:
@@ -71,3 +76,17 @@ class CausalityDAGVerifier:
 
         is_acyclic = (visited_count == len(self.nodes))
         return is_acyclic, topological_order
+
+    def verify_acyclicity(self, events: Optional[List[Dict[str, Any]]] = None) -> List[str]:
+        """Convenience method that verifies acyclicity and raises CausalCycleError if a cycle exists."""
+        if events is not None:
+            self.events = events
+            self.build_graph()
+        is_acyclic, order = self.verify_dag_acyclicity()
+        if not is_acyclic:
+            raise CausalCycleError(f"Causal cycle detected! Graph cannot be topologically sorted. Visited only {len(order)} of {len(self.nodes)} events.")
+        return order
+
+
+# Alias for backward and testing compatibility
+CausalityDAGValidator = CausalityDAGVerifier

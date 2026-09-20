@@ -1,0 +1,44 @@
+schema_version: "1.0.0"
+world_id: "orbital_station"
+total_events: 5
+
+events:
+  - id: "EVT-ORB-001"
+    time: "14:20:00"
+    minute: 0
+    name: "اصطدام حطام نيزكي مجهري بإطار عازل البوابة الخارجية"
+    type: "Physical_Impact"
+    causes:
+      - "EVT-ORB-002"
+
+  - id: "EVT-ORB-002"
+    time: "14:21:00"
+    minute: 1
+    name: "إطلاق صفارة تفريغ الضغط وانغلاق العزل التلقائي للوحدة B"
+    type: "Emergency_Lockdown"
+    causes:
+      - "EVT-ORB-003"
+      - "EVT-ORB-004"
+
+  - id: "EVT-ORB-003"
+    time: "14:23:00"
+    minute: 3
+    name: "انفصال ناقل الطاقة B وتجمد صمام التعويض التلقائي"
+    type: "Electrical_Failure"
+    causes:
+      - "EVT-ORB-005"
+
+  - id: "EVT-ORB-004"
+    time: "14:25:00"
+    minute: 5
+    name: "فتح خزانة البزات واكتشاف وجود بزة نجاة وظيفية واحدة فقط (EVA-01)"
+    type: "Resource_Crisis"
+    causes:
+      - "EVT-ORB-005"
+
+  - id: "EVT-ORB-005"
+    time: "14:35:00"
+    minute: 15
+    name: "هبوط الضغط إلى 45.0 kPa وبدء العد التنازلي الحرج للوعي"
+    type: "Critical_Boundary"
+    causes: []

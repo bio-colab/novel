@@ -1,0 +1,66 @@
+schema_version: "1.0.0"
+world_id: "orbital_station"
+title: "محطة أورورا-9: كارثة غرفة العزل الهوائي (Aurora-9 Airlock Failure)"
+genre: "orbital_hard_scifi_survival"
+
+chronotope:
+  setting: "غرفة العزل الهوائي (Airlock Module B) في محطة أورورا-9 المدارية، مدار أرضي منخفض (LEO)"
+  coordinates: "Low Earth Orbit (altitude: 408 km, inclination: 51.6 deg)"
+  historical_epoch: "near_future_orbital_confinement"
+  start_timestamp: "2031-11-04T14:20:00Z"
+  total_duration_minutes: 45.0
+  timestep_minutes: 1.0
+
+environment:
+  temperature_celsius:
+    initial: 18.5
+    min: -40.0
+    max: 25.0
+  humidity_percent:
+    min: 10.0
+    max: 60.0
+  wind:
+    speed_kmh: 0.0
+    direction_degrees: 0.0
+    gust_kmh: 0.0
+  lux_ambient:
+    min: 0.0
+    max: 120.0
+
+spatial_topology:
+  coordinate_type: "3D_bounded_box"
+  total_envelope_meters: 8.5
+  zones:
+    - id: "zone_airlock_outer"
+      name: "الحيز الخارجي لبوابة التفريغ (Outer Hatch Threshold)"
+      bounds_meters: [0.0, 3.5]
+      acoustic_isolation_db: 45.0
+      thermal_conduction_factor: 0.05
+    - id: "zone_airlock_inner"
+      name: "الحيز الداخلي لخزانة البزات ولوحة التحكم (Equipment & Suit Locker Chamber)"
+      bounds_meters: [3.5, 8.5]
+      acoustic_isolation_db: 35.0
+      thermal_conduction_factor: 0.8
+
+resource_ledger:
+  initial_inventories:
+    - resource_id: "emergency_oxygen_reserve"
+      category: "misc"
+      amount: 120.0
+      unit: "liters_ntp"
+      location_zone_id: "zone_airlock_inner"
+      consumption_rate_per_hour_per_capita: 30.0
+    - resource_id: "spacesuit_eva_01"
+      category: "clothing"
+      amount: 1.0
+      unit: "unit_suit"
+      location_zone_id: "zone_airlock_inner"
+
+headcount_target:
+  initial_total: 2
+  demographic_breakdown:
+    specialists: 2
+
+rules_manifest_ref: "rules_manifest.yaml"
+entities_catalog_ref: "entities_catalog.yaml"
+causality_graph_ref: "causality_graph.yaml"
