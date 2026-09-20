@@ -65,9 +65,10 @@
 <body>
     <div id="graph-container">
         <div class="toolbar">
-            <h1>العقل الثانوي: قطار الرمل</h1>
+            <h1>Novel-OS: العقل الثانوي (Digital Twin)</h1>
             <input type="text" id="search" class="search-box" placeholder="ابحث عن عقدة أو شخصية...">
             <button class="btn" id="reset-zoom">إعادة ضبط المشهد</button>
+            <a href="https://github.com/bio-colab/novel" target="_blank" class="btn" style="text-decoration: none; color: #38bdf8; font-weight: 600;">GitHub Repo ↗</a>
         </div>
 
         <div class="legend" id="legend"></div>
@@ -110,14 +111,53 @@
             height = canvas.height = window.innerHeight;
         });
 
-        // Build Graph Data Structures
-        const nodes = rawNodes.map((n, i) => ({
-            ...n,
-            x: width / 2 + (Math.random() - 0.5) * 400,
-            y: height / 2 + (Math.random() - 0.5) * 400,
-            vx: 0, vy: 0,
-            connectedNodes: new Set()
-        }));
+        // Build Initial Categorized & Radial Layout
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        // Group nodes by category to establish clean orbital sectors
+        const nodesByCategory = {};
+        rawNodes.forEach(n => {
+            nodesByCategory[n.category] = nodesByCategory[n.category] || [];
+            nodesByCategory[n.category].push(n);
+        });
+
+        const sectorConfig = {
+            "ROOT": { r: 0, angleStart: 0, angleSpan: 0 },
+            "01_CHARACTERS": { r: 240, angleStart: -Math.PI / 2, angleSpan: Math.PI * 2 },
+            "03_PHYSICS_AND_LAWS": { r: 420, angleStart: -Math.PI * 0.9, angleSpan: Math.PI * 0.8 },
+            "02_SEMIOTICS_AND_SYMBOLS": { r: 390, angleStart: Math.PI * 0.1, angleSpan: Math.PI * 0.8 },
+            "04_SOCIOLOGY_AND_POWER": { r: 340, angleStart: Math.PI * 0.8, angleSpan: Math.PI * 0.4 },
+            "05_DRAMATURGY_AND_GRAPH": { r: 300, angleStart: -Math.PI * 0.1, angleSpan: Math.PI * 0.3 }
+        };
+
+        const nodes = rawNodes.map((n) => {
+            let x = centerX;
+            let y = centerY;
+
+            if (n.category === "ROOT" || n.id === "index") {
+                x = centerX;
+                y = centerY;
+            } else {
+                const conf = sectorConfig[n.category] || { r: 300, angleStart: 0, angleSpan: Math.PI * 2 };
+                const catList = nodesByCategory[n.category] || [];
+                const idx = catList.indexOf(n);
+                const count = Math.max(1, catList.length);
+                const angle = conf.angleStart + (idx / count) * conf.angleSpan;
+                const radius = conf.r + (Math.random() - 0.5) * 30;
+                x = centerX + Math.cos(angle) * radius;
+                y = centerY + Math.sin(angle) * radius;
+            }
+
+            return {
+                ...n,
+                x,
+                y,
+                vx: 0,
+                vy: 0,
+                connectedNodes: new Set()
+            };
+        });
 
         const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
 
@@ -133,7 +173,7 @@
         }).filter(Boolean);
 
         // Transform / Zoom
-        let transform = { x: 0, y: 0, k: 1 };
+        let transform = { x: 0, y: 0, k: 0.85 };
         let isDragging = false;
         let dragNode = null;
         let startX, startY;
@@ -141,55 +181,123 @@
         let hoveredNode = null;
         let searchQuery = "";
 
-        // Simple Force Simulation
-        function stepSimulation() {
-            const repulsion = 1200;
-            const springLen = 90;
-            const springK = 0.04;
-            const centerK = 0.005;
+        // D3-style Alpha Decay & Damping (The Fix for violent jitter)
+        let alpha = 1.0;
+        const alphaMin = 0.001;
+        const alphaDecay = 0.022; // Smooth settling in ~140 frames (2.3 seconds)
 
-            // Repulsion between nodes
+        function wakeUp(level = 0.35) {
+            alpha = Math.max(alpha, level);
+        }
+
+        // Force Simulation with Collision Protection
+        function stepSimulation() {
+            if (alpha < alphaMin) {
+                // Completely at rest. Zero physics calculation, zero CPU jitter!
+                return;
+            }
+
+            // 1. Anti-Collision Force (Guarantees zero overlapping nodes)
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const a = nodes[i], b = nodes[j];
+                    const dx = b.x - a.x;
+                    const dy = b.y - a.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const minDist = a.radius + b.radius + 38; // Safety buffer
+                    if (dist < minDist) {
+                        const push = (minDist - dist) / dist * 0.5 * alpha;
+                        if (a !== dragNode && a.id !== 'index') {
+                            a.x -= dx * push;
+                            a.y -= dy * push;
+                        }
+                        if (b !== dragNode && b.id !== 'index') {
+                            b.x += dx * push;
+                            b.y += dy * push;
+                        }
+                    }
+                }
+            }
+
+            // 2. Many-body Repulsion (Coulomb Repulsion with distance cap)
+            const repulsion = 3200 * alpha;
             for (let i = 0; i < nodes.length; i++) {
                 for (let j = i + 1; j < nodes.length; j++) {
                     const a = nodes[i], b = nodes[j];
                     const dx = b.x - a.x;
                     const dy = b.y - a.y;
                     const distSq = dx * dx + dy * dy || 1;
-                    const dist = Math.sqrt(distSq);
-                    if (dist < 450) {
-                        const f = repulsion / distSq;
+                    if (distSq < 360000) { // 600px range
+                        const dist = Math.sqrt(distSq);
+                        const f = Math.min(repulsion / distSq, 6.0 * alpha);
                         const fx = (dx / dist) * f;
                         const fy = (dy / dist) * f;
-                        a.vx -= fx; a.vy -= fy;
-                        b.vx += fx; b.vy += fy;
+                        if (a !== dragNode && a.id !== 'index') { a.vx -= fx; a.vy -= fy; }
+                        if (b !== dragNode && b.id !== 'index') { b.vx += fx; b.vy += fy; }
                     }
                 }
             }
 
-            // Spring attraction
+            // 3. Link Spring Attraction
             edges.forEach(e => {
+                const isIndexEdge = (e.source.id === 'index' || e.target.id === 'index');
+                const springLen = isIndexEdge ? 240 : 130;
+                const springK = (isIndexEdge ? 0.012 : 0.035) * alpha;
+
                 const dx = e.target.x - e.source.x;
                 const dy = e.target.y - e.source.y;
                 const dist = Math.sqrt(dx * dx + dy * dy) || 1;
                 const f = (dist - springLen) * springK;
                 const fx = (dx / dist) * f;
                 const fy = (dy / dist) * f;
-                e.source.vx += fx; e.source.vy += fy;
-                e.target.vx -= fx; e.target.vy -= fy;
+
+                if (e.source !== dragNode && e.source.id !== 'index') {
+                    e.source.vx += fx;
+                    e.source.vy += fy;
+                }
+                if (e.target !== dragNode && e.target.id !== 'index') {
+                    e.target.vx += fx;
+                    e.target.vy += fy;
+                }
             });
 
-            // Gravity towards center
+            // 4. Center Gravity & Velocity Clamping
+            const centerK = 0.006 * alpha;
             nodes.forEach(n => {
-                if (n === dragNode) return;
-                n.vx += (width / 2 - n.x) * centerK;
-                n.vy += (height / 2 - n.y) * centerK;
-                n.vx *= 0.85; // damping
-                n.vy *= 0.85;
+                if (n === dragNode || n.id === 'index') return;
+                n.vx += (centerX - n.x) * centerK;
+                n.vy += (centerY - n.y) * centerK;
+
+                // Strong velocity damping for smooth settling
+                n.vx *= 0.76;
+                n.vy *= 0.76;
+
+                // Max velocity cap
+                const maxV = 5.0 * alpha;
+                const v = Math.sqrt(n.vx * n.vx + n.vy * n.vy);
+                if (v > maxV && v > 0) {
+                    n.vx = (n.vx / v) * maxV;
+                    n.vy = (n.vy / v) * maxV;
+                }
+
                 n.x += n.vx;
                 n.y += n.vy;
             });
+
+            // Keep index anchored at center
+            const indexNode = nodeMap['index'];
+            if (indexNode && indexNode !== dragNode) {
+                indexNode.x = centerX;
+                indexNode.y = centerY;
+                indexNode.vx = 0;
+                indexNode.vy = 0;
+            }
+
+            // Exponential alpha decay
+            alpha *= (1 - alphaDecay);
         }
 
+        // Draw Function with Legible Text Pills
         function draw() {
             ctx.clearRect(0, 0, width, height);
             ctx.save();
@@ -198,14 +306,30 @@
 
             // Draw Edges
             edges.forEach(e => {
-                const isHighlight = selectedNode && (selectedNode === e.source || selectedNode === e.target);
-                ctx.strokeStyle = isHighlight ? '#38bdf8' : '#334155';
-                ctx.lineWidth = isHighlight ? 2 : 1;
+                const isSelectedEdge = selectedNode && (selectedNode === e.source || selectedNode === e.target);
+                const isHoveredEdge = hoveredNode && (hoveredNode === e.source || hoveredNode === e.target);
+                const isIndexEdge = (e.source.id === 'index' || e.target.id === 'index');
+
+                if (isSelectedEdge || isHoveredEdge) {
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 2.2;
+                    ctx.globalAlpha = 1.0;
+                } else if (isIndexEdge) {
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 0.8;
+                    ctx.globalAlpha = 0.25; // Keep center hub lines subtle
+                } else {
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 1.0;
+                    ctx.globalAlpha = 0.55;
+                }
+
                 ctx.beginPath();
                 ctx.moveTo(e.source.x, e.source.y);
                 ctx.lineTo(e.target.x, e.target.y);
                 ctx.stroke();
             });
+            ctx.globalAlpha = 1.0;
 
             // Draw Nodes
             nodes.forEach(n => {
@@ -213,26 +337,56 @@
                 const isSelected = n === selectedNode;
                 const isHovered = n === hoveredNode;
                 const isConnected = selectedNode && selectedNode.connectedNodes.has(n);
+                const isHoverConnected = hoveredNode && hoveredNode.connectedNodes.has(n);
 
                 let radius = n.radius;
-                if (isSelected || isHovered) radius += 4;
+                if (isSelected || isHovered) radius += 5;
 
+                // Node Circle
                 ctx.beginPath();
                 ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
                 ctx.fillStyle = isMatch ? '#f43f5e' : n.color;
                 ctx.fill();
 
-                if (isSelected || isConnected || isHovered) {
-                    ctx.strokeStyle = '#fff';
+                if (isSelected || isHovered || isConnected || isHoverConnected) {
+                    ctx.strokeStyle = '#ffffff';
                     ctx.lineWidth = 2.5;
                     ctx.stroke();
                 }
 
-                // Label
-                ctx.fillStyle = (isSelected || isHovered || isMatch) ? '#fff' : '#94a3b8';
-                ctx.font = `${isSelected ? 'bold 13px' : '11px'} Cairo, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.fillText(n.title, n.x, n.y + radius + 14);
+                // Selective, Legible Text Labels (Obsidian Style with background pill)
+                const showAlways = (n.id === 'index' || n.category === 'ROOT' || isSelected || isHovered || isMatch);
+                const showConnected = isConnected || isHoverConnected;
+                const showMajor = (n.category === '01_CHARACTERS' && transform.k >= 0.65);
+                const showGeneral = (transform.k >= 0.85);
+
+                if (showAlways || showConnected || showMajor || showGeneral) {
+                    ctx.font = `${isSelected ? 'bold 13px' : '11px'} "Cairo", sans-serif`;
+                    ctx.textAlign = 'center';
+                    const text = n.title;
+                    const textW = ctx.measureText(text).width;
+                    const labelY = n.y + radius + 15;
+
+                    // Dark background pill behind text
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                    if (ctx.roundRect) {
+                        ctx.beginPath();
+                        ctx.roundRect(n.x - textW / 2 - 5, labelY - 11, textW + 10, 16, 4);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(n.x - textW / 2 - 5, labelY - 11, textW + 10, 16);
+                    }
+
+                    // Text color
+                    if (isSelected || isHovered || isMatch) {
+                        ctx.fillStyle = '#38bdf8';
+                    } else if (showConnected) {
+                        ctx.fillStyle = '#f8fafc';
+                    } else {
+                        ctx.fillStyle = '#94a3b8';
+                    }
+                    ctx.fillText(text, n.x, labelY);
+                }
             });
 
             ctx.restore();
@@ -257,12 +411,13 @@
             const pos = getMousePos(e);
             const hit = nodes.find(n => {
                 const dx = n.x - pos.x, dy = n.y - pos.y;
-                return Math.sqrt(dx * dx + dy * dy) <= n.radius + 4;
+                return Math.sqrt(dx * dx + dy * dy) <= n.radius + 6;
             });
 
             if (hit) {
                 dragNode = hit;
                 selectNode(hit);
+                wakeUp(0.35);
             } else {
                 isDragging = true;
                 startX = e.clientX - transform.x;
@@ -276,6 +431,7 @@
                 dragNode.x = pos.x;
                 dragNode.y = pos.y;
                 dragNode.vx = dragNode.vy = 0;
+                wakeUp(0.25);
             } else if (isDragging) {
                 transform.x = e.clientX - startX;
                 transform.y = e.clientY - startY;
@@ -283,7 +439,7 @@
                 const pos = getMousePos(e);
                 hoveredNode = nodes.find(n => {
                     const dx = n.x - pos.x, dy = n.y - pos.y;
-                    return Math.sqrt(dx * dx + dy * dy) <= n.radius + 4;
+                    return Math.sqrt(dx * dx + dy * dy) <= n.radius + 6;
                 }) || null;
             }
         });
@@ -295,7 +451,7 @@
 
         canvas.addEventListener('wheel', e => {
             e.preventDefault();
-            const factor = e.deltaY < 0 ? 1.1 : 0.9;
+            const factor = e.deltaY < 0 ? 1.08 : 0.92;
             transform.k = Math.max(0.2, Math.min(3, transform.k * factor));
         });
 
@@ -318,7 +474,10 @@
             node.connectedNodes.forEach(c => {
                 const li = document.createElement('li');
                 li.innerHTML = `<span class="connection-tag">${c.title}</span>`;
-                li.addEventListener('click', () => selectNode(c));
+                li.addEventListener('click', () => {
+                    selectNode(c);
+                    wakeUp(0.25);
+                });
                 connList.appendChild(li);
             });
         }
@@ -330,10 +489,12 @@
 
         document.getElementById('search').addEventListener('input', e => {
             searchQuery = e.target.value.trim();
+            wakeUp(0.3);
         });
 
         document.getElementById('reset-zoom').addEventListener('click', () => {
-            transform = { x: 0, y: 0, k: 1 };
+            transform = { x: 0, y: 0, k: 0.85 };
+            wakeUp(0.6);
         });
     </script>
 </body>
