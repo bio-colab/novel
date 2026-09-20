@@ -579,6 +579,22 @@ class WorldAuditor:
         except Exception as e:
             self.warnings.append(f"Could not run JevEngine: {e}")
 
+        # 11. Declarative Rules Evaluator: Declarative Manifest Invariants
+        try:
+            from declarative_evaluator import DeclarativeInvariantEvaluator
+            decl_eval = DeclarativeInvariantEvaluator()
+            report = decl_eval.evaluate_all()
+            if report.overall_valid:
+                self.passes.append(
+                    f"Declarative Invariant Engine: 100% of declarative rules satisfied ({report.invariants_passed}/{report.invariants_checked} invariants across {report.triggered_rules} active laws)."
+                )
+            else:
+                for viol in report.violations:
+                    self.violations.append(f"Declarative Invariant Violation [{viol.rule_id}]: {viol.message}")
+        except Exception as e:
+            self.warnings.append(f"Could not run DeclarativeInvariantEvaluator: {e}")
+
+
         print("\n--- PASSED INVARIANTS (الفحوصات الناجحة) ---")
         for p in self.passes:
             print(f"  ✅ {p}")

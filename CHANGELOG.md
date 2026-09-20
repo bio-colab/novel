@@ -3,7 +3,29 @@
 
 جميع التغييرات والترقيات الموثقة في هذا المشروع تتبع معايير [Keep a Changelog](https://keepachangelog.com/ar/)، ونظام الترقيم الدلالي للإصدارات (Semantic Versioning).
 
+## [2.2.0-narrative-os-framework] - 2026-09-20
+
+### أُضيف (Added)
+* **المرحلة 1: صياغة المخططات المعيارية والعقد التصريحي للعالم (World Specification Schemas):**
+  * بناء المخططات القياسية الثلاثة: `world_manifest.schema.json` و `rule.schema.json` و `entity.schema.json`.
+  * إطلاق المانيفست الموحد لعالم الرواية: [`05_WORLD_BRAIN/world_manifest.yaml`](file:///d:/قطار%20الرمل/1/05_WORLD_BRAIN/world_manifest.yaml).
+  * تقنين 16 قانوناً دستورياً بصيغة تصريحية مهيكلة: [`01_SPECS_AND_RULES/rules_manifest.yaml`](file:///d:/قطار%20الرمل/1/01_SPECS_AND_RULES/rules_manifest.yaml).
+  * إيداع شبكة الأحداث السببية كملف بيانات نقي: [`05_WORLD_BRAIN/causality_graph.yaml`](file:///d:/قطار%20الرمل/1/05_WORLD_BRAIN/causality_graph.yaml).
+  * بناء أداة التحقق والربط المتبادل: [`02_TOOLS/schema_validator.py`](file:///d:/قطار%20الرمل/1/02_TOOLS/schema_validator.py).
+  * إضافة حزمة اختبارات المخططات: `tests/test_world_schema.py` (9 اختبارات امتثال وطفرات سلبية).
+* **المرحلة 2: محرك تقييم القوانين التصريحي الآمن (`02_TOOLS/declarative_evaluator.py`):**
+  * استجابة لتوجيه JEV الصارم (بنسبة 99%)، تم بناء مفسر شجري آمن (`SafeExpressionEvaluator`) عبر حصر العقد المسموحة في AST واستبعاد `eval()` كلياً.
+  * فحص الشروط والمشغلات (Triggers) وفرض القيود الحتمية (Invariants) ديناميكياً على حالة العالم.
+  * دمج المحرك كـ **المنظومة الفرعية رقم 23** في مدقق العالم المركزي [`02_TOOLS/world_auditor.py`](file:///d:/قطار%20الرمل/1/02_TOOLS/world_auditor.py).
+  * إضافة اختبارات الأمان والنزاهة: `tests/test_declarative_evaluator.py` (12 اختباراً).
+* **الترقية الكمية الشاملة للاختبارات:**
+  * ارتفاع إجمالي الاختبارات الناجحة من 65 إلى **86 اختباراً مؤتمتاً بنسبة نجاح 100%**.
+  * اجتياز **23 نظاماً فرعياً** في `world_auditor.py` بنسبة امتثال 100%.
+
+---
+
 ## [2.1.0-jev-system-one] - 2026-09-20
+
 
 ### أُضيف (Added)
 * **تكامل محرك JEV لنماذج System One (`02_TOOLS/jev_engine.py`):**
