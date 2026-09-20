@@ -211,6 +211,33 @@ class PsychologyDetector:
         else:
             self.warnings.append(f"Khalid military command archetype weakly attested ({khalid_matches} matches).")
 
+    def audit_semantic_psychology_with_jev(self):
+        """Perform semantic psychological verification via JEV System One engine if available."""
+        try:
+            from jev_engine import JevEngine
+            jev = JevEngine()
+            # Test focal scene for Khalid
+            khalid_passage = (
+                "خالد جالس على صندوق ذخيرة خشبي مثبت بمسامير قرب الباب الداخلي. البندقية الكلاشنكوف موضوعة طولاً بين فخذيه، "
+                "فوهتها تشير إلى الصاج الأسفل، وأصابعه تستقر على عقبها الخشبي المتآكل. كانت سبابته اليمنى ترتفع ببطء، تتحسس أثر الندبة الغائرة في فكه الأيمن... "
+                "يمرر إصبعه على حافتها، يتوقف عند العظم، ثم يعيد يده إلى ماسورة السلاح الباردة."
+            )
+            res = jev.audit_character_psychology(
+                character="خالد",
+                expected_archetype="الصرامة العسكرية وحفظ التراتبية وكبت الهلع",
+                passage=khalid_passage
+            )
+            if res.is_consistent:
+                self.passes.append(
+                    f"JEV Semantic Psychology: 'خالد' defense mechanism verified as '{res.defense_mechanism}' (Confidence: {res.confidence*100:.0f}%)."
+                )
+            else:
+                self.violations.append(
+                    f"[JEV Semantic Breach] Khalid psychological drift detected: {res.defense_mechanism} (Teleportation prob: {res.teleportation_prob:.2f})."
+                )
+        except Exception as e:
+            self.warnings.append(f"JEV Semantic Psychology skipped: {e}")
+
     def run_detector(self) -> int:
         print("\n" + "=" * 80)
         print("  PSYCHOLOGY & BEHAVIORAL DETECTOR (فاحص الاتساق النفسي والسلوكي للشخصيات)")
@@ -224,6 +251,7 @@ class PsychologyDetector:
         self.audit_neurological_tics_distribution()
         self.audit_panic_dialogue_fragmentation()
         self.audit_defense_mechanism_archetypes()
+        self.audit_semantic_psychology_with_jev()
 
         # Display Tics Table
         print("\n--- NEUROLOGICAL TICS & DISPLACEMENT MANIFESTATIONS (LAW-BIO-02) ---")

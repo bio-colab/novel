@@ -378,7 +378,17 @@ class SocioDemographyAnalyzer:
         else:
             print("  ❌ Economic Value Invariant Failed.")
 
-        overall_passed = demo_res["passed"] and ideo_res["passed"] and power_res["passed"] and econ_res["passed"]
+        bridge_res = self.audit_sociology_physics_bridge()
+        print("\n--- SOCIOLOGY-PHYSICS BRIDGE (LAW-BIO-01/02/05 & LAW-SOC-01/03) ---")
+        print(f"  Trigger Motor Stiffness Grounding (LAW-BIO-01): {bridge_res['motor_stiffness_present']}")
+        print(f"  Vocal Tremor / Shivering Command Erosion     : {bridge_res['vocal_tremor_present']}")
+        print(f"  Military Authority Depletion (Khalid ΔP >= 0.5): {bridge_res['khalid_power_decline']}")
+        if bridge_res["passed"]:
+            print("  ✅ Sociology-Physics Bridge Verified: Guard authority collapse is physically driven by cold biology.")
+        else:
+            print("  ❌ Sociology-Physics Bridge Failed.")
+
+        overall_passed = demo_res["passed"] and ideo_res["passed"] and power_res["passed"] and econ_res["passed"] and bridge_res["passed"]
         print("\n" + "=" * 80)
         if overall_passed:
             print("  SOCIO-DEMOGRAPHIC AUDIT PASSED: 100% Invariant Compliance Verified.")
@@ -387,6 +397,27 @@ class SocioDemographyAnalyzer:
         print("=" * 80 + "\n")
 
         return overall_passed
+
+    def audit_sociology_physics_bridge(self) -> Dict[str, Any]:
+        """
+        Validates the Sociology-Physics Bridge (JEV recommendation):
+        Guarantees that power erosion (LAW-SOC-01/03) is causally anchored in:
+        1. LAW-BIO-01: Trigger-finger stiffness and loss of fine motor aim in guards.
+        2. LAW-BIO-02 & LAW-BIO-04: Shivering teeth chattering and voice tremor breaking command authority.
+        3. Physical degradation of guards' command monopoly.
+        """
+        has_motor_stiffness = bool(re.search(r"سبابة|أصابع|زناد|برد|متصلب|تخشب", self.raw_text))
+        has_vocal_tremor = bool(re.search(r"اصطكاك|ارتجاف|يرتجف|صوت.*?متقطع|أسنان", self.raw_text))
+        khalid_power_drop = (DEMOGRAPHIC_REGISTRY["خالد"]["power_t0"] - DEMOGRAPHIC_REGISTRY["خالد"]["power_t645"]) >= 0.50
+
+        passed = has_motor_stiffness and has_vocal_tremor and khalid_power_drop
+
+        return {
+            "passed": passed,
+            "motor_stiffness_present": has_motor_stiffness,
+            "vocal_tremor_present": has_vocal_tremor,
+            "khalid_power_decline": khalid_power_drop,
+        }
 
 
 if __name__ == "__main__":

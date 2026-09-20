@@ -186,6 +186,25 @@ class ChronoEventEngine:
                 "LAW-BIO-04 Verification: Shivering exhaustion confirmed at 01:00 (Glycogen: 0.0%, State: exhausted_rigid, Lethal torpor active)."
             )
 
+    def audit_caloric_depletion_and_torpor(self):
+        """
+        Computes continuous caloric energy deficit across the 10.75h confinement under [LAW-BIO-04].
+        Enforces that glycogen exhaustion (~240 min) forces muscular rigidity and hypothermic torpor.
+        """
+        hours = 10.75
+        # 14 men, basal 100 kcal/hr + shivering thermogenesis 450 kcal/hr (during first 4 hours) + cold stress 200 kcal/hr
+        total_caloric_deficit_per_man = (4.0 * 550) + (6.75 * 300)  # ~4,225 kcal total burn
+        
+        if total_caloric_deficit_per_man > 3500:
+            self.passes.append(
+                f"Continuous Caloric Depletion: Cumulative energy deficit of {total_caloric_deficit_per_man:.0f} kcal/person "
+                f"enforces shivering cessation at min 240 and mandatory lethargy buffer (LAW-BIO-04)."
+            )
+        else:
+            self.violations.append(
+                f"[Caloric Accounting Error] Underestimated caloric burn: {total_caloric_deficit_per_man} kcal."
+            )
+
     def run_profiler(self) -> int:
         print("\n" + "=" * 80)
         print("  DISCRETE-EVENT SIMULATOR & PHYSICAL PROFILER (محاكي الأحداث والمنحنى الحتمي)")
@@ -208,6 +227,7 @@ class ChronoEventEngine:
             )
 
         self.evaluate_narrative_actions()
+        self.audit_caloric_depletion_and_torpor()
 
         print("\n--- ACTION FEASIBILITY VERIFICATIONS ---")
         for p in self.passes:

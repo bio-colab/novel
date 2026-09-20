@@ -1,0 +1,54 @@
+{
+  "model": "jev-1.13.0",
+  "answers": {
+    "world_auditor_diagnosis": {
+      "type": "choice",
+      "choice": "deterministic_boundary_defense",
+      "confidence": 0.78,
+      "probabilities": {
+        "deterministic_boundary_defense": 0.86,
+        "character_depth": 0.01,
+        "semantic_fluidity": 0.13
+      }
+    },
+    "moral_entropy_risk": {
+      "type": "score",
+      "score": 1.42,
+      "confidence": 0.13,
+      "legend": {
+        "0": "لا خطورة، فهو مقيد بأفعال مادية مشهودة",
+        "1": "خطورة متوسطة تتطلب معايرة مستمرة مع نبض الشخصيات",
+        "2": "خطورة عالية لتحوله إلى لعبة رقمية خاوية من المعنى"
+      },
+      "probabilities": {
+        "0": 0.12,
+        "1": 0.34,
+        "2": 0.54
+      }
+    },
+    "epistemic_tracker_blindspot": {
+      "type": "choice",
+      "choice": "subtle_inference_vs_omniscience",
+      "confidence": 0.91,
+      "probabilities": {
+        "acoustic_loss": 0.01,
+        "subtle_inference_vs_omniscience": 0.94,
+        "spatial_bounds": 0.05
+      }
+    },
+    "psychology_detector_breakthrough": {
+      "type": "choice",
+      "choice": "semantic_concordance_over_word_counting",
+      "confidence": 0.99,
+      "probabilities": {
+        "faster_execution": 0.0,
+        "less_code": 0.0,
+        "semantic_concordance_over_word_counting": 1.0
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1023,
+    "output_tokens": 205
+  }
+}

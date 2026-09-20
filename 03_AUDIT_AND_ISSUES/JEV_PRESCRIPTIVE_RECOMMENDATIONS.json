@@ -1,0 +1,39 @@
+{
+  "model": "jev-1.13.0",
+  "answers": {
+    "excretion_narrative_treatment": {
+      "type": "choice",
+      "choice": "corner_bucket_humiliation",
+      "confidence": 0.22,
+      "probabilities": {
+        "shared_shame_solidarity": 0.38,
+        "suppression_and_spasm": 0.14,
+        "corner_bucket_humiliation": 0.48
+      }
+    },
+    "sociology_physics_bridge": {
+      "type": "choice",
+      "choice": "trigger_finger_stiffness",
+      "confidence": 0.33,
+      "probabilities": {
+        "shivering_voice_tremor": 0.41,
+        "trigger_finger_stiffness": 0.56,
+        "caloric_hypoglycemic_confusion": 0.03
+      }
+    },
+    "pruning_micro_coordinates_action": {
+      "type": "choice",
+      "choice": "zone_affordance_anchoring",
+      "confidence": 0.39,
+      "probabilities": {
+        "zone_affordance_anchoring": 0.59,
+        "cluster_distance_matrix": 0.4,
+        "pure_narrative_vagueness": 0.01
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 1398,
+    "output_tokens": 194
+  }
+}

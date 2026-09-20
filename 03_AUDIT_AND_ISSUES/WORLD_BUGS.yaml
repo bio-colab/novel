@@ -537,3 +537,85 @@ bugs:
     patch: 'تثبيت الموقع الكانوني للبرميل في العربة الأولى (مربوطاً بالطوق الحديدي)،
       وتعديل سطر 1251 في Staging ليصبح: «جيب طاسة الماي من برميل الأولى لهنا بالوسطى»
       ليتطابق مع ميكانيكا التقنين والتوزيع (100 مل).'
+- id: WORLD-BUG-011
+  title: مفارقة موال عزيز والخرق التكتيكي الصوتي وغياب رد فعل الحراس
+  type: Tactical_and_Acoustic
+  severity: HIGH
+  status: DOCUMENTED
+  law_broken: LAW-ACOUST-03 & LAW-TACTICAL-01
+  semantic_anchor:
+    part: 4
+    chapter: 4
+    anchor_text: "موال عزيز: انصهار الأرواح"
+    resolved_line: 1180
+  observed:
+    description: >
+      بعد انحسار الكمين الغامض وتوقف إطلاق النار، يطلق عزيز موالاً جهورياً شجياً يتردد في سكون الصحراء الليلي.
+      على الرغم من القيمة التطهيرية والنفسية للموال (LAW-ETHIC-03)، إلا أن النص يُسقط كلياً التهديد التكتيكي لكشف موقع الناجين
+      لأي عناصر استطلاع معادية في محيط 2-3 كم، كما يُسقط أي رد فعل احترازي أو ارتباك أمني من قِبل الحراس العسكريين (خالد)
+      لمحاولة خفض الصوت أو تأمين الفضاء، مما يمثل فجوة سلوكية تكتيكية كشفها JEV بنسبة 99%.
+    state_snapshot: characters.guards.reaction_to_acoustic_exposure = null
+  required:
+    invariant: >
+      الحفاظ على اليقظة التكتيكية في بيئة كمين غير محسومة يستوجب رد فعل أمني حتمي (تحذير بالهمس، توتر السلاح،
+      أو إدراك متعمد للمخاطرة مقابل الضرورة الوجودية لكسر الصدمة النفسية).
+    physical_minimum: Behavioral acknowledgment of acoustic broadcast in open silent desert.
+  evidence:
+    telemetry_timestamp: 03:20:00 (Minute 500 - Post-Ambush Trauma Window)
+    text_attested_evidence:
+    - 'mawal_loudness: Part 4, Ch 4, Line 1180: صوت الموال ينفذ عبر الصاج المتشظي إلى فضاء الصحراء'
+    - 'guards_omission: Part 4, Ch 4: zero tactical suppression commands issued by Khalid during mawal'
+  affected:
+    components:
+    - narrative.tactical_coherence
+    - characters.khalid.military_vigilance
+    - acoustic_stealth
+  simulation_impact:
+    runs_affected: 80 / 100
+    fragility_score: 0.8
+  remediation_proposal:
+    proposal_id: PR-011-MAWAL-ACOUSTIC
+    patch: >
+      إضافة توتر حركي مادي في مستهل الموال: رفع خالد لسبابته مهدداً ومتحفزاً لإسكات عزيز قبل أن تلجمه نبرة الصوت
+      ويدرك فسيولوجياً أن الموال هو ما يمنع رفاقه من الاستسلام لموت الصقيع والذهول التخادري.
+- id: WORLD-BUG-012
+  title: التفريغ الكهروحراري لبطاريات الإضاءة دون توثيق لحظة الانطفاء
+  type: Electromechanical_and_Optics
+  severity: MEDIUM
+  status: DOCUMENTED
+  law_broken: LAW-ELEC-01 & LAW-OPT-01
+  semantic_anchor:
+    part: 1
+    chapter: 1
+    anchor_text: مصباحان داخل قفصين سلكيين في السقف
+    resolved_line: 18
+  observed:
+    description: >
+      يؤسس المشهد الأول وجود مصباحين كهربائيين بسقف العربة الأولى يعطيان ضوءاً أصفر. ومع توقف القاطرة عند 19:00
+      واستمرار التوقف 11.75 ساعة في درجة حرارة دون الصفر (-2°C إلى -8°C)، تغفل الرواية مسار انطفاء البطاريات الحتمي،
+      حيث تفرغ بطاريات الرصاص في غضون 3-4 ساعات دون توثيق للحظة تحول الضوء الأصفر إلى خفوت احتضاري وانطفاء تام.
+    state_snapshot: train.electrical.auxiliary_battery = drained_unwitnessed
+  required:
+    invariant: >
+      تخضع أنظمة الإضاءة المعتمدة على البطاريات في الصقيع لقانون التفريغ الكهروحراري [LAW-ELEC-01]؛
+      ويجب توثيق لحظة انطفاء النور الكهربائي وانتقال الفضاء السردي للعتمة الخالصة والإنارة البديلة.
+    physical_minimum: Explicit chronicle of auxiliary battery exhaustion and optical transition.
+  evidence:
+    telemetry_timestamp: 22:30:00 (Minute 210 - Battery Exhaustion Horizon)
+    text_attested_evidence:
+    - 'initial_lighting: Part 1, Ch 1, Line 18: مصباحان داخل قفصين سلكيين'
+    - 'darkness_transition: Part 1, Ch 8 to Part 2, Ch 1: subsequent chapters describe pitch blackness without mentioning bulb extinction'
+  affected:
+    components:
+    - train.electrical.battery_bank
+    - optics.ambient_lux
+    - atmosphere.temporal_milestones
+  simulation_impact:
+    runs_affected: 75 / 100
+    fragility_score: 0.65
+  remediation_proposal:
+    proposal_id: PR-012-BATTERY-COLLAPSE
+    patch: >
+      توثيق لحظة موت البطاريات عند الدقيقة 210 (قبيل الكمين): احمرار فتيل المصباح، طقطقة انقطاع المرحل (Relay)،
+      وهبوط العربة في العتمة التامة التي أجبرت الحراس على إشعال أول عود ثقاب.
+

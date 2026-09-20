@@ -1,0 +1,140 @@
+{
+  "threads": {
+    "model": "jev-1.13.0",
+    "answers": {
+      "systemic_connectivity_score": {
+        "type": "score",
+        "score": 1.99,
+        "confidence": 0.99,
+        "legend": {
+          "0": "مفكك ومجرد قواعد منفصلة لا تنعكس على سلوك الشخصيات",
+          "1": "مترابط جزئياً مع ثغرات في مفاصل التحول الدرامي",
+          "2": "عالم عضوي محكم حيث تولد التراجيديا الإنسانية من صلب القوانين الفيزيائية"
+        },
+        "probabilities": {
+          "0": 0.0,
+          "1": 0.01,
+          "2": 0.99
+        }
+      },
+      "weakest_joint": {
+        "type": "choice",
+        "choice": "sociology_physics_fusion",
+        "confidence": 0.53,
+        "probabilities": {
+          "sociology_physics_fusion": 0.64,
+          "flint_symbol_vs_thermo": 0.06,
+          "external_world_silence": 0.19,
+          "driver_mystery_isolation": 0.11
+        }
+      },
+      "is_causally_unbreakable": {
+        "type": "noul",
+        "noul": 0.5
+      }
+    },
+    "usage": {
+      "input_tokens": 1900,
+      "output_tokens": 121
+    }
+  },
+  "missing": {
+    "model": "jev-1.13.0",
+    "answers": {
+      "primary_missing_dimension": {
+        "type": "choice",
+        "choice": "desert_predators_and_ecology",
+        "confidence": 0.33,
+        "probabilities": {
+          "desert_predators_and_ecology": 0.5,
+          "diesel_chemistry_cloud_point": 0.02,
+          "locomotive_cab_resolution": 0.11,
+          "biological_excretion_and_air": 0.37
+        }
+      },
+      "excretion_and_atmosphere_urgency": {
+        "type": "noul",
+        "noul": 0.77
+      },
+      "diesel_gelling_risk": {
+        "type": "noul",
+        "noul": 0.78
+      }
+    },
+    "usage": {
+      "input_tokens": 1803,
+      "output_tokens": 126
+    }
+  },
+  "redundant": {
+    "model": "jev-1.13.0",
+    "answers": {
+      "primary_redundancy_source": {
+        "type": "choice",
+        "choice": "dual_auditing_specs",
+        "confidence": 0.85,
+        "probabilities": {
+          "dual_auditing_specs": 0.88,
+          "spatial_metric_redundancy": 0.07,
+          "guard_neurosis_duplication": 0.01,
+          "character_trauma_overlap": 0.04
+        }
+      },
+      "has_character_overlap": {
+        "type": "noul",
+        "noul": 0.32
+      },
+      "law_duplication_detected": {
+        "type": "noul",
+        "noul": 0.5
+      }
+    },
+    "usage": {
+      "input_tokens": 1700,
+      "output_tokens": 114
+    }
+  },
+  "excess": {
+    "model": "jev-1.13.0",
+    "answers": {
+      "primary_excess_element": {
+        "type": "choice",
+        "choice": "bureaucratic_cataloging",
+        "confidence": 0.79,
+        "probabilities": {
+          "bureaucratic_cataloging": 0.84,
+          "astronomical_angles_overkill": 0.04,
+          "micro_spatial_coordinates": 0.06,
+          "hyper_thermo_equations": 0.06
+        }
+      },
+      "is_micro_coordinates_excessive": {
+        "type": "noul",
+        "noul": 0.37
+      },
+      "world_readiness_score": {
+        "type": "score",
+        "score": 1.42,
+        "confidence": 0.34,
+        "legend": {
+          "0": "غير جاهز ويحتاج إعادة هيكلة جذرية",
+          "1": "شبه مكتمل ويحتاج تشذيب الزوائد الهندسية وسد النواقص البيولوجية",
+          "2": "مكتمل واستثنائي وفائق الإحكام والحتمية"
+        },
+        "probabilities": {
+          "0": 0.01,
+          "1": 0.56,
+          "2": 0.43
+        }
+      }
+    },
+    "usage": {
+      "input_tokens": 1910,
+      "output_tokens": 117
+    }
+  },
+  "engine_telemetry": {
+    "total_calls": 4,
+    "total_latency_seconds": 3.6121968000079505
+  }
+}

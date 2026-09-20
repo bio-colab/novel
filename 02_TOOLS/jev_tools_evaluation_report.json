@@ -1,0 +1,58 @@
+{
+  "model": "jev-1.13.0",
+  "answers": {
+    "most_rigorous_measurement": {
+      "type": "choice",
+      "choice": "EventReplayer",
+      "confidence": 0.89,
+      "probabilities": {
+        "EventReplayer": 0.92,
+        "WorldAuditor": 0.04,
+        "CausalityGraph": 0.04
+      }
+    },
+    "measurement_paradox_tool": {
+      "type": "choice",
+      "choice": "MoralEntropyMonitor",
+      "confidence": 0.9,
+      "probabilities": {
+        "MoralEntropyMonitor": 0.9400000000000001,
+        "SensoryLinter": 0.0,
+        "PsychologyDetector": 0.06
+      }
+    },
+    "system_maturity_score": {
+      "type": "score",
+      "score": 1.01,
+      "confidence": 0.98,
+      "legend": {
+        "0": "أدوات فحص شكلية سهلة التحايل تفتقر للعمق الفيزيائي",
+        "1": "منظومة متقدمة ورائدة تزاوج بين الصرامة الحسابية والذكاء الدلالي مع فجوات قابلة للتطوير",
+        "2": "منظومة قياس معصومة تامة الإحكام تغطي الوجود السردي بنسبة 100%"
+      },
+      "probabilities": {
+        "0": 0.0,
+        "1": 0.99,
+        "2": 0.01
+      }
+    },
+    "false_sense_of_control": {
+      "type": "noul",
+      "noul": 0.71
+    },
+    "key_blindspot": {
+      "type": "choice",
+      "choice": "symbolic_literalism",
+      "confidence": 0.31,
+      "probabilities": {
+        "symbolic_literalism": 0.54,
+        "author_intent_blindness": 0.36,
+        "discrete_vs_continuous": 0.1
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 2764,
+    "output_tokens": 212
+  }
+}

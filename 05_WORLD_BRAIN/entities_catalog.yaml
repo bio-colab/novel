@@ -23,6 +23,7 @@ characters:
   material_type: flesh
   properties:
     role: قائد مفرزة الحراسة
+    affordance_anchor: جالس_على_صندوق_ذخيرة_قرب_الباب
     tic: ندبة_الفك
     weapon: ENT-PROP-3002
 - entity_id: ENT-CHAR-1002
@@ -39,6 +40,7 @@ characters:
   material_type: flesh
   properties:
     role: عامل خدمة القطار
+    affordance_anchor: واقف_قرب_برميل_الماء_وممر_القاطرة
     tic: مسح_الكفين_ببنطال_الديزل
     held_tool: ENT-PROP-3008
 - entity_id: ENT-CHAR-1003
@@ -55,6 +57,7 @@ characters:
   material_type: flesh
   properties:
     role: حارس
+    affordance_anchor: منكمش_على_المقعد_المقابل_للنافذة
     tic: مسح_العرق_ونزيف_الأنف
     injury: fractured_nasal_bone
 - entity_id: ENT-CHAR-1004
@@ -71,6 +74,7 @@ characters:
   material_type: flesh
   properties:
     role: حارس متوتر
+    affordance_anchor: متوتر_قرب_مزلاج_الباب_الجانبي
     tic: الضحكة_الهستيرية_وفرك_الكفين
     weapon: ENT-PROP-3004
 - entity_id: ENT-CHAR-1005
@@ -87,6 +91,7 @@ characters:
   material_type: flesh
   properties:
     role: حارس المنصة الخلفية
+    affordance_anchor: حارس_متجمد_على_المنصة_الخلفية
     tic: إدارة_الحصاة_الصوانية
     weapon: ENT-PROP-3003
 - entity_id: ENT-CHAR-1006
@@ -103,6 +108,7 @@ characters:
   material_type: flesh
   properties:
     role: سجين ومقاتل سابق وخبير ميكانيك
+    affordance_anchor: مستند_إلى_جدار_الصاج_قرب_التهوية
     tic: فحص_مفاصل_القبضتين
     shackled: true
 - entity_id: ENT-CHAR-1007
@@ -119,6 +125,7 @@ characters:
   material_type: flesh
   properties:
     role: سجين صامت
+    affordance_anchor: جالس_في_قلب_التكدس_البشري_بالعربة_الوسطى
     tic: إبهام_عزيز_وسبابة_الدم
 - entity_id: ENT-CHAR-1008
   numeric_id: 1008
@@ -134,6 +141,7 @@ characters:
   material_type: flesh
   properties:
     role: سجين تركماني وقور
+    affordance_anchor: منتصب_بوقار_في_الركن_الأمامي_للعربة_الثانية
     tic: حذاء_خليل_الأسود
 - entity_id: ENT-CHAR-1009
   numeric_id: 1009
@@ -149,6 +157,7 @@ characters:
   material_type: flesh
   properties:
     role: سجين ممرض
+    affordance_anchor: منحنٍ_بين_المصابين_قرب_الممر
     tic: الضغط_على_منبت_الظفر
     held_item: ENT-PROP-3009
 - entity_id: ENT-CHAR-1010
@@ -165,6 +174,7 @@ characters:
   material_type: flesh
   properties:
     role: فتى سجين مهمش
+    affordance_anchor: محشور_في_الزاوية_الميتة_عند_شق_الباب
     tic: جيب_سلوم_الفارغ
     frostbite: true
 - entity_id: ENT-CHAR-1011
@@ -181,6 +191,7 @@ characters:
   material_type: flesh
   properties:
     role: سجين كتوم
+    affordance_anchor: منكمش_في_أقصى_العتمة_مستنداً_إلى_عارضة
     tic: ورقة_بشير_المطوية
 - entity_id: ENT-CHAR-1012
   numeric_id: 1012
@@ -196,6 +207,7 @@ characters:
   material_type: flesh
   properties:
     role: المدير العام السابق
+    affordance_anchor: جالس_في_زاوية_المقاعد_مشدوداً_إلى_معطفه
     tic: الزر_المخلوع_والساعة_المفقودة
 - entity_id: ENT-CHAR-1013
   numeric_id: 1013
@@ -211,6 +223,7 @@ characters:
   material_type: flesh
   properties:
     role: مهرب وبائع عملة
+    affordance_anchor: متردد_قرب_شق_الصاج_المنزاح
     tic: رزمة_الدنانير_المشتتة
 - entity_id: ENT-CHAR-1014
   numeric_id: 1014
@@ -226,6 +239,7 @@ characters:
   material_type: flesh
   properties:
     role: السجين الشبح
+    affordance_anchor: منسل_في_بطن_السواد_كشبح
     tic: السكون_الحيواني
     stealth_status: calculating_jump
 vehicles:

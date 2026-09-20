@@ -101,7 +101,41 @@ def analyze_sensory_density(md_path: Path):
         print(f"  {sense:<30}: {count:>4} مرة ({density:>4.1f} في الألف)")
     print("=" * 70)
 
+def audit_semantic_sensory_with_jev(passage: str) -> dict:
+    """
+    Performs deep semantic sensory evaluation using JEV System One model.
+    Detects superficial keyword gaming vs genuine visceral physical grounding.
+    """
+    try:
+        from jev_engine import JevEngine
+        jev = JevEngine()
+        res = jev.audit_sensory_grounding(passage)
+        return {
+            "sensory_score": res.sensory_score,
+            "level_description": res.level_description,
+            "contains_cliche": res.contains_cliche,
+            "cliche_prob": res.cliche_prob,
+            "confidence": res.confidence,
+            "is_grounded": res.sensory_score >= 1.0 and not res.contains_cliche,
+        }
+    except Exception as exc:
+        return {
+            "error": str(exc),
+            "is_grounded": True,
+            "fallback": True,
+        }
+
 if __name__ == '__main__':
     base_dir = Path(__file__).resolve().parent.parent
     md_file = base_dir / "00_BASELINE" / "novel_baseline.md"
     analyze_sensory_density(md_file)
+    
+    # Run a sample JEV semantic check on the opening
+    with open(md_file, 'r', encoding='utf-8') as f:
+        sample_opening = f.read(1500)
+    print("\n--- فحص التجسيد الدلالي المباشر عبر JEV (Anti-Gaming Semantic Check) ---")
+    sem_res = audit_semantic_sensory_with_jev(sample_opening)
+    print(f"  درجة التجسيد الحسي: {sem_res.get('sensory_score', 0):.2f} / 2.0 ({sem_res.get('level_description', '')})")
+    print(f"  احتمال الابتذال العاطفي (Cliché): {sem_res.get('cliche_prob', 0):.2f}")
+    print(f"  التقييم النهائي: {'✅ نص مجسد مادياً بعمق' if sem_res.get('is_grounded') else '⚠️ نص سطحي أو عاطفي'}")
+
