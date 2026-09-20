@@ -1,0 +1,93 @@
+schema_version: "1.0.0"
+world_id: "sand_train"
+title: "قطار الرمل - Sand Train"
+genre: "existential_survival_tragedy"
+
+chronotope:
+  setting: "بادية السماوة - خط السكة الحديد KP 312.4"
+  coordinates: "31.3°N, 45.3°E, Azimuth 165°"
+  historical_epoch: "1980s_analog"
+  start_timestamp: "198X-01-18T19:00:00"
+  total_duration_minutes: 645
+  timestep_minutes: 1.0
+
+environment:
+  temperature_celsius:
+    initial: 0.0
+    min: -8.0
+    max: 0.0
+  humidity_percent:
+    min: 8
+    max: 14
+  wind:
+    speed_kmh: 38.0
+    direction_degrees: 315.0
+    gust_kmh: 55.0
+  lux_ambient:
+    min: 0.0
+    max: 15.0
+
+spatial_topology:
+  coordinate_type: "1D_linear_track"
+  total_envelope_meters: 57.4
+  zones:
+    - id: "car_0"
+      name: "القاطرة (Locomotive Engine & Cabin)"
+      bounds_meters: [0.0, 14.2]
+      acoustic_isolation_db: 38.0
+      thermal_conduction_factor: 1.2
+    - id: "car_1"
+      name: "العربة الأولى (First Guard & Prisoner Car)"
+      bounds_meters: [14.2, 28.6]
+      acoustic_isolation_db: 35.0
+      thermal_conduction_factor: 1.1
+    - id: "car_2"
+      name: "العربة الثانية (Middle Prisoner Car)"
+      bounds_meters: [28.6, 43.0]
+      acoustic_isolation_db: 35.0
+      thermal_conduction_factor: 1.1
+    - id: "car_3"
+      name: "العربة الثالثة (Rear Caboose & Observation Platform)"
+      bounds_meters: [43.0, 57.4]
+      acoustic_isolation_db: 40.0
+      thermal_conduction_factor: 1.3
+
+resource_ledger:
+  initial_inventories:
+    - resource_id: "water_barrel_01"
+      category: "water"
+      amount: 14.0
+      unit: "liters"
+      location_zone_id: "car_1"
+      consumption_rate_per_hour_per_capita: 0.04
+    - resource_id: "kalashnikov_rounds_total"
+      category: "ammunition"
+      amount: 118
+      unit: "rounds"
+      location_zone_id: "car_0"
+    - resource_id: "diesel_fuel_tank"
+      category: "fuel"
+      amount: 850.0
+      unit: "liters"
+      location_zone_id: "car_0"
+    - resource_id: "pipe_wrench_12in"
+      category: "tool"
+      amount: 1
+      unit: "piece"
+      location_zone_id: "car_0"
+    - resource_id: "steel_wire_coil"
+      category: "tool"
+      amount: 4.5
+      unit: "meters"
+      location_zone_id: "car_0"
+
+headcount_target:
+  initial_total: 14
+  demographic_breakdown:
+    guards: 4
+    civilian_staff: 1
+    prisoners: 9
+
+rules_manifest_ref: "01_SPECS_AND_RULES/rules_manifest.yaml"
+entities_catalog_ref: "05_WORLD_BRAIN/entities_catalog.yaml"
+causality_graph_ref: "05_WORLD_BRAIN/causality_graph.yaml"

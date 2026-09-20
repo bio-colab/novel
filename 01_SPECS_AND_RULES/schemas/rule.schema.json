@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://narrative-engine.org/schemas/rule.schema.json",
+  "title": "RulesManifest",
+  "description": "Schema defining declarative, computable narrative rules and physical invariants.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "domain_count",
+    "rules"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "domain_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "domain",
+          "description",
+          "severity"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^LAW-[A-Z]+-[0-9]{2}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 3
+          },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "thermodynamics",
+              "kinetics",
+              "ballistics",
+              "pneumatics",
+              "acoustics",
+              "optics",
+              "electromechanics",
+              "biology",
+              "chemistry",
+              "sociology",
+              "ethics",
+              "historical_politics"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10
+          },
+          "mathematical_expression": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "conditions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["parameter", "operator", "value"],
+                  "properties": {
+                    "parameter": { "type": "string" },
+                    "operator": {
+                      "type": "string",
+                      "enum": ["<", "<=", "==", "!=", ">=", ">", "in", "contains"]
+                    },
+                    "value": {},
+                    "unit": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "invariants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["target", "assertion"],
+              "properties": {
+                "target": { "type": "string" },
+                "assertion": { "type": "string" },
+                "operator": {
+                  "type": "string",
+                  "enum": ["<", "<=", "==", "!=", ">=", ">", "in"]
+                },
+                "expected_value": {}
+              }
+            }
+          },
+          "state_mutations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["target", "action"],
+              "properties": {
+                "target": { "type": "string" },
+                "action": { "type": "string", "enum": ["set", "decrement", "increment", "lock", "unlock"] },
+                "value": {}
+              }
+            }
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["FATAL", "VIOLATION", "WARNING"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

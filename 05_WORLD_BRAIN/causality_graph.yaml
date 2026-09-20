@@ -1,0 +1,133 @@
+schema_version: "1.0.0"
+world_id: "sand_train"
+total_events: 16
+
+events:
+  - id: "EVT-001-SABOTAGE"
+    time: "18:45:00"
+    minute: -15
+    name: "تخريب السكة وزرع اللغم الأرضي عند نقطة KP 312.4"
+    type: "Physical_Action"
+    causes:
+      - "EVT-002-DERAIL_SHOCK"
+
+  - id: "EVT-002-DERAIL_SHOCK"
+    time: "19:00:00"
+    minute: 0
+    name: "صدمة الارتداد وانكسار أنبوب الوقود وتوقف عمود الحركة"
+    type: "Mechanical_Failure"
+    causes:
+      - "EVT-003-BRAKE_LOCK"
+      - "EVT-004-FUEL_LEAK"
+      - "EVT-005-CABIN_DROP_LATCH"
+
+  - id: "EVT-003-BRAKE_LOCK"
+    time: "19:00:05"
+    minute: 0
+    name: "تفريغ أنبوب الهواء وإطباق مكابح ويستنغهاوس القسري"
+    type: "Pneumatic_Invariable"
+    causes:
+      - "EVT-006-TOTAL_IMMOBILITY"
+
+  - id: "EVT-004-FUEL_LEAK"
+    time: "19:00:10"
+    minute: 0
+    name: "تسرب الديزل وانعدام الضغط في غرفة الاحتراق"
+    type: "Hydraulic_State"
+    causes:
+      - "EVT-007-ENGINE_STALL"
+
+  - id: "EVT-005-CABIN_DROP_LATCH"
+    time: "19:01:00"
+    minute: 1
+    name: "سقوط السقاطة الداخلية لمقصورة السائق وانغلاق الباب"
+    type: "Mechanical_State"
+    causes:
+      - "EVT-008-CABIN_ISOLATION"
+
+  - id: "EVT-006-TOTAL_IMMOBILITY"
+    time: "19:02:00"
+    minute: 2
+    name: "شلل القطار التام في العراء والصقيع الصحراوي"
+    type: "Spatial_State"
+    causes:
+      - "EVT-009-COLD_EXPOSURE"
+      - "EVT-010-AMBUSH_TRAP"
+
+  - id: "EVT-007-ENGINE_STALL"
+    time: "19:02:00"
+    minute: 2
+    name: "انطفاء المحرك وتوقف التدفئة وفقدان المولد"
+    type: "Thermal_State"
+    causes:
+      - "EVT-009-COLD_EXPOSURE"
+
+  - id: "EVT-008-CABIN_ISOLATION"
+    time: "19:05:00"
+    minute: 5
+    name: "عجز الحراس عن دخول المقصورة وإدارة القطار"
+    type: "Epistemic_State"
+    causes:
+      - "EVT-015-MANUAL_PRIMER_BYPASS"
+
+  - id: "EVT-009-COLD_EXPOSURE"
+    time: "19:30:00"
+    minute: 30
+    name: "هبوط الحرارة دون الصفر وتآكل مهارات الأصابع الحركية"
+    type: "Bio_Thermal"
+    causes:
+      - "EVT-011-SLOW_REACTION"
+      - "EVT-012-WATER_RATIONING"
+
+  - id: "EVT-010-AMBUSH_TRAP"
+    time: "23:55:00"
+    minute: 295
+    name: "تطويق المهاجمين للقطار وبدء إطلاق النار الكثيف"
+    type: "Tactical_Combat"
+    causes:
+      - "EVT-013-AMMO_CONSUMPTION"
+      - "EVT-014-AMBUSHER_RETREAT_UNCAUSED"
+
+  - id: "EVT-011-SLOW_REACTION"
+    time: "00:15:00"
+    minute: 315
+    name: "تيبس أصابع الحراس وتراجع دقة إطلاق النار"
+    type: "Bio_Thermal"
+    causes: []
+
+  - id: "EVT-012-WATER_RATIONING"
+    time: "01:00:00"
+    minute: 360
+    name: "تقنين الماء بالاستكانة الواحدة لمواجهة الجفاف"
+    type: "Resource_State"
+    causes: []
+
+  - id: "EVT-013-AMMO_CONSUMPTION"
+    time: "00:35:00"
+    minute: 335
+    name: "استهلاك 100 طلقة وبقاء 18 طلقة فعالة فقط"
+    type: "Resource_State"
+    causes: []
+
+  - id: "EVT-014-AMBUSHER_RETREAT_UNCAUSED"
+    time: "00:35:00"
+    minute: 335
+    name: "انسحاب المهاجمين المفاجئ دون تكلفة سالبة موثقة"
+    type: "Anomaly_Effect"
+    anomaly_flag: "WORLD-BUG-002"
+    causes: []
+
+  - id: "EVT-015-MANUAL_PRIMER_BYPASS"
+    time: "05:45:00"
+    minute: 645
+    name: "سحب أبو علي لذراع مضخة التحضير الخارجية لتشغيل المحرك"
+    type: "Physical_Action"
+    causes:
+      - "EVT-016-ENGINE_RESTART"
+
+  - id: "EVT-016-ENGINE_RESTART"
+    time: "05:46:00"
+    minute: 646
+    name: "اشتعال الماكينة العمياء وتحرك القطار في الفجر"
+    type: "Mechanical_State"
+    causes: []

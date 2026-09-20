@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://narrative-engine.org/schemas/world_manifest.schema.json",
+  "title": "WorldManifest",
+  "description": "Schema defining a deterministic narrative world manifest, environment, spatial topology, and resource ledger.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "world_id",
+    "title",
+    "chronotope",
+    "environment",
+    "spatial_topology",
+    "resource_ledger"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "world_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "genre": {
+      "type": "string"
+    },
+    "chronotope": {
+      "type": "object",
+      "required": [
+        "setting",
+        "historical_epoch",
+        "start_timestamp",
+        "total_duration_minutes",
+        "timestep_minutes"
+      ],
+      "properties": {
+        "setting": { "type": "string" },
+        "coordinates": { "type": "string" },
+        "historical_epoch": { "type": "string" },
+        "start_timestamp": { "type": "string" },
+        "total_duration_minutes": { "type": "number", "minimum": 0 },
+        "timestep_minutes": { "type": "number", "minimum": 0.01 }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "temperature_celsius",
+        "humidity_percent",
+        "wind"
+      ],
+      "properties": {
+        "temperature_celsius": {
+          "type": "object",
+          "required": ["initial", "min", "max"],
+          "properties": {
+            "initial": { "type": "number" },
+            "min": { "type": "number" },
+            "max": { "type": "number" }
+          }
+        },
+        "humidity_percent": {
+          "type": "object",
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "number", "minimum": 0, "maximum": 100 },
+            "max": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        },
+        "wind": {
+          "type": "object",
+          "required": ["speed_kmh", "direction_degrees"],
+          "properties": {
+            "speed_kmh": { "type": "number", "minimum": 0 },
+            "direction_degrees": { "type": "number", "minimum": 0, "maximum": 360 },
+            "gust_kmh": { "type": "number", "minimum": 0 }
+          }
+        },
+        "lux_ambient": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number", "minimum": 0 },
+            "max": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "spatial_topology": {
+      "type": "object",
+      "required": [
+        "coordinate_type",
+        "total_envelope_meters",
+        "zones"
+      ],
+      "properties": {
+        "coordinate_type": {
+          "type": "string",
+          "enum": ["1D_linear_track", "2D_plane", "3D_bounded_box", "network_graph"]
+        },
+        "total_envelope_meters": { "type": "number", "minimum": 0 },
+        "zones": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "bounds_meters"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "bounds_meters": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "acoustic_isolation_db": { "type": "number", "minimum": 0 },
+              "thermal_conduction_factor": { "type": "number", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "resource_ledger": {
+      "type": "object",
+      "required": ["initial_inventories"],
+      "properties": {
+        "initial_inventories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["resource_id", "category", "amount", "unit", "location_zone_id"],
+            "properties": {
+              "resource_id": { "type": "string" },
+              "category": { "type": "string", "enum": ["water", "food", "ammunition", "fuel", "medical", "tool", "clothing", "misc"] },
+              "amount": { "type": "number", "minimum": 0 },
+              "unit": { "type": "string" },
+              "location_zone_id": { "type": "string" },
+              "consumption_rate_per_hour_per_capita": { "type": "number", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "headcount_target": {
+      "type": "object",
+      "required": ["initial_total", "demographic_breakdown"],
+      "properties": {
+        "initial_total": { "type": "integer", "minimum": 1 },
+        "demographic_breakdown": { "type": "object" }
+      }
+    },
+    "rules_manifest_ref": { "type": "string" },
+    "entities_catalog_ref": { "type": "string" },
+    "causality_graph_ref": { "type": "string" }
+  },
+  "additionalProperties": false
+}

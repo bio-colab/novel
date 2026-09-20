@@ -1,0 +1,301 @@
+schema_version: "1.0.0"
+domain_count: 12
+
+rules:
+  - id: "LAW-THERMO-01"
+    name: "انكماش الصاج 1.8 ملم وطقطقة الغسق"
+    domain: "thermodynamics"
+    description: "انكماش صفيحة الحديد 1.8 ملم بمعدل 0.012 ملم/م لكل درجة مئوية هبوطاً، محدثاً طقطقة جافة حتمية مع انخفاض الحرارة إلى ما دون الصفر."
+    mathematical_expression: "Delta_L = alpha * L_0 * Delta_T"
+    trigger:
+      description: "هبوط درجة حرارة الصاج بمقدار 5 درجات خلال أقل من 60 دقيقة"
+      conditions:
+        - parameter: "ambient_temperature"
+          operator: "<="
+          value: 0.0
+          unit: "celsius"
+    invariants:
+      - target: "train.car_plates.acoustic_creak"
+        assertion: "طقطقة انكماشية مسموعة في الدقيقة الأولى بعد الغروب"
+        operator: "=="
+        expected_value: true
+    severity: "VIOLATION"
+
+  - id: "LAW-KIN-01"
+    name: "موجة ارتداد الصدادات الارتجاجية (Slack Action)"
+    domain: "kinetics"
+    description: "انتقال صدمة الفرملة الفجائية أو الاصطدام عبر فجوات الصدادات بسرعة 200 م/ث نحو العربة الخلفية، مسببة قوى تسارع تصل إلى 2.5G."
+    mathematical_expression: "a_max = (v_impact^2) / (2 * d_slack) >= 2.5 * g"
+    trigger:
+      description: "هبوط ضغط أنبوب المكابح إلى 0.0 بار فجأة"
+      conditions:
+        - parameter: "brake_pipe_pressure"
+          operator: "=="
+          value: 0.0
+          unit: "bar"
+    invariants:
+      - target: "car_3.impact_g_force"
+        assertion: "قوة الاصطدام في العربة الأخيرة يجب أن تبلغ ذروتها بعد 0.28 ثانية من القاطرة"
+        operator: ">="
+        expected_value: 2.0
+    severity: "FATAL"
+
+  - id: "LAW-BALL-01"
+    name: "اختراق المقذوفات وتشظي الصاج (Spalling)"
+    domain: "ballistics"
+    description: "اختراق رصاص 7.62 ملم لصاج 1.8 ملم ينتج تشظياً مسنناً داخلياً وارتدادات قاتلة داخل الفضاء المعدني المغلق."
+    mathematical_expression: "E_residual = 0.5 * m * (v_impact^2 - v_limit^2) > 0"
+    trigger:
+      description: "إطلاق نار موجه نحو صاج العربة"
+      conditions:
+        - parameter: "ballistic_impact_detected"
+          operator: "=="
+          value: true
+    invariants:
+      - target: "target_zone.spalling_fragments_present"
+        assertion: "تشظي شظايا صاج مسننة داخل العربة حتمي عند كل اختراق"
+        operator: "=="
+        expected_value: true
+    severity: "FATAL"
+
+  - id: "LAW-PNEUM-01"
+    name: "الفرملة الهوائية الآمنة إخفاقياً (مبدأ ويستنغهاوس)"
+    domain: "pneumatics"
+    description: "انقطاع أو ثقب أنبوب الهواء يفرغ الضغط مسبباً إطباق فكوك المكابح بقوة اليايات الميكانيكية، ويستحيل تحريك القطار إلا بالتصريف اليدوي."
+    mathematical_expression: "P_pipe <= 0.5 bar -> Clamping_Force = F_spring_max"
+    trigger:
+      description: "انخفاض ضغط الأنبوب الرئيسي إلى ما دون 0.5 بار"
+      conditions:
+        - parameter: "brake_pipe_pressure"
+          operator: "<="
+          value: 0.5
+          unit: "bar"
+    invariants:
+      - target: "train.motion_locked"
+        assertion: "القطار مقفل ميكانيكياً ويستحيل تدوير العجلات"
+        operator: "=="
+        expected_value: true
+    severity: "FATAL"
+
+  - id: "LAW-ACOUST-01"
+    name: "الرنين التجويفي والمحو السمعي الصحراوي"
+    domain: "acoustics"
+    description: "تضخيم التجويف المعدني للأصوات والموال بـ +20 dB داخلياً، ومحو سمعي تام في الفراغ الصحراوي بمسافة تفوق 50 متراً عكس الريح."
+    mathematical_expression: "Loss_acoustic = 20 * log10(d) + alpha * d > 35 dB"
+    trigger:
+      description: "صدور صوت داخل عربة مغلقة"
+      conditions:
+        - parameter: "source_sound_db"
+          operator: ">"
+          value: 40.0
+    invariants:
+      - target: "cross_car_audibility"
+        assertion: "الهمس داخل عربة لا ينتقل إلى العربة التالية إذا كان العزل يفوق 35 dB"
+        operator: "<="
+        expected_value: 20.0
+    severity: "VIOLATION"
+
+  - id: "LAW-OPT-01"
+    name: "تدرج العتمة وعمى وميض الإطلاق"
+    domain: "optics"
+    description: "تدرج الإضاءة من 15 Lux في القاطرة إلى 0.05 Lux في الأخيرة، وعمى وميضي مؤقت لمدة 3-8 ثوانٍ عند كل طلقة في الظلام."
+    mathematical_expression: "t_recovery = 3.5 * log10(I_flash / I_ambient)"
+    trigger:
+      description: "إطلاق نار في بيئة إضاءة أقل من 1.0 Lux"
+      conditions:
+        - parameter: "ambient_lux"
+          operator: "<="
+          value: 1.0
+    invariants:
+      - target: "shooter.temporary_flash_blindness_seconds"
+        assertion: "عمى وميضي فوري يعطل الرؤية الدقيقة"
+        operator: ">="
+        expected_value: 3.0
+    severity: "VIOLATION"
+
+  - id: "LAW-ELEC-01"
+    name: "التفريغ الكهروحراري لبطاريات الرصاص وانطفاء الإضاءة"
+    domain: "electromechanics"
+    description: "هبوط سعة بطاريات الرصاص الحمضية بنسبة 50% عند درجات ما دون الصفر، مما يجعل استمرار الإضاءة محكوماً بـ 3 إلى 4.5 ساعات كحد أقصى."
+    mathematical_expression: "C_eff(T) = C_nominal * (1 + 0.008 * (T - 25)) <= 0.60 * C_nominal"
+    trigger:
+      description: "استمرار تشغيل مصابيح القطار في حرارة تحت الصفر"
+      conditions:
+        - parameter: "ambient_temperature"
+          operator: "<="
+          value: 0.0
+        - parameter: "elapsed_time_hours"
+          operator: ">="
+          value: 4.5
+    invariants:
+      - target: "train.electric_lights_active"
+        assertion: "انطفاء الإضاءة الكهربائية التلقائي وانتقال الفضاء للعتمة"
+        operator: "=="
+        expected_value: false
+    severity: "FATAL"
+
+  - id: "LAW-BIO-01"
+    name: "التقبض الوعائي وتيبس سبابة الزناد (Trigger Finger Stiffness)"
+    domain: "biology"
+    description: "هبوط حرارة الأطراف إلى ما دون 10 درجات مئوية يسبب فقدان المهارات الحركية الدقيقة وتيبس إصبع الزناد بعد 45 دقيقة من التعرض المباشر."
+    mathematical_expression: "Dexterity_ratio(t) = e^(-0.015 * t_exposure) <= 0.35"
+    trigger:
+      description: "تعرض الأطراف غير المحمية لدرجة حرارة أقل من الصفر"
+      conditions:
+        - parameter: "ambient_temperature"
+          operator: "<="
+          value: -2.0
+        - parameter: "exposure_minutes"
+          operator: ">="
+          value: 45.0
+    invariants:
+      - target: "character.motor_dexterity_ratio"
+        assertion: "انخفاض مهارة الأصابع الدقيقة إلى أقل من 40%"
+        operator: "<="
+        expected_value: 0.40
+    severity: "FATAL"
+
+  - id: "LAW-BIO-02"
+    name: "اللوازم الحركية العصبية القهرية (Basal Ganglia Tics)"
+    domain: "biology"
+    description: "إطلاق العقد القاعدية في الدماغ حركات لاإرادية قهرية متكررة (لمس الندبة، اصطكاك الأسنان، فرك الجيب) لتصريف التوتر الوجودي الحاد."
+    mathematical_expression: "P_tic_activation = 1.0 / (1.0 + e^(-10 * (Stress_Level - 0.70)))"
+    trigger:
+      description: "ارتفاع مستوى التوتر النفسي فوق 0.70"
+      conditions:
+        - parameter: "stress_level"
+          operator: ">="
+          value: 0.70
+    invariants:
+      - target: "character.primary_tic_active"
+        assertion: "تفعيل الحركة اللاإرادية القهرية الخاصة بالشخصية حتمياً"
+        operator: "=="
+        expected_value: true
+    severity: "VIOLATION"
+
+  - id: "LAW-BIO-03"
+    name: "تجفاف الزفير الجليدي في الهواء الجاف"
+    domain: "biology"
+    description: "فقدان الجسم للماء عبر رطوبة الزفير والارتجاف بمعدل 40 مل/ساعة للشخص في الهواء الصحراوي الجاف (-8°C ورطوبة 10%)."
+    mathematical_expression: "Water_loss_total = 0.040 * Headcount * Hours_elapsed"
+    trigger:
+      description: "تنفس في هواء قطبي جاف"
+      conditions:
+        - parameter: "ambient_humidity_percent"
+          operator: "<="
+          value: 15.0
+    invariants:
+      - target: "train.total_dehydration_loss_liters"
+        assertion: "فقدان 6 لترات على الأقل من الرطوبة الجسدية لـ 14 فرداً خلال 10.75 ساعات"
+        operator: ">="
+        expected_value: 5.5
+    severity: "VIOLATION"
+
+  - id: "LAW-BIO-05"
+    name: "بيولوجيا الإخراج الحبيس، تشنج المثانة، وسقوط الكرامة"
+    domain: "biology"
+    description: "احتجاز 14 فرداً لمدة 10.75 ساعات ينتج حتمياً 3.0 إلى 4.2 لتر من البول، وتشنج العضلة العاصرة في الصقيع يجعل الإخراج في زاوية العربة محكاً لسقوط تراتبية السلطة."
+    mathematical_expression: "V_urine_total = N_souls * (t_hours / 24) * 0.8 to 1.0 L >= 3.0 L"
+    trigger:
+      description: "احتجاز بشري لأكثر من 6 ساعات في حيز مغلق دون مرافق"
+      conditions:
+        - parameter: "confinement_hours"
+          operator: ">="
+          value: 6.0
+    invariants:
+      - target: "car_1.biological_waste_volume_liters"
+        assertion: "تراكم فضلات بولية سائلة بحد أدنى 3.0 لترات"
+        operator: ">="
+        expected_value: 3.0
+    severity: "FATAL"
+
+  - id: "LAW-CHEM-01"
+    name: "نقطة التغيم وتصلب شمع البرافين لوقود الديزل"
+    domain: "chemistry"
+    description: "تبلور شمع البرافين في الديزل الصيفي عند -2 إلى -4 مئوية، وانسداد الفلاتر تماماً (CFPP) عند -6 مئوية مانعاً أي تشغيل للمحرك دون تسخين."
+    mathematical_expression: "T_ambient <= -6.0 C -> Viscosity -> infinity (Paraffin Gel Locked)"
+    trigger:
+      description: "هبوط حرارة خزان وأنابيب الديزل إلى ما دون -6.0°C"
+      conditions:
+        - parameter: "diesel_fuel_temperature"
+          operator: "<="
+          value: -6.0
+          unit: "celsius"
+    invariants:
+      - target: "locomotive.engine.cold_restart_possible"
+        assertion: "يستحيل تشغيل المحرك بالتدوير الهوائي أو السلك دون تسخين مسبق للفلاتر"
+        operator: "=="
+        expected_value: false
+    severity: "FATAL"
+
+  - id: "LAW-SOC-01"
+    name: "تآكل السلطة المؤسسية وانقلاب التراتبية في الصقيع"
+    domain: "sociology"
+    description: "تآكل نفوذ الأوامر العسكرية الرسمية أمام الموت بالبرد وتساوي الجميع في الحاجة البيولوجية للدفء."
+    mathematical_expression: "Authority_Index = Base_Rank * (1.0 - Delta_T_cold / 10.0) * Dexterity_ratio"
+    trigger:
+      description: "عجز الحراس عن توفير التدفئة أو إطلاق النار بدقة"
+      conditions:
+        - parameter: "ambient_temperature"
+          operator: "<="
+          value: -6.0
+    invariants:
+      - target: "guard_officer.absolute_obedience_ratio"
+        assertion: "هبوط طاعة السجناء التلقائية للأوامر الصرفة بنسبة تتجاوز 50%"
+        operator: "<="
+        expected_value: 0.50
+    severity: "VIOLATION"
+
+  - id: "LAW-SOC-02"
+    name: "سيادة القيمة الاستعمالية الفيزيائية في البقاء"
+    domain: "sociology"
+    description: "صعود المكانة الميدانية للميكانيكي والممرض والجسد الفدائي وتراجع قيمة الرتب الإدارية والمال الورقي إلى الصفر."
+    mathematical_expression: "Survival_Status = Use_Value_Multiplier / (Paper_Bureaucracy_Value + 0.01)"
+    trigger:
+      description: "عطل وجودي يهدد الحياة ولا ينفع فيه المال أو الرتبة"
+      conditions:
+        - parameter: "crisis_state"
+          operator: "=="
+          value: "existential_confinement"
+    invariants:
+      - target: "haji_ammar.functional_status_rank"
+        assertion: "هبوط رتبة حجي عمار الوظيفية الفعلية إلى الدرك الأسفل (صفر فائدة)"
+        operator: "=="
+        expected_value: 0
+    severity: "VIOLATION"
+
+  - id: "LAW-ETHIC-01"
+    name: "التضامن العضوي كنيغينتروبيا (مقاومة الفناء المادي)"
+    domain: "ethics"
+    description: "التضامن الإنساني العفوي (اقتسام رشفة ماء، التدفئة بالتلاصق) يمثل القوة الفيزيائية الوحيدة القادرة على إبطاء الإنتروبيا القاتلة."
+    mathematical_expression: "dS_moral / dt = Production - J_solidarity <= 0"
+    trigger:
+      description: "اقتراب حرارة الجذع الجمعي من درك الخطر"
+      conditions:
+        - parameter: "ambient_temperature"
+          operator: "<="
+          value: -4.0
+    invariants:
+      - target: "group.cohesion_neg_entropy_active"
+        assertion: "تلاصق الأجساد في العربة الثانية يقلل الفقد الحراري السطحي بنسبة 25%"
+        operator: "=="
+        expected_value: true
+    severity: "WARNING"
+
+  - id: "LAW-POL-01"
+    name: "النقاء التناظري المطلق والعزل الجغرافي السجني"
+    domain: "historical_politics"
+    description: "العالم محكوم بتقنيات الثمانينيات التناظرية الصرفة (سلك، ميكانيكا، شحم، راديو متقطع) وخالٍ تماماً من أي مفارقة رقمية أو أجهزة حديثة."
+    mathematical_expression: "Digital_Artifacts_Count == 0"
+    trigger:
+      description: "فحص أدوات وأعيان العالم"
+      conditions:
+        - parameter: "epoch_year"
+          operator: "<"
+          value: 1990
+    invariants:
+      - target: "world.digital_signals_present"
+        assertion: "انعدام أي إشارة أو شريحة رقمية أو هاتف محمول"
+        operator: "=="
+        expected_value: false
+    severity: "FATAL"

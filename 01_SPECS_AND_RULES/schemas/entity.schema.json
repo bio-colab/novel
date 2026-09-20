@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://narrative-engine.org/schemas/entity.schema.json",
+  "title": "EntitiesCatalog",
+  "description": "Schema defining entities catalog including characters, vehicles, props, and landmarks.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "characters",
+    "vehicles",
+    "props",
+    "landmarks"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["schema_version", "novel_id", "charter", "total_entities_count"],
+      "properties": {
+        "schema_version": { "type": "string" },
+        "novel_id": { "type": "string" },
+        "charter": { "type": "string" },
+        "total_entities_count": { "type": "integer", "minimum": 1 },
+        "breakdown": { "type": "object" }
+      }
+    },
+    "characters": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "entity_id",
+          "numeric_id",
+          "canonical_name",
+          "category",
+          "location_id",
+          "properties"
+        ],
+        "properties": {
+          "entity_id": { "type": "string", "pattern": "^ENT-CHAR-[0-9]+$" },
+          "numeric_id": { "type": "integer" },
+          "canonical_name": { "type": "string" },
+          "category": { "type": "string", "enum": ["CHARACTER"] },
+          "parent_entity_id": { "type": ["string", "null"] },
+          "location_id": { "type": "string" },
+          "coordinates": { "type": ["object", "null"] },
+          "mass_kg": { "type": "number" },
+          "temperature_c": { "type": "number" },
+          "material_type": { "type": "string" },
+          "properties": {
+            "type": "object",
+            "required": ["role", "affordance_anchor"],
+            "properties": {
+              "role": { "type": "string" },
+              "affordance_anchor": { "type": "string", "minLength": 3 },
+              "tic": { "type": "string" },
+              "weapon": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "vehicles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entity_id", "canonical_name", "category"],
+        "properties": {
+          "entity_id": { "type": "string" },
+          "canonical_name": { "type": "string" },
+          "category": { "type": "string", "enum": ["VEHICLE"] },
+          "properties": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "props": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entity_id", "canonical_name", "category"],
+        "properties": {
+          "entity_id": { "type": "string" },
+          "canonical_name": { "type": "string" },
+          "category": { "type": "string", "enum": ["PROP"] },
+          "properties": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "landmarks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entity_id", "canonical_name", "category"],
+        "properties": {
+          "entity_id": { "type": "string" },
+          "canonical_name": { "type": "string" },
+          "category": { "type": "string", "enum": ["LANDMARK"] },
+          "properties": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
