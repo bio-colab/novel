@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>العقل الثانوي: عالم رواية قطار الرمل</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", sans-serif; }
+        body { background: #0f172a; color: #f8fafc; overflow: hidden; height: 100vh; display: flex; }
+        #graph-container { flex: 1; position: relative; height: 100%; }
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        /* Top Navigation Overlay */
+        .toolbar {
+            position: absolute; top: 16px; right: 16px; z-index: 10;
+            background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(8px);
+            padding: 12px 18px; border-radius: 12px; border: 1px solid #334155;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: flex; gap: 12px; align-items: center;
+        }
+        .toolbar h1 { font-size: 15px; font-weight: 700; color: #38bdf8; margin-left: 12px; }
+        .search-box {
+            background: #0f172a; border: 1px solid #475569; color: #fff;
+            padding: 6px 12px; border-radius: 6px; font-size: 13px; width: 180px; outline: none;
+        }
+        .search-box:focus { border-color: #38bdf8; }
+        .btn {
+            background: #334155; color: #f1f5f9; border: 1px solid #475569;
+            padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn:hover { background: #475569; color: #fff; }
+        
+        /* Categories Legend */
+        .legend {
+            position: absolute; bottom: 16px; right: 16px; z-index: 10;
+            background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(8px);
+            padding: 12px 16px; border-radius: 10px; border: 1px solid #334155;
+            font-size: 12px; display: flex; flex-direction: column; gap: 6px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; }
+
+        /* Node Inspector Sidebar */
+        #inspector {
+            width: 340px; height: 100%; background: #1e293b; border-left: 1px solid #334155;
+            padding: 24px; overflow-y: auto; display: none; z-index: 20;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+        }
+        #inspector h2 { font-size: 20px; color: #f8fafc; margin-bottom: 6px; }
+        #inspector .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 600; margin-bottom: 16px;
+        }
+        #inspector .section-title { font-size: 13px; font-weight: 700; color: #94a3b8; margin: 16px 0 8px; text-transform: uppercase; }
+        #inspector p { font-size: 13px; line-height: 1.6; color: #cbd5e1; }
+        #inspector .connections-list { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        #inspector .connection-tag {
+            background: #0f172a; border: 1px solid #475569; padding: 4px 10px;
+            border-radius: 6px; font-size: 12px; color: #38bdf8; cursor: pointer; text-decoration: none;
+        }
+        #inspector .connection-tag:hover { border-color: #38bdf8; background: #1e293b; }
+        #inspector .close-btn { float: left; cursor: pointer; color: #94a3b8; font-size: 18px; }
+        #inspector .close-btn:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="graph-container">
+        <div class="toolbar">
+            <h1>Novel-OS: العقل الثانوي (Digital Twin)</h1>
+            <input type="text" id="search" class="search-box" placeholder="ابحث عن عقدة أو شخصية...">
+            <button class="btn" id="reset-zoom">إعادة ضبط المشهد</button>
+            <a href="https://github.com/bio-colab/novel" target="_blank" class="btn" style="text-decoration: none; color: #38bdf8; font-weight: 600;">GitHub Repo ↗</a>
+        </div>
+
+        <div class="legend" id="legend"></div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="inspector">
+        <span class="close-btn" id="close-inspector">&times;</span>
+        <h2 id="ins-title">عنوان العقدة</h2>
+        <span class="badge" id="ins-badge">الفئة</span>
+        <div class="section-title">المقتطف السيميائي / التوصيف</div>
+        <p id="ins-snippet">...</p>
+        <div class="section-title">العلاقات والروابط المتصلة (<span id="ins-conn-count">0</span>)</div>
+        <ul class="connections-list" id="ins-connections"></ul>
+        <div class="section-title" style="margin-top: 24px;">مسار الملف المعرفي</div>
+        <code style="font-size: 11px; color: #64748b;" id="ins-path"></code>
+    </div>
+
+    <script>
+        const rawNodes = [{"id": "index", "title": "index", "category": "ROOT", "categoryLabel": "البوابة المركزية", "color": "#ec4899", "radius": 16, "snippet": "مرحباً بك في العقل الثانوي لعالم رواية «قطار الرمل». هذه البيئة مصممة لربط كل عنصر في الرواية بسياقه الفيزيائي، والسيميائي، والاجتماعي، والدرامي، تمام...", "filePath": "05_WORLD_BRAIN/index.md"}, {"id": "أبو_اللول", "title": "أبو اللول", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "خالد تخبلت؟ السجناء ننطيهم مثلنا؟ احنا حراس الدولة!", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/أبو_اللول.md"}, {"id": "أبو_علي", "title": "أبو علي", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "السايق ما يرد.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/أبو_علي.md"}, {"id": "بسام", "title": "بسام", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "العظم سليم. الشريان ما انضرب. بس لازم تضغط عليه.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/بسام.md"}, {"id": "بشير", "title": "بشير", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "كتلك ما أريد. عوفني بحالي.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/بشير.md"}, {"id": "حجي_عمار", "title": "حجي عمار", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "المسافة المتبقية للمحطة القادمة تتجاوز ساعتين ونصف... هذا الإجراء يحمي الحراسة قبل السجناء.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/حجي_عمار.md"}, {"id": "حسن_كاز", "title": "حسن كاز", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "هذا درب مهربين قديم ينزل على وادي الغدف... إذا بقينا بالقطار، ننجمد للصبح!", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/حسن_كاز.md"}, {"id": "حناطة", "title": "حناطة", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "هههه... خاف مات؟ خاف انجلط والقطار مشى وحدة من راوة لهنا؟", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/حناطة.md"}, {"id": "خالد", "title": "خالد (أبو وليد)", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "سد حلكك.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/خالد.md"}, {"id": "خليل", "title": "خليل التركماني", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "ساغ أول... عوفه، ماكو شي.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/خليل.md"}, {"id": "سردار", "title": "سردار", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "خالد! انطيني السلاح مال حناطة!", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/سردار.md"}, {"id": "سلوم", "title": "سلوم", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "بشير! ساعدني... رح ننذبح!", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/سلوم.md"}, {"id": "عباس", "title": "عباس", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "الكاع مو مريحة... السكوت زايد عن حده.", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/عباس.md"}, {"id": "عزيز", "title": "عزيز", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "يـا ليل هـود... تـرى ثـكل الحـزن غـاطي  ", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/عزيز.md"}, {"id": "مهدي", "title": "مهدي", "category": "01_CHARACTERS", "categoryLabel": "الشخصيات", "color": "#3b82f6", "radius": 14, "snippet": "...", "filePath": "05_WORLD_BRAIN/01_CHARACTERS/مهدي.md"}, {"id": "إبهام_عزيز_وسبابة_الدم", "title": "إبهام عزيز ومحو الدم", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/إبهام_عزيز_وسبابة_الدم.md"}, {"id": "الحصاة_الصوانية", "title": "الحصاة الصوانية الملساء", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/الحصاة_الصوانية.md"}, {"id": "برميل_الماء_الأزرق", "title": "برميل الماء الأزرق", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/برميل_الماء_الأزرق.md"}, {"id": "جيب_سلوم_الفارغ", "title": "جيب سلوم الفارغ", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/جيب_سلوم_الفارغ.md"}, {"id": "حذاء_خليل_الأسود", "title": "حذاء خليل الجلدي الأسود", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/حذاء_خليل_الأسود.md"}, {"id": "رزمة_الدنانير_المشتتة", "title": "رزمة الدنانير المشتتة", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/رزمة_الدنانير_المشتتة.md"}, {"id": "مقصورة_السائق_المغلقة", "title": "مقصورة السائق المغلقة", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/مقصورة_السائق_المغلقة.md"}, {"id": "ندبة_الفك", "title": "ندبة الفك الأيمن", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/ندبة_الفك.md"}, {"id": "ورقة_بشير_المطوية", "title": "ورقة بشير المطوية", "category": "02_SEMIOTICS_AND_SYMBOLS", "categoryLabel": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/02_SEMIOTICS_AND_SYMBOLS/ورقة_بشير_المطوية.md"}, {"id": "البالستيات_وتشظي_الصاج", "title": "البالستيات وتشظي الصاج الداخلي", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **نفاذية مقذوفات الكلاشينكوف (`LAW-BALL-01`):**\n  طلقات عيار $7.62 \\times 39 \\text{ mm}$ تنفذ بسهولة من جانبي العربة من مسافات تتجاوز 400 متر، مخلفة...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/البالستيات_وتشظي_الصاج.md"}, {"id": "الصحراء_والفراغ", "title": "الصحراء والفراغ الكلسي", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **الفراغ كقوة سالبة حتمية:** \n  الصحراء لا تحارب بالحراب؛ هي تحارب بـ **\"المحو\"**. تمحو الصوت باتجاه الريح (`LAW-ACOUST-02`)، تشتت الضوء في ظلمة خال...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/الصحراء_والفراغ.md"}, {"id": "الصوتيات_وأفق_السمع", "title": "الصوتيات وأفق السمع والرنين", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **الرنين التجويفي الداخلي (`LAW-ACOUST-01`):**\n  الأسطوانة الصاجية للعربة المغلقة تعمل كمكبر صوت ميكانيكي غير مخمد؛ ترتفع فيه الأصوات المعدنية بمقدا...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/الصوتيات_وأفق_السمع.md"}, {"id": "الفيزياء_الحيوية_والصقيع", "title": "الفيزياء الحيوية وتيبس الأطراف بالصقيع", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **انهيار المهارات الحركية الدقيقة (`LAW-BIO-01`):**\n  التقبض الوعائي الدفاعي يمنع الدم من الوصول للأطراف؛ بعد 45 دقيقة من انطفاء الدفء وهبوط الحرارة...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/الفيزياء_الحيوية_والصقيع.md"}, {"id": "تمدد_وانكماش_الحديد", "title": "تمدد وانكماش الحديد وفيزياء الصاج", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **الانكماش الإشعاعي المباغت (`LAW-THERMO-01`):** \n  صاج مضلع بسمك $1.8 \\text{ mm}$ خالٍ من العوازل؛ مع مغيب الشمس في بادية الحماد يلفظ حرارته الكلسي...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/تمدد_وانكماش_الحديد.md"}, {"id": "صقيع_البادية_والانجماد", "title": "صقيع البادية والانجماد الحراري", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **تدرج الهبوط الحراري:** من $+16^\\circ\\text{C}$ عند الغروب (17:30)، إلى الصفر المئوي (20:00)، وصولاً إلى الذروة القارسة ($-8^\\circ\\text{C}$) قبيل ال...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/صقيع_البادية_والانجماد.md"}, {"id": "ميكانيكا_القطار_والديزل", "title": "ميكانيكا القطار وشبكة الديزل", "category": "03_PHYSICS_AND_LAWS", "categoryLabel": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12, "snippet": "* **مبدأ ويستنغهاوس للفرملة القسرية (`LAW-PNEUM-01`):**\n  المكابح تظل محررة ما دام أنبوب الهواء مضغوطاً ($5.0 \\text{ bar}$). لحظة حدوث أي انفراط أو تس...", "filePath": "05_WORLD_BRAIN/03_PHYSICS_AND_LAWS/ميكانيكا_القطار_والديزل.md"}, {"id": "الفسيفساء_العراقية", "title": "الفسيفساء العراقية داخل التابوت المشترك", "category": "04_SOCIOLOGY_AND_POWER", "categoryLabel": "علم الاجتماع وبنية السلطة", "color": "#10b981", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/04_SOCIOLOGY_AND_POWER/الفسيفساء_العراقية.md"}, {"id": "تراتبية_السلطة_وتآكلها", "title": "تراتبية السلطة وتآكلها الميكانيكي", "category": "04_SOCIOLOGY_AND_POWER", "categoryLabel": "علم الاجتماع وبنية السلطة", "color": "#10b981", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/04_SOCIOLOGY_AND_POWER/تراتبية_السلطة_وتآكلها.md"}, {"id": "خط_السكة_المهجور", "title": "خط السكة المهجور والمسار الجبري", "category": "04_SOCIOLOGY_AND_POWER", "categoryLabel": "علم الاجتماع وبنية السلطة", "color": "#10b981", "radius": 12, "snippet": "", "filePath": "05_WORLD_BRAIN/04_SOCIOLOGY_AND_POWER/خط_السكة_المهجور.md"}, {"id": "مسار_العقدة_والتطهير", "title": "مسار العقدة والتطهير", "category": "05_DRAMATURGY_AND_GRAPH", "categoryLabel": "الدراما والحبكة", "color": "#ef4444", "radius": 12, "snippet": "```text\n       [الذروة المادية: الكمين والرصاص] ── مقتل عباس وسلوم وحسن كاز\n                 /                               \\\n    [توقف المحرك والبرد...", "filePath": "05_WORLD_BRAIN/05_DRAMATURGY_AND_GRAPH/مسار_العقدة_والتطهير.md"}, {"id": "مصفوفة_العلاقات_الشاملة", "title": "مصفوفة العلاقات الشاملة", "category": "05_DRAMATURGY_AND_GRAPH", "categoryLabel": "الدراما والحبكة", "color": "#ef4444", "radius": 12, "snippet": "تحدد هذه المصفوفة طبيعة التفاعل والروابط الشعورية والمادية بين كل شخصية وأخرى داخل فضاء القطار:...", "filePath": "05_WORLD_BRAIN/05_DRAMATURGY_AND_GRAPH/مصفوفة_العلاقات_الشاملة.md"}];
+        const rawEdges = [{"source": "index", "target": "خالد"}, {"source": "index", "target": "ندبة_الفك"}, {"source": "index", "target": "أبو_علي"}, {"source": "index", "target": "أبو_اللول"}, {"source": "index", "target": "حناطة"}, {"source": "index", "target": "عباس"}, {"source": "index", "target": "الحصاة_الصوانية"}, {"source": "index", "target": "سردار"}, {"source": "index", "target": "عزيز"}, {"source": "index", "target": "إبهام_عزيز_وسبابة_الدم"}, {"source": "index", "target": "خليل"}, {"source": "index", "target": "حذاء_خليل_الأسود"}, {"source": "index", "target": "بسام"}, {"source": "index", "target": "سلوم"}, {"source": "index", "target": "جيب_سلوم_الفارغ"}, {"source": "index", "target": "بشير"}, {"source": "index", "target": "ورقة_بشير_المطوية"}, {"source": "index", "target": "حجي_عمار"}, {"source": "index", "target": "حسن_كاز"}, {"source": "index", "target": "رزمة_الدنانير_المشتتة"}, {"source": "index", "target": "مهدي"}, {"source": "index", "target": "مقصورة_السائق_المغلقة"}, {"source": "index", "target": "برميل_الماء_الأزرق"}, {"source": "index", "target": "تمدد_وانكماش_الحديد"}, {"source": "index", "target": "صقيع_البادية_والانجماد"}, {"source": "index", "target": "ميكانيكا_القطار_والديزل"}, {"source": "index", "target": "الصحراء_والفراغ"}, {"source": "index", "target": "البالستيات_وتشظي_الصاج"}, {"source": "index", "target": "الصوتيات_وأفق_السمع"}, {"source": "index", "target": "الفيزياء_الحيوية_والصقيع"}, {"source": "index", "target": "تراتبية_السلطة_وتآكلها"}, {"source": "index", "target": "الفسيفساء_العراقية"}, {"source": "index", "target": "خط_السكة_المهجور"}, {"source": "index", "target": "مصفوفة_العلاقات_الشاملة"}, {"source": "index", "target": "مسار_العقدة_والتطهير"}, {"source": "أبو_اللول", "target": "خالد"}, {"source": "أبو_اللول", "target": "حناطة"}, {"source": "أبو_علي", "target": "خالد"}, {"source": "أبو_علي", "target": "سردار"}, {"source": "أبو_علي", "target": "سلوم"}, {"source": "أبو_علي", "target": "عزيز"}, {"source": "بسام", "target": "حجي_عمار"}, {"source": "بسام", "target": "خالد"}, {"source": "بسام", "target": "خليل"}, {"source": "بشير", "target": "ورقة_بشير_المطوية"}, {"source": "بشير", "target": "أبو_علي"}, {"source": "بشير", "target": "سلوم"}, {"source": "حجي_عمار", "target": "خالد"}, {"source": "حسن_كاز", "target": "رزمة_الدنانير_المشتتة"}, {"source": "حسن_كاز", "target": "الصحراء_والفراغ"}, {"source": "حسن_كاز", "target": "خليل"}, {"source": "حسن_كاز", "target": "مهدي"}, {"source": "حناطة", "target": "مهدي"}, {"source": "حناطة", "target": "خالد"}, {"source": "حناطة", "target": "سردار"}, {"source": "خالد", "target": "ندبة_الفك"}, {"source": "خالد", "target": "سردار"}, {"source": "خالد", "target": "برميل_الماء_الأزرق"}, {"source": "خالد", "target": "عباس"}, {"source": "خليل", "target": "حذاء_خليل_الأسود"}, {"source": "خليل", "target": "سردار"}, {"source": "سردار", "target": "ميكانيكا_القطار_والديزل"}, {"source": "سردار", "target": "عزيز"}, {"source": "سلوم", "target": "جيب_سلوم_الفارغ"}, {"source": "سلوم", "target": "عباس"}, {"source": "عباس", "target": "الحصاة_الصوانية"}, {"source": "عزيز", "target": "إبهام_عزيز_وسبابة_الدم"}, {"source": "مهدي", "target": "الصحراء_والفراغ"}, {"source": "الحصاة_الصوانية", "target": "خالد"}, {"source": "برميل_الماء_الأزرق", "target": "أبو_اللول"}, {"source": "مقصورة_السائق_المغلقة", "target": "أبو_علي"}, {"source": "مقصورة_السائق_المغلقة", "target": "خالد"}, {"source": "ندبة_الفك", "target": "أبو_اللول"}, {"source": "ندبة_الفك", "target": "حجي_عمار"}, {"source": "ورقة_بشير_المطوية", "target": "سلوم"}, {"source": "البالستيات_وتشظي_الصاج", "target": "تمدد_وانكماش_الحديد"}, {"source": "البالستيات_وتشظي_الصاج", "target": "خالد"}, {"source": "البالستيات_وتشظي_الصاج", "target": "سردار"}, {"source": "البالستيات_وتشظي_الصاج", "target": "سلوم"}, {"source": "البالستيات_وتشظي_الصاج", "target": "عباس"}, {"source": "البالستيات_وتشظي_الصاج", "target": "بسام"}, {"source": "الصحراء_والفراغ", "target": "صقيع_البادية_والانجماد"}, {"source": "الصحراء_والفراغ", "target": "الصوتيات_وأفق_السمع"}, {"source": "الصحراء_والفراغ", "target": "عباس"}, {"source": "الصوتيات_وأفق_السمع", "target": "عزيز"}, {"source": "الصوتيات_وأفق_السمع", "target": "خالد"}, {"source": "الصوتيات_وأفق_السمع", "target": "أبو_علي"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "صقيع_البادية_والانجماد"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "ندبة_الفك"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "حذاء_خليل_الأسود"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "جيب_سلوم_الفارغ"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "خالد"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "عزيز"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "خليل"}, {"source": "الفيزياء_الحيوية_والصقيع", "target": "سلوم"}, {"source": "تمدد_وانكماش_الحديد", "target": "صقيع_البادية_والانجماد"}, {"source": "تمدد_وانكماش_الحديد", "target": "ميكانيكا_القطار_والديزل"}, {"source": "تمدد_وانكماش_الحديد", "target": "خالد"}, {"source": "تمدد_وانكماش_الحديد", "target": "سردار"}, {"source": "تمدد_وانكماش_الحديد", "target": "أبو_اللول"}, {"source": "صقيع_البادية_والانجماد", "target": "ميكانيكا_القطار_والديزل"}, {"source": "صقيع_البادية_والانجماد", "target": "خليل"}, {"source": "صقيع_البادية_والانجماد", "target": "بسام"}, {"source": "ميكانيكا_القطار_والديزل", "target": "أبو_علي"}, {"source": "الفسيفساء_العراقية", "target": "سردار"}, {"source": "الفسيفساء_العراقية", "target": "خليل"}, {"source": "الفسيفساء_العراقية", "target": "عباس"}, {"source": "الفسيفساء_العراقية", "target": "عزيز"}, {"source": "الفسيفساء_العراقية", "target": "حسن_كاز"}, {"source": "الفسيفساء_العراقية", "target": "حجي_عمار"}, {"source": "الفسيفساء_العراقية", "target": "سلوم"}, {"source": "الفسيفساء_العراقية", "target": "بشير"}, {"source": "الفسيفساء_العراقية", "target": "خالد"}, {"source": "الفسيفساء_العراقية", "target": "أبو_اللول"}, {"source": "الفسيفساء_العراقية", "target": "حناطة"}, {"source": "تراتبية_السلطة_وتآكلها", "target": "سردار"}, {"source": "تراتبية_السلطة_وتآكلها", "target": "عزيز"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "خالد"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "سردار"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "أبو_علي"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "برميل_الماء_الأزرق"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "أبو_اللول"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "حجي_عمار"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "ميكانيكا_القطار_والديزل"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "عزيز"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "خليل"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "بسام"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "حسن_كاز"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "عباس"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "سلوم"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "بشير"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "حناطة"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "مهدي"}, {"source": "مصفوفة_العلاقات_الشاملة", "target": "الصحراء_والفراغ"}];
+        const categories = {"01_CHARACTERS": {"label": "الشخصيات", "color": "#3b82f6", "radius": 14}, "02_SEMIOTICS_AND_SYMBOLS": {"label": "السيميائيات والرموز", "color": "#f59e0b", "radius": 12}, "03_PHYSICS_AND_LAWS": {"label": "الفيزياء وقوانين المادة", "color": "#8b5cf6", "radius": 12}, "04_SOCIOLOGY_AND_POWER": {"label": "علم الاجتماع وبنية السلطة", "color": "#10b981", "radius": 12}, "05_DRAMATURGY_AND_GRAPH": {"label": "الدراما والحبكة", "color": "#ef4444", "radius": 12}, "ROOT": {"label": "البوابة المركزية", "color": "#ec4899", "radius": 16}};
+
+        // Populate Legend
+        const legendContainer = document.getElementById('legend');
+        Object.entries(categories).forEach(([k, v]) => {
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+            item.innerHTML = `<span class="legend-color" style="background: ${v.color}"></span><span>${v.label}</span>`;
+            legendContainer.appendChild(item);
+        });
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        // Build Graph Data Structures
+        const nodes = rawNodes.map((n, i) => ({
+            ...n,
+            x: width / 2 + (Math.random() - 0.5) * 400,
+            y: height / 2 + (Math.random() - 0.5) * 400,
+            vx: 0, vy: 0,
+            connectedNodes: new Set()
+        }));
+
+        const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+        const edges = rawEdges.map(e => {
+            const source = nodeMap[e.source];
+            const target = nodeMap[e.target];
+            if (source && target) {
+                source.connectedNodes.add(target);
+                target.connectedNodes.add(source);
+                return { source, target };
+            }
+            return null;
+        }).filter(Boolean);
+
+        // Transform / Zoom
+        let transform = { x: 0, y: 0, k: 1 };
+        let isDragging = false;
+        let dragNode = null;
+        let startX, startY;
+        let selectedNode = null;
+        let hoveredNode = null;
+        let searchQuery = "";
+
+        // Simple Force Simulation
+        function stepSimulation() {
+            const repulsion = 1200;
+            const springLen = 90;
+            const springK = 0.04;
+            const centerK = 0.005;
+
+            // Repulsion between nodes
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const a = nodes[i], b = nodes[j];
+                    const dx = b.x - a.x;
+                    const dy = b.y - a.y;
+                    const distSq = dx * dx + dy * dy || 1;
+                    const dist = Math.sqrt(distSq);
+                    if (dist < 450) {
+                        const f = repulsion / distSq;
+                        const fx = (dx / dist) * f;
+                        const fy = (dy / dist) * f;
+                        a.vx -= fx; a.vy -= fy;
+                        b.vx += fx; b.vy += fy;
+                    }
+                }
+            }
+
+            // Spring attraction
+            edges.forEach(e => {
+                const dx = e.target.x - e.source.x;
+                const dy = e.target.y - e.source.y;
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const f = (dist - springLen) * springK;
+                const fx = (dx / dist) * f;
+                const fy = (dy / dist) * f;
+                e.source.vx += fx; e.source.vy += fy;
+                e.target.vx -= fx; e.target.vy -= fy;
+            });
+
+            // Gravity towards center
+            nodes.forEach(n => {
+                if (n === dragNode) return;
+                n.vx += (width / 2 - n.x) * centerK;
+                n.vy += (height / 2 - n.y) * centerK;
+                n.vx *= 0.85; // damping
+                n.vy *= 0.85;
+                n.x += n.vx;
+                n.y += n.vy;
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            ctx.translate(transform.x, transform.y);
+            ctx.scale(transform.k, transform.k);
+
+            // Draw Edges
+            edges.forEach(e => {
+                const isHighlight = selectedNode && (selectedNode === e.source || selectedNode === e.target);
+                ctx.strokeStyle = isHighlight ? '#38bdf8' : '#334155';
+                ctx.lineWidth = isHighlight ? 2 : 1;
+                ctx.beginPath();
+                ctx.moveTo(e.source.x, e.source.y);
+                ctx.lineTo(e.target.x, e.target.y);
+                ctx.stroke();
+            });
+
+            // Draw Nodes
+            nodes.forEach(n => {
+                const isMatch = searchQuery && n.title.includes(searchQuery);
+                const isSelected = n === selectedNode;
+                const isHovered = n === hoveredNode;
+                const isConnected = selectedNode && selectedNode.connectedNodes.has(n);
+
+                let radius = n.radius;
+                if (isSelected || isHovered) radius += 4;
+
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = isMatch ? '#f43f5e' : n.color;
+                ctx.fill();
+
+                if (isSelected || isConnected || isHovered) {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                }
+
+                // Label
+                ctx.fillStyle = (isSelected || isHovered || isMatch) ? '#fff' : '#94a3b8';
+                ctx.font = `${isSelected ? 'bold 13px' : '11px'} Cairo, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.fillText(n.title, n.x, n.y + radius + 14);
+            });
+
+            ctx.restore();
+        }
+
+        function animate() {
+            stepSimulation();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Mouse Interactions
+        function getMousePos(e) {
+            return {
+                x: (e.clientX - transform.x) / transform.k,
+                y: (e.clientY - transform.y) / transform.k
+            };
+        }
+
+        canvas.addEventListener('mousedown', e => {
+            const pos = getMousePos(e);
+            const hit = nodes.find(n => {
+                const dx = n.x - pos.x, dy = n.y - pos.y;
+                return Math.sqrt(dx * dx + dy * dy) <= n.radius + 4;
+            });
+
+            if (hit) {
+                dragNode = hit;
+                selectNode(hit);
+            } else {
+                isDragging = true;
+                startX = e.clientX - transform.x;
+                startY = e.clientY - transform.y;
+            }
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (dragNode) {
+                const pos = getMousePos(e);
+                dragNode.x = pos.x;
+                dragNode.y = pos.y;
+                dragNode.vx = dragNode.vy = 0;
+            } else if (isDragging) {
+                transform.x = e.clientX - startX;
+                transform.y = e.clientY - startY;
+            } else {
+                const pos = getMousePos(e);
+                hoveredNode = nodes.find(n => {
+                    const dx = n.x - pos.x, dy = n.y - pos.y;
+                    return Math.sqrt(dx * dx + dy * dy) <= n.radius + 4;
+                }) || null;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            dragNode = null;
+            isDragging = false;
+        });
+
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.1 : 0.9;
+            transform.k = Math.max(0.2, Math.min(3, transform.k * factor));
+        });
+
+        // Inspector View
+        const inspector = document.getElementById('inspector');
+        function selectNode(node) {
+            selectedNode = node;
+            inspector.style.display = 'block';
+            document.getElementById('ins-title').innerText = node.title;
+            const badge = document.getElementById('ins-badge');
+            badge.innerText = node.categoryLabel;
+            badge.style.background = node.color + '25';
+            badge.style.color = node.color;
+            document.getElementById('ins-snippet').innerText = node.snippet || "عقدة أنطولوجية معرفية.";
+            document.getElementById('ins-path').innerText = node.filePath;
+
+            const connList = document.getElementById('ins-connections');
+            connList.innerHTML = '';
+            document.getElementById('ins-conn-count').innerText = node.connectedNodes.size;
+            node.connectedNodes.forEach(c => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="connection-tag">${c.title}</span>`;
+                li.addEventListener('click', () => selectNode(c));
+                connList.appendChild(li);
+            });
+        }
+
+        document.getElementById('close-inspector').addEventListener('click', () => {
+            inspector.style.display = 'none';
+            selectedNode = null;
+        });
+
+        document.getElementById('search').addEventListener('input', e => {
+            searchQuery = e.target.value.trim();
+        });
+
+        document.getElementById('reset-zoom').addEventListener('click', () => {
+            transform = { x: 0, y: 0, k: 1 };
+        });
+    </script>
+</body>
+</html>

@@ -59,10 +59,10 @@ class MetaAuditor:
     def scan_codebase_for_citations(self) -> Dict[str, List[str]]:
         scan_paths = []
 
-        # 1. All python tools
+        # 1. All python tools (excluding phase evaluation drivers)
         if os.path.exists(TOOLS_DIR):
             for fname in os.listdir(TOOLS_DIR):
-                if fname.endswith(".py"):
+                if fname.endswith(".py") and not fname.startswith("run_jev_"):
                     scan_paths.append(os.path.join(TOOLS_DIR, fname))
 
         # 2. Key markdown and yaml documents
