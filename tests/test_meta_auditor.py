@@ -23,10 +23,15 @@ class TestMetaAuditor(unittest.TestCase):
 
     def test_load_defined_laws(self):
         self.assertTrue(self.loaded, "MetaAuditor must load defined laws from PHYSICAL_LAWS.md.")
-        self.assertEqual(len(self.auditor.defined_laws), 34, "There must be exactly 34 codified laws in PHYSICAL_LAWS.md.")
+        self.assertEqual(len(self.auditor.defined_laws), 41, "There must be exactly 41 codified laws in PHYSICAL_LAWS.md.")
         self.assertIn("LAW-ELEC-01", self.auditor.defined_laws, "LAW-ELEC-01 must be codified in PHYSICAL_LAWS.md.")
         self.assertIn("LAW-BIO-05", self.auditor.defined_laws, "LAW-BIO-05 must be codified in PHYSICAL_LAWS.md.")
         self.assertIn("LAW-CHEM-01", self.auditor.defined_laws, "LAW-CHEM-01 must be codified in PHYSICAL_LAWS.md.")
+        self.assertIn("LAW-BIO-06", self.auditor.defined_laws, "LAW-BIO-06 must be codified in PHYSICAL_LAWS.md.")
+        self.assertIn("LAW-THERMO-03", self.auditor.defined_laws, "LAW-THERMO-03 must be codified in PHYSICAL_LAWS.md.")
+        self.assertIn("LAW-ACOUST-04", self.auditor.defined_laws, "LAW-ACOUST-04 must be codified in PHYSICAL_LAWS.md.")
+        self.assertIn("LAW-MAT-01", self.auditor.defined_laws, "LAW-MAT-01 must be codified in PHYSICAL_LAWS.md.")
+        self.assertIn("LAW-PSYCH-03", self.auditor.defined_laws, "LAW-PSYCH-03 must be codified in PHYSICAL_LAWS.md.")
 
     def test_ethical_laws_present(self):
         ethical_laws = {"LAW-ETHIC-01", "LAW-ETHIC-02", "LAW-ETHIC-03"}

@@ -21,6 +21,9 @@ metadata:
     nearest_abandoned_outpost_km: 68.0    # Tal Al-Suwan (KP 244.4)
 
 astronomical_ephemeris:
+  phenomenological_state: "starlit_freezing_void"
+  is_moon_above_horizon: false
+  moonlight_lux: 0.0
   sunset_time: "17:18:00"
   civil_dusk_time: "17:44:00"
   nautical_dusk_time: "18:14:00"
@@ -28,12 +31,6 @@ astronomical_ephemeris:
   solar_midnight_time: "00:11:00"
   astronomical_dawn_time: "05:22:00"
   sunrise_time: "06:48:00"
-  solar_depression_angle_deg: -22.5
-  lunar_status:
-    phase: "waning_crescent_3_percent"
-    moonset_time: "16:22:00"
-    is_moon_above_horizon: false
-    moonlight_lux: 0.0
 
 environment:
   ambient_temperature_c: 0.0
@@ -51,8 +48,7 @@ compass_and_vectors:
   train_heading_bearing_deg: 165.0   # SSE towards Samawah desert
   wind_drift_bearing_deg: 135.0      # SE (carries sound/smoke into desert void)
   ambush_ridge_bearing_deg: 250.0    # WSW
-  ambush_distance_m: 850.0
-  ambush_elevation_m: +25.0
+  ambush_nature: "desert_stalking_shadow_ridge"
 
 train:
   metrics:
@@ -103,6 +99,13 @@ train:
         rear_sliding_door: "closed_unlatched"
       structural_integrity: 1.0
       occupants: ["خالد", "أبو_علي", "أبو_اللول", "حناطة", "حجي_عمار", "بسام"]
+      affordance_slots:
+        صندوق_الذخيرة_المثبت_قرب_الباب_الداخلي: { capacity: 1, exclusive: true }
+        بسطة_القاطرة_الأمامية_قرب_مزلاج_المحرك: { capacity: 1, exclusive: true }
+        المقعد_الخشبي_الأيسر_المقابل_للنافذة: { capacity: 1, exclusive: true }
+        مزلاج_الباب_الجانبي_الأيمن: { capacity: 1, exclusive: true }
+        زاوية_المقاعد_الأمامية_منكمشاً_في_معطفه: { capacity: 1, exclusive: true }
+        ممر_المصابين_الوسطي_قرب_حقيبة_الشاش: { capacity: 1, exclusive: true }
 
     car_02_middle:
       id: "car_02"
@@ -119,6 +122,12 @@ train:
       vents: "jammed_black_soot"
       structural_integrity: 0.95
       occupants: ["عزيز", "سردار", "خليل", "مهدي", "حسن_كاز"]
+      affordance_slots:
+        قلب_التكدس_البشري_المتلاصق_طلباً_للدفء: { capacity: 5, exclusive: false, allows_huddling: true }
+        جدار_الصاج_الأيمن_قرب_فتحة_التهوية_المسدودة: { capacity: 1, exclusive: true }
+        الركن_الأمامي_للعربة_حارساً_لبرميل_الماء: { capacity: 1, exclusive: true }
+        العتمة_الخلفية_قرب_شق_الحديد: { capacity: 1, exclusive: true }
+        شق_الصاج_المنزاح_المتوسط: { capacity: 1, exclusive: true }
 
     car_03_rear:
       id: "car_03"
@@ -134,6 +143,9 @@ train:
         rear_draft_breach: "unlatched_3cm_gap"
       structural_integrity: 0.88
       occupants: ["سلوم", "بشير"]
+      affordance_slots:
+        الزاوية_الميتة_عند_جردل_البول_وشق_الباب_المتصلب: { capacity: 1, exclusive: true }
+        العارضة_الخلفية_حاجباً_العري_بسترته: { capacity: 1, exclusive: true }
 
     platform_rear:
       id: "car_platform"
@@ -145,6 +157,8 @@ train:
       interior_lux: 0.8
       wind_exposure_factor: 1.0
       occupants: ["عباس"]
+      affordance_slots:
+        المنصة_الخلفية_المكشوفة_في_مهب_الريح: { capacity: 1, exclusive: true }
 
 inventory:
   water_supply:
@@ -182,21 +196,20 @@ threats:
   ambushers:
     known_by_train_occupants: false
     status: "stalking_in_darkness"
-    coordinates:
-      bearing_deg: 250.0
-      distance_m: 850.0
-      elevation_m: +25.0
+    nature: "desert_stalking_shadow_ridge"
     weapons: "7.62x39mm_rifles"
     waiting_for: "thermal_paralysis_and_total_immobility"
 
 # ==============================================================================
-# CHARACTERS MATRIX: METRIC COORDINATES AND BIOMETRICS (14 ENTITIES)
+# CHARACTERS MATRIX: PHENOMENOLOGICAL AFFORDANCE SLOTS & BIOMETRICS (14 ENTITIES)
 # ==============================================================================
 characters:
   خالد:
     role: "قائد مفرزة الحراسة"
+    agency_type: "primary_agent"
     location: "car_01_guard"
-    coordinates: { x_m: 2.2, y_m: 18.2 }  # Inside Car 01 (right bench)
+    affordance_slot: "صندوق_الذخيرة_المثبت_قرب_الباب_الداخلي"
+    coordinates: { x_m: 2.2, y_m: 18.2 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.8
       fingers_temp_c: 24.5
@@ -219,8 +232,10 @@ characters:
 
   أبو_علي:
     role: "عامل خدمة القطار"
+    agency_type: "primary_agent"
     location: "car_01_guard"
-    coordinates: { x_m: 1.4, y_m: 17.5 }  # Front gangway near locomotive hatch
+    affordance_slot: "بسطة_القاطرة_الأمامية_قرب_مزلاج_المحرك"
+    coordinates: { x_m: 1.4, y_m: 17.5 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.6
       fingers_temp_c: 22.0
@@ -243,8 +258,10 @@ characters:
 
   أبو_اللول:
     role: "حارس"
+    agency_type: "primary_agent"
     location: "car_01_guard"
-    coordinates: { x_m: 0.6, y_m: 23.0 }  # Left bench, slumped against wooden frame
+    affordance_slot: "المقعد_الخشبي_الأيسر_المقابل_للنافذة"
+    coordinates: { x_m: 0.6, y_m: 23.0 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.4
       fingers_temp_c: 20.0
@@ -268,8 +285,10 @@ characters:
 
   حناطة:
     role: "حارس متوتر"
+    agency_type: "cohort_agent"
     location: "car_01_guard"
-    coordinates: { x_m: 0.6, y_m: 26.2 }  # Rear bench near sliding door
+    affordance_slot: "مزلاج_الباب_الجانبي_الأيمن"
+    coordinates: { x_m: 0.6, y_m: 26.2 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.5
       fingers_temp_c: 21.0
@@ -292,8 +311,10 @@ characters:
 
   عباس:
     role: "حارس المنصة الخلفية"
+    agency_type: "cohort_agent"
     location: "platform_rear"
-    coordinates: { x_m: 1.4, y_m: 56.4 }  # Open gangway at extreme rear
+    affordance_slot: "المنصة_الخلفية_المكشوفة_في_مهب_الريح"
+    coordinates: { x_m: 1.4, y_m: 56.4 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 35.8
       fingers_temp_c: 11.2  # LAW-BIO-01 threshold: motor skills dropping
@@ -316,8 +337,10 @@ characters:
 
   سردار:
     role: "سجين ومقاتل سابق وخبير ميكانيك"
+    agency_type: "primary_agent"
     location: "car_02_middle"
-    coordinates: { x_m: 2.2, y_m: 31.0 }  # Near front right wire-screen window
+    affordance_slot: "جدار_الصاج_الأيمن_قرب_فتحة_التهوية_المسدودة"
+    coordinates: { x_m: 2.2, y_m: 31.0 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.7
       fingers_temp_c: 18.0
@@ -340,8 +363,10 @@ characters:
 
   عزيز:
     role: "سجين صامت"
+    agency_type: "cohort_agent"
     location: "car_02_middle"
-    coordinates: { x_m: 2.2, y_m: 35.0 }  # Leaning against central iron rib
+    affordance_slot: "قلب_التكدس_البشري_المتلاصق_طلباً_للدفء"
+    coordinates: { x_m: 2.2, y_m: 35.0 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.2
       fingers_temp_c: 15.0
@@ -364,8 +389,10 @@ characters:
 
   خليل:
     role: "سجين تركماني وقور"
+    agency_type: "primary_agent"
     location: "car_02_middle"
-    coordinates: { x_m: 0.6, y_m: 33.5 }  # Left wooden bench
+    affordance_slot: "الركن_الأمامي_للعربة_حارساً_لبرميل_الماء"
+    coordinates: { x_m: 0.6, y_m: 33.5 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.0
       fingers_temp_c: 14.0
@@ -388,8 +415,10 @@ characters:
 
   بسام:
     role: "سجين ممرض"
+    agency_type: "primary_agent"
     location: "car_01_guard"
-    coordinates: { x_m: 2.2, y_m: 23.0 }  # Right bench across from Abu Al-Loul
+    affordance_slot: "ممر_المصابين_الوسطي_قرب_حقيبة_الشاش"
+    coordinates: { x_m: 2.2, y_m: 23.0 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.6
       fingers_temp_c: 21.0
@@ -412,8 +441,10 @@ characters:
 
   سلوم:
     role: "فتى سجين مهمش"
+    agency_type: "primary_agent"
     location: "car_03_rear"
-    coordinates: { x_m: 1.2, y_m: 46.5 }  # Curled on bare corrugated floor
+    affordance_slot: "الزاوية_الميتة_عند_جردل_البول_وشق_الباب_المتصلب"
+    coordinates: { x_m: 1.2, y_m: 46.5 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 35.5
       fingers_temp_c: 8.5  # Critical hypothermia onset
@@ -436,8 +467,10 @@ characters:
 
   بشير:
     role: "سجين كتوم"
+    agency_type: "primary_agent"
     location: "car_03_rear"
-    coordinates: { x_m: 0.5, y_m: 45.0 }  # Leaning against left sheet wall
+    affordance_slot: "العارضة_الخلفية_حاجباً_العري_بسترته"
+    coordinates: { x_m: 0.5, y_m: 45.0 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.1
       fingers_temp_c: 13.0
@@ -460,8 +493,10 @@ characters:
 
   حجي_عمار:
     role: "المدير العام السابق"
+    agency_type: "cohort_agent"
     location: "car_01_guard"
-    coordinates: { x_m: 0.6, y_m: 18.2 }  # Front left bench
+    affordance_slot: "زاوية_المقاعد_الأمامية_منكمشاً_في_معطفه"
+    coordinates: { x_m: 0.6, y_m: 18.2 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.3
       fingers_temp_c: 19.0
@@ -484,8 +519,10 @@ characters:
 
   حسن_كاز:
     role: "مهرب وبائع عملة"
+    agency_type: "cohort_agent"
     location: "car_02_middle"
-    coordinates: { x_m: 0.6, y_m: 37.5 }  # Near exit gangway aisle
+    affordance_slot: "شق_الصاج_المنزاح_المتوسط"
+    coordinates: { x_m: 0.6, y_m: 37.5 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.5
       fingers_temp_c: 17.5
@@ -508,8 +545,10 @@ characters:
 
   مهدي:
     role: "السجين الشبح"
+    agency_type: "cohort_agent"
     location: "car_02_middle"
-    coordinates: { x_m: 2.4, y_m: 40.0 }  # Beside middle car sliding side door
+    affordance_slot: "العتمة_الخلفية_قرب_شق_الحديد"
+    coordinates: { x_m: 2.4, y_m: 40.0 }  # Coarse backward-compatibility anchor
     physical:
       core_temp_c: 36.8
       fingers_temp_c: 20.0

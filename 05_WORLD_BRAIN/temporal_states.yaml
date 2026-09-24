@@ -1,0 +1,178 @@
+# ==============================================================================
+# DYNAMIC TEMPORAL TRANSITION MATRIX: قطار الرمل
+# 5 Chronological Milestone States across the 10.75-Hour Night (19:00:00 to 05:45:00)
+# Schema: Multi-State Deterministic Timeline for Novel World Simulation
+# ==============================================================================
+
+schema_version: "1.0.0"
+novel_id: "sand_train"
+timeline_duration_hours: 10.75
+total_minutes: 645
+
+states:
+  - id: "T0_1900_BREAKDOWN"
+    timestamp: "19:00:00"
+    minute: 0
+    narrative_phase: "mechanical_stall_and_shock"
+    environment:
+      ambient_temperature_c: 0.0
+      wind_chill_effective_c: -5.4
+      ambient_humidity_percent: 12.0
+      radiation_cooling_rate_c_per_hour: 1.8
+      illumination_lux: 0.8
+    train:
+      locomotive_engine: "stalled"
+      train_pipe_pressure_bar: 0.0
+      brake_shoes: "clamped_locked"
+      fuel_line: "fractured"
+    air_quality:
+      car_01_co2_percent: 0.04
+      car_02_co2_percent: 0.05
+      car_03_co2_percent: 0.04
+    battery:
+      auxiliary_charge_percent: 100.0
+      interior_lights_on: true
+    biometrics:
+      core_huddling_active: false
+      khalid_fingers_temp_c: 24.5
+      khalid_dexterity: 0.95
+      abbas_fingers_temp_c: 11.2
+      abbas_dexterity: 0.48
+      allostatic_load: 0.05
+    weapons:
+      grease_viscosity_status: "normal"
+      jam_probability: 0.02
+
+  - id: "T1_2100_DESCENT"
+    timestamp: "21:00:00"
+    minute: 120
+    narrative_phase: "cold_descent_and_initial_huddling"
+    environment:
+      ambient_temperature_c: -2.5
+      wind_chill_effective_c: -8.8
+      ambient_humidity_percent: 12.0
+      radiation_cooling_rate_c_per_hour: 1.6
+      illumination_lux: 0.5
+    train:
+      locomotive_engine: "stalled"
+      train_pipe_pressure_bar: 0.0
+      brake_shoes: "clamped_locked"
+      fuel_line: "fractured"
+    air_quality:
+      car_01_co2_percent: 0.45
+      car_02_co2_percent: 0.65
+      car_03_co2_percent: 0.35
+    battery:
+      auxiliary_charge_percent: 65.0
+      interior_lights_on: true
+    biometrics:
+      core_huddling_active: true
+      khalid_fingers_temp_c: 18.0
+      khalid_dexterity: 0.85
+      abbas_fingers_temp_c: 7.5
+      abbas_dexterity: 0.28
+      allostatic_load: 0.25
+    weapons:
+      grease_viscosity_status: "thickening"
+      jam_probability: 0.08
+
+  - id: "T2_0000_MIDNIGHT_APEX"
+    timestamp: "00:00:00"
+    minute: 300
+    narrative_phase: "midnight_apex_and_hypercapnia"
+    environment:
+      ambient_temperature_c: -5.0
+      wind_chill_effective_c: -12.4
+      ambient_humidity_percent: 11.0
+      radiation_cooling_rate_c_per_hour: 1.4
+      illumination_lux: 0.05
+    train:
+      locomotive_engine: "stalled"
+      train_pipe_pressure_bar: 0.0
+      brake_shoes: "clamped_locked"
+      fuel_line: "fractured"
+    air_quality:
+      car_01_co2_percent: 1.35
+      car_02_co2_percent: 1.85  # LAW-BIO-06 Hypercapnia threshold (> 1.5%)
+      car_03_co2_percent: 0.95
+    battery:
+      auxiliary_charge_percent: 20.0
+      interior_lights_on: false  # LAW-ELEC-01 & LAW-MAT-01 battery exhaustion
+    biometrics:
+      core_huddling_active: true
+      khalid_fingers_temp_c: 11.5  # LAW-BIO-01 threshold breach
+      khalid_dexterity: 0.52
+      abbas_fingers_temp_c: 2.1
+      abbas_dexterity: 0.10
+      allostatic_load: 0.55
+    weapons:
+      grease_viscosity_status: "stiff"
+      jam_probability: 0.22
+
+  - id: "T3_0300_DEEP_FREEZE"
+    timestamp: "03:00:00"
+    minute: 480
+    narrative_phase: "paraffin_gelling_and_sphincter_spasm"
+    environment:
+      ambient_temperature_c: -7.2
+      wind_chill_effective_c: -15.5
+      ambient_humidity_percent: 10.0
+      radiation_cooling_rate_c_per_hour: 1.0
+      illumination_lux: 0.02
+    train:
+      locomotive_engine: "stalled"
+      train_pipe_pressure_bar: 0.0
+      brake_shoes: "clamped_locked"
+      fuel_line: "gelled_paraffin_blocked"  # LAW-CHEM-01
+    air_quality:
+      car_01_co2_percent: 1.80
+      car_02_co2_percent: 2.20
+      car_03_co2_percent: 1.40
+    battery:
+      auxiliary_charge_percent: 0.0
+      interior_lights_on: false
+    biometrics:
+      core_huddling_active: true
+      khalid_fingers_temp_c: 8.0
+      khalid_dexterity: 0.28
+      salloum_fingers_temp_c: 4.2
+      salloum_dexterity: 0.12
+      sphincter_spasm_active: true  # LAW-BIO-05
+      allostatic_load: 0.80
+    weapons:
+      grease_viscosity_status: "partially_frozen"
+      jam_probability: 0.35
+
+  - id: "T4_0545_FALSE_DAWN"
+    timestamp: "05:45:00"
+    minute: 645
+    narrative_phase: "false_dawn_apathy_and_standoff"
+    environment:
+      ambient_temperature_c: -8.0
+      wind_chill_effective_c: -16.8
+      ambient_humidity_percent: 10.0
+      radiation_cooling_rate_c_per_hour: 0.2  # Diminishing pre-dawn cooling
+      illumination_lux: 0.2  # Astronomical dawn approaching at 05:22
+    train:
+      locomotive_engine: "stalled"
+      train_pipe_pressure_bar: 0.0
+      brake_shoes: "clamped_locked"
+      fuel_line: "gelled_paraffin_blocked"
+    air_quality:
+      car_01_co2_percent: 2.10
+      car_02_co2_percent: 2.45
+      car_03_co2_percent: 1.70
+    battery:
+      auxiliary_charge_percent: 0.0
+      interior_lights_on: false
+    biometrics:
+      core_huddling_active: true
+      khalid_fingers_temp_c: 6.5
+      khalid_dexterity: 0.20
+      salloum_fingers_temp_c: 3.0
+      salloum_dexterity: 0.08
+      sphincter_spasm_active: true
+      allostatic_load: 0.95  # LAW-PSYCH-03 Hypothermic apathy onset
+    weapons:
+      grease_viscosity_status: "frozen_sluggish"
+      jam_probability: 0.40
