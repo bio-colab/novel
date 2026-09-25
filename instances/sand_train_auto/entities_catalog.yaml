@@ -2,12 +2,12 @@ metadata:
   schema_version: 1.0.0
   novel_id: sand_train_auto
   charter: نحن نُحلل ونُقيّم.. ولا نُقوّم
-  total_entities_count: 25
+  total_entities_count: 32
   breakdown:
     characters_count: 10
-    vehicles_count: 1
-    props_count: 10
-    landmarks_count: 4
+    vehicles_count: 4
+    props_count: 11
+    landmarks_count: 7
 characters:
 - entity_id: ENT-CHAR-1001
   numeric_id: 1001
@@ -121,10 +121,25 @@ characters:
     mentions_count: 1
 vehicles:
 - entity_id: ENT-VEH-2001
+  canonical_name: قطار
+  category: VEHICLE
+  properties:
+    type: train_convoy
+- entity_id: ENT-VEH-2002
+  canonical_name: قاطرة
+  category: VEHICLE
+  properties:
+    type: locomotive_engine
+- entity_id: ENT-VEH-2003
   canonical_name: عربة
   category: VEHICLE
   properties:
     type: enclosed_car
+- entity_id: ENT-VEH-2004
+  canonical_name: منصة
+  category: VEHICLE
+  properties:
+    type: observation_platform
 props:
 - entity_id: ENT-PROP-3001
   canonical_name: بندقية
@@ -152,26 +167,31 @@ props:
   properties:
     type: وعاء تخزين سوائل
 - entity_id: ENT-PROP-3006
+  canonical_name: طلقات
+  category: PROP
+  properties:
+    type: ذخيرة بالستية
+- entity_id: ENT-PROP-3007
   canonical_name: ساعة
   category: PROP
   properties:
     type: أداة قياس زمنية
-- entity_id: ENT-PROP-3007
+- entity_id: ENT-PROP-3008
   canonical_name: وصل
   category: PROP
   properties:
     type: وثيقة ورقية إدارية
-- entity_id: ENT-PROP-3008
+- entity_id: ENT-PROP-3009
   canonical_name: حذاء
   category: PROP
   properties:
     type: ملبس واقٍ
-- entity_id: ENT-PROP-3009
+- entity_id: ENT-PROP-3010
   canonical_name: حصاة
   category: PROP
   properties:
     type: أثر طبيعي رمزي
-- entity_id: ENT-PROP-3010
+- entity_id: ENT-PROP-3011
   canonical_name: حقيبة
   category: PROP
   properties:
@@ -188,11 +208,26 @@ landmarks:
   properties:
     type: arid_desert
 - entity_id: ENT-LAND-4003
+  canonical_name: بادية
+  category: LANDMARK
+  properties:
+    type: desert_steppe
+- entity_id: ENT-LAND-4004
+  canonical_name: هور
+  category: LANDMARK
+  properties:
+    type: marshland
+- entity_id: ENT-LAND-4005
+  canonical_name: تل
+  category: LANDMARK
+  properties:
+    type: desert_ridge
+- entity_id: ENT-LAND-4006
   canonical_name: محطة
   category: LANDMARK
   properties:
     type: remote_station
-- entity_id: ENT-LAND-4004
+- entity_id: ENT-LAND-4007
   canonical_name: سجن
   category: LANDMARK
   properties:

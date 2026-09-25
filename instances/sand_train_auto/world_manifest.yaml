@@ -3,11 +3,11 @@ world_id: sand_train_auto
 title: قطار الرمل
 genre: existential_survival_tragedy
 chronotope:
-  setting: سكة - صحراء - محطة
+  setting: سكة - صحراء - بادية
   coordinates: 31.3°N, 45.3°E
   historical_epoch: 1980s_analog
   start_timestamp: 198X-01-18T19:00:00
-  total_duration_minutes: 360
+  total_duration_minutes: 640
   timestep_minutes: 1.0
 environment:
   temperature_celsius:
@@ -26,40 +26,61 @@ environment:
     max: 15.0
 spatial_topology:
   coordinate_type: 1D_linear_track
-  total_envelope_meters: 15.0
+  total_envelope_meters: 60.0
   zones:
-  - id: zone_1_عربة
-    name: عربة (enclosed_car)
+  - id: zone_1_قطار
+    name: قطار (train_convoy)
     bounds_meters:
     - 0.0
     - 15.0
+    acoustic_isolation_db: 35.0
+    thermal_conduction_factor: 1.1
+  - id: zone_2_قاطرة
+    name: قاطرة (locomotive_engine)
+    bounds_meters:
+    - 15.0
+    - 30.0
+    acoustic_isolation_db: 35.0
+    thermal_conduction_factor: 1.1
+  - id: zone_3_عربة
+    name: عربة (enclosed_car)
+    bounds_meters:
+    - 30.0
+    - 45.0
+    acoustic_isolation_db: 35.0
+    thermal_conduction_factor: 1.1
+  - id: zone_4_منصة
+    name: منصة (observation_platform)
+    bounds_meters:
+    - 45.0
+    - 60.0
     acoustic_isolation_db: 35.0
     thermal_conduction_factor: 1.1
 resource_ledger:
   initial_inventories:
   - resource_id: res_1_بندقية
     category: ammunition
-    amount: 1.0
+    amount: 9.0
     unit: units
-    location_zone_id: zone_1_عربة
+    location_zone_id: zone_1_قطار
     consumption_rate_per_hour_per_capita: 0.0
   - resource_id: res_2_مسدس
     category: misc
     amount: 1.0
     unit: units
-    location_zone_id: zone_1_عربة
+    location_zone_id: zone_1_قطار
     consumption_rate_per_hour_per_capita: 0.0
   - resource_id: res_3_سلك
     category: tool
-    amount: 1.0
+    amount: 9.0
     unit: units
-    location_zone_id: zone_1_عربة
+    location_zone_id: zone_1_قطار
     consumption_rate_per_hour_per_capita: 0.0
   - resource_id: res_4_مفتاح
     category: tool
-    amount: 3.0
+    amount: 6.0
     unit: units
-    location_zone_id: zone_1_عربة
+    location_zone_id: zone_1_قطار
     consumption_rate_per_hour_per_capita: 0.0
 headcount_target:
   initial_total: 10

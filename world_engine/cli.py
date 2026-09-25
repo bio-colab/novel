@@ -285,6 +285,45 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     return 0 if audit_report["is_valid"] else 1
 
 
+def cmd_recommend_rules(args: argparse.Namespace) -> int:
+    """Analyze a narrative text and recommend appropriate domain physical law packs."""
+    input_file = Path(args.input).resolve()
+    if not input_file.exists():
+        print(f"❌ Error: Input narrative file not found: {input_file}")
+        return 1
+
+    text = input_file.read_text(encoding="utf-8", errors="replace")
+    from world_engine.law_catalog.recommender import DomainLawRecommender
+
+    recommender = DomainLawRecommender()
+    report = recommender.recommend_for_text(text, genre_hint=args.genre)
+
+    print("===========================================================================")
+    print("  WORLD ENGINE CLI: PHYSICAL LAW RECOMMENDER (مستكشف ومقترح القوانين)")
+    print("===========================================================================")
+    print(f"Source File: {input_file}")
+    print("\n--- 1. DOMAIN CLASSIFICATION ---")
+    print(f"  • Recommended Pack:   {report.pack_title} [{report.recommended_pack_id}]")
+    print(f"  • Confidence Score:   {report.confidence_score * 100:.0f}%")
+    print(f"  • Matched Keywords:   {', '.join(report.matched_keywords) if report.matched_keywords else 'None'}")
+
+    print("\n--- 2. EXPLANATION ---")
+    print(f"  {report.explanation}")
+
+    print(f"\n--- 3. SUGGESTED STATUTORY LAWS ({len(report.suggested_rules)}) ---")
+    for r in report.suggested_rules:
+        print(f"  📜 [{r['id']}] {r['name']} ({r['domain']}) - Severity: {r['severity']}")
+
+    if args.output:
+        out_path = Path(args.output).resolve()
+        with open(out_path, "w", encoding="utf-8") as f:
+            yaml.dump(report.to_rules_manifest_dict(), f, allow_unicode=True, sort_keys=False)
+        print(f"\n  📄 Exported rules manifest to: {out_path}")
+
+    print("\n===========================================================================")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="world_engine",
@@ -316,6 +355,12 @@ def main():
     ingest_parser.add_argument("--title", type=str, default=None, help="Title of the novel")
     ingest_parser.add_argument("--genre", type=str, default="existential_survival_tragedy", help="Narrative genre")
 
+    # Subcommand: recommend-rules
+    rules_parser = subparsers.add_parser("recommend-rules", help="Recommend domain physical laws for a narrative text")
+    rules_parser.add_argument("input", type=Path, help="Path to raw narrative text file (txt, md)")
+    rules_parser.add_argument("--genre", type=str, default=None, help="Optional narrative genre hint")
+    rules_parser.add_argument("--output", type=Path, default=None, help="Optional output path to export rules_manifest.yaml")
+
     args = parser.parse_args()
 
     if args.command == "audit":
@@ -324,6 +369,8 @@ def main():
         sys.exit(cmd_init(args))
     elif args.command == "ingest":
         sys.exit(cmd_ingest(args))
+    elif args.command == "recommend-rules":
+        sys.exit(cmd_recommend_rules(args))
     else:
         parser.print_help()
         sys.exit(0)

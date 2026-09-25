@@ -1,7 +1,61 @@
 schema_version: 1.0.0
-events_count: 1
+events_count: 8
+causal_edges_count: 7
+causal_density: 0.875
+is_acyclic: true
 events:
 - id: EVT-001
-  name: 'حدث الفصل 1: المتن السردي العام'
-  chapter_index: 1
+  name: صدمة الارتداد الميكانيكي
+  type: Physical_Shock
+  line: 1
+  minute: 0
+  causes:
+  - EVT-002
+- id: EVT-002
+  name: إصابة عباس على المنصة الخلفية
+  type: Casualty_Event
+  line: 617
+  minute: 300
+  causes:
+  - EVT-008
+- id: EVT-003
+  name: إصابة عباس على المنصة الخلفية
+  type: Casualty_Event
+  line: 765
+  minute: 300
+  causes:
+  - EVT-008
+- id: EVT-004
+  name: وقوع الكمين الليلي وإطلاق النار
+  type: Tactical_Ambush
+  line: 817
+  minute: 300
+  causes:
+  - EVT-005
+- id: EVT-005
+  name: قفز مهدي من الباب المنزلق واختفاؤه
+  type: Tactical_Breach
+  line: 865
+  minute: 300
+  causes:
+  - EVT-006
+- id: EVT-006
+  name: وقوع الكمين الليلي وإطلاق النار
+  type: Tactical_Ambush
+  line: 945
+  minute: 300
+  causes:
+  - EVT-007
+- id: EVT-007
+  name: وقوع الكمين الليلي وإطلاق النار
+  type: Tactical_Ambush
+  line: 953
+  minute: 300
+  causes:
+  - EVT-008
+- id: EVT-008
+  name: انطلاق موال عزيز ورنين العتمة
+  type: Psychological_Resonance
+  line: 1145
+  minute: 645
   causes: []

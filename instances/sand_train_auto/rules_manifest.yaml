@@ -1,12 +1,12 @@
 schema_version: 1.0.0
-domain_count: 2
+domain_count: 4
 rules:
 - id: LAW-THERMO-01
-  name: قانون الحفظ الحراري للعالم (Thermal Preservation)
+  name: قانون الحفظ الحراري وانكماش الصاج (Sheet Metal Contraction)
   domain: thermodynamics
-  description: توازن درجات الحرارة والتبادل الحراري في الفضاء المغلق وفق مبادئ الديناميكا
-    الحرارية.
+  description: انكماش الصاج المعدني بطقطقة جافة وهبوط الحرارة الداخلية في الصقيع.
   mathematical_expression: dQ/dt = -k * A * (T_in - T_out)
+  severity: VIOLATION
   trigger:
     description: هبوط درجة الحرارة المحيطة إلى ما دون الصفر
     conditions:
@@ -19,22 +19,56 @@ rules:
     assertion: الحرارة الصغرى لا تهبط تحت حد الصقيع المسموح
     operator: '>='
     expected_value: -15.0
-  severity: VIOLATION
-- id: LAW-BIO-01
-  name: قانون استهلاك الموارد الحيوية (Metabolic Consumption)
-  domain: biology
-  description: استهلاك المخزون المائي والغذائي وفق المعادلات الأيضية للإنسان في بيئات
-    الحصار.
-  mathematical_expression: Water_loss = 0.05 * Headcount * Hours_elapsed
+- id: LAW-CHEM-01
+  name: قانون تبلور وتصلب شمع البرافين للديزل (Fuel Paraffin Gelling)
+  domain: chemistry
+  description: تجمد وتكتل شمع الديزل الصيفي عند هبوط الحرارة دون -6°C مانعاً تشغيل
+    المحرك.
+  mathematical_expression: Viscosity_fuel = mu_0 * exp(E / R*T)
+  severity: FATAL
   trigger:
-    description: مرور أكثر من 6 ساعات في بيئة محاصرة
+    description: هبوط حرارة الوقود دون نقطة التغيم
     conditions:
-    - parameter: elapsed_time_hours
-      operator: '>='
-      value: 6.0
+    - parameter: diesel_fuel_temperature
+      operator: <=
+      value: -6.0
+      unit: celsius
   invariants:
-  - target: headcount_target.initial_total
-    assertion: تعداد الشخصيات أكبر من الصفر
+  - target: locomotive.engine.cold_restart_possible
+    assertion: استحالة تشغيل المحرك الميكانيكي دون تسخين مسبق
+    operator: ==
+    expected_value: false
+- id: LAW-BIO-06
+  name: قانون ديناميكا فرط ثاني أكسيد الكربون الحبيس (Hypercapnia Dynamics)
+  domain: biology
+  description: تراكم غاز CO2 في الصندوق المعدني المحكم بمعدل 280 لتر/ساعة وبلبلة الإدراك.
+  mathematical_expression: d[CO2]/dt = (N_humans * 20.0 L/h) / V_chamber
+  severity: VIOLATION
+  trigger:
+    description: تجاوز تركيز ثاني أكسيد الكربون 1.5%
+    conditions:
+    - parameter: environment.co2_concentration_percent
+      operator: '>='
+      value: 1.5
+  invariants:
+  - target: characters.allostatic_load
+    assertion: تصاعد الإجهاد العصبي والبلبلة الإدراكية الحتمية
     operator: '>='
-    expected_value: 1
+    expected_value: 0.4
+- id: LAW-ACOUST-04
+  name: قانون التوصيل الصوتي الهيكلي للحديد (Structure-Borne Acoustics)
+  domain: acoustics
+  description: انتقال صدمات الطرق عبر شاسيه السكة والفولاذ بسرعة 5000 م/ث بفقد طفيف.
+  mathematical_expression: v_steel = sqrt(E / rho) = 5000 m/s
   severity: WARNING
+  trigger:
+    description: وقوع صدمة ميكانيكية أو طرقة على الهيكل المعدني
+    conditions:
+    - parameter: structural_mechanical_strike
+      operator: ==
+      value: true
+  invariants:
+  - target: train.structural_vibration_detected
+    assertion: اهتزاز الشاسيه وسماع الصوت في كافة العربات
+    operator: ==
+    expected_value: true

@@ -16,9 +16,12 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
+from world_engine.dag_miner import NarrativeCausalityMiner
 from world_engine.ingest.narrative_ner import ExtractedEntities, NarrativeEntityExtractor
 from world_engine.ingest.sensory_grounder import GroundedEnvironment, SensoryPhysicalGrounder
 from world_engine.ingest.text_chunker import ChunkedDocument, NarrativeTextChunker
+from world_engine.law_catalog.recommender import DomainLawRecommender
+from world_engine.spatial_epistemics import SpatialAcousticEpistemicField, SoundEvent
 
 
 class WorldManifestSynthesizer:
@@ -28,6 +31,9 @@ class WorldManifestSynthesizer:
         self.chunker = NarrativeTextChunker()
         self.ner = NarrativeEntityExtractor()
         self.grounder = SensoryPhysicalGrounder()
+        self.miner = NarrativeCausalityMiner()
+        self.law_recommender = DomainLawRecommender()
+        self.epistemic_field = SpatialAcousticEpistemicField()
 
     def slugify(self, text: str) -> str:
         s = text.lower().strip()
@@ -104,10 +110,10 @@ class WorldManifestSynthesizer:
         )
 
         # 7. Synthesize rules_manifest.yaml
-        rules_data = self._build_rules_manifest(env=env)
+        rules_data = self._build_rules_manifest(text=text, genre=effective_genre)
 
         # 8. Synthesize causality_graph.yaml
-        causality_data = self._build_causality_graph(doc=doc, entities=entities)
+        causality_data = self._build_causality_graph(text=text, doc=doc)
 
         # Write files
         manifest_file = out_path / "world_manifest.yaml"
@@ -393,72 +399,17 @@ class WorldManifestSynthesizer:
             },
         }
 
-    def _build_rules_manifest(self, env: GroundedEnvironment) -> Dict[str, Any]:
-        rules = [
-            {
-                "id": "LAW-THERMO-01",
-                "name": "قانون الحفظ الحراري للعالم (Thermal Preservation)",
-                "domain": "thermodynamics",
-                "description": "توازن درجات الحرارة والتبادل الحراري في الفضاء المغلق وفق مبادئ الديناميكا الحرارية.",
-                "mathematical_expression": "dQ/dt = -k * A * (T_in - T_out)",
-                "trigger": {
-                    "description": "هبوط درجة الحرارة المحيطة إلى ما دون الصفر",
-                    "conditions": [
-                        {
-                            "parameter": "ambient_temperature",
-                            "operator": "<=",
-                            "value": 0.0,
-                            "unit": "celsius",
-                        }
-                    ],
-                },
-                "invariants": [
-                    {
-                        "target": "environment.temperature_celsius.min",
-                        "assertion": "الحرارة الصغرى لا تهبط تحت حد الصقيع المسموح",
-                        "operator": ">=",
-                        "expected_value": -15.0,
-                    }
-                ],
-                "severity": "VIOLATION",
-            },
-            {
-                "id": "LAW-BIO-01",
-                "name": "قانون استهلاك الموارد الحيوية (Metabolic Consumption)",
-                "domain": "biology",
-                "description": "استهلاك المخزون المائي والغذائي وفق المعادلات الأيضية للإنسان في بيئات الحصار.",
-                "mathematical_expression": "Water_loss = 0.05 * Headcount * Hours_elapsed",
-                "trigger": {
-                    "description": "مرور أكثر من 6 ساعات في بيئة محاصرة",
-                    "conditions": [
-                        {
-                            "parameter": "elapsed_time_hours",
-                            "operator": ">=",
-                            "value": 6.0,
-                        }
-                    ],
-                },
-                "invariants": [
-                    {
-                        "target": "headcount_target.initial_total",
-                        "assertion": "تعداد الشخصيات أكبر من الصفر",
-                        "operator": ">=",
-                        "expected_value": 1,
-                    }
-                ],
-                "severity": "WARNING",
-            },
-        ]
+    def _build_rules_manifest(self, text: str, genre: Optional[str] = None) -> Dict[str, Any]:
+        report = self.law_recommender.recommend_for_text(text, genre_hint=genre)
+        return report.to_rules_manifest_dict()
 
-        return {
-            "schema_version": "1.0.0",
-            "domain_count": len(rules),
-            "rules": rules,
-        }
+    def _build_causality_graph(self, text: str, doc: ChunkedDocument) -> Dict[str, Any]:
+        mining_report = self.miner.mine_and_report(text)
+        if mining_report.total_events >= 2:
+            return mining_report.to_yaml_dict()
 
-    def _build_causality_graph(self, doc: ChunkedDocument, entities: ExtractedEntities) -> Dict[str, Any]:
+        # Fallback to chapters if fewer events detected
         events = []
-        # Derive initial events from chapters
         for idx, ch in enumerate(doc.chapters[:10], start=1):
             events.append({
                 "id": f"EVT-{idx:03d}",
