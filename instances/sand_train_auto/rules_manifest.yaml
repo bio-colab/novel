@@ -1,0 +1,40 @@
+schema_version: 1.0.0
+domain_count: 2
+rules:
+- id: LAW-THERMO-01
+  name: قانون الحفظ الحراري للعالم (Thermal Preservation)
+  domain: thermodynamics
+  description: توازن درجات الحرارة والتبادل الحراري في الفضاء المغلق وفق مبادئ الديناميكا
+    الحرارية.
+  mathematical_expression: dQ/dt = -k * A * (T_in - T_out)
+  trigger:
+    description: هبوط درجة الحرارة المحيطة إلى ما دون الصفر
+    conditions:
+    - parameter: ambient_temperature
+      operator: <=
+      value: 0.0
+      unit: celsius
+  invariants:
+  - target: environment.temperature_celsius.min
+    assertion: الحرارة الصغرى لا تهبط تحت حد الصقيع المسموح
+    operator: '>='
+    expected_value: -15.0
+  severity: VIOLATION
+- id: LAW-BIO-01
+  name: قانون استهلاك الموارد الحيوية (Metabolic Consumption)
+  domain: biology
+  description: استهلاك المخزون المائي والغذائي وفق المعادلات الأيضية للإنسان في بيئات
+    الحصار.
+  mathematical_expression: Water_loss = 0.05 * Headcount * Hours_elapsed
+  trigger:
+    description: مرور أكثر من 6 ساعات في بيئة محاصرة
+    conditions:
+    - parameter: elapsed_time_hours
+      operator: '>='
+      value: 6.0
+  invariants:
+  - target: headcount_target.initial_total
+    assertion: تعداد الشخصيات أكبر من الصفر
+    operator: '>='
+    expected_value: 1
+  severity: WARNING

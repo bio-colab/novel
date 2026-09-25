@@ -1,0 +1,7 @@
+schema_version: 1.0.0
+events_count: 1
+events:
+- id: EVT-001
+  name: 'حدث الفصل 1: المتن السردي العام'
+  chapter_index: 1
+  causes: []

@@ -230,6 +230,21 @@ class DeclarativeInvariantEvaluator:
             if found:
                 return cur
 
+        # 2b. Check manifest_data as fallback
+        if self.manifest_data:
+            for cand in candidate_paths:
+                parts = cand.split(".")
+                cur = self.manifest_data
+                found = True
+                for part in parts:
+                    if isinstance(cur, dict) and part in cur:
+                        cur = cur[part]
+                    else:
+                        found = False
+                        break
+                if found:
+                    return cur
+
         # 3. Canonical dynamic parameters
         if path_str in ("confinement_hours", "elapsed_time_hours"):
             return 10.75

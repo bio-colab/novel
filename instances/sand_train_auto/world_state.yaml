@@ -1,0 +1,140 @@
+schema_version: 1.0.0
+timestamp: '19:00:00'
+environment:
+  ambient_temperature_c: 0.0
+  lux_ambient: 0.8
+  wind_speed_kmh: 38.0
+  co2_concentration_percent: 0.04
+characters:
+  أبو_علي:
+    name_ar: أبو علي
+    agency_type: primary_agent
+    affordance_slot: slot_أبو_علي
+    vitals:
+      core_temp_c: 36.8
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (أبو علي)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  أبو_اللول:
+    name_ar: أبو اللول
+    agency_type: primary_agent
+    affordance_slot: slot_أبو_اللول
+    vitals:
+      core_temp_c: 36.8
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (أبو اللول)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  حجي_عمار:
+    name_ar: حجي عمار
+    agency_type: primary_agent
+    affordance_slot: slot_حجي_عمار
+    vitals:
+      core_temp_c: 36.8
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (حجي عمار)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  نحو:
+    name_ar: نحو
+    agency_type: primary_agent
+    affordance_slot: slot_نحو
+    vitals:
+      core_temp_c: 36.8
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (نحو)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  خالد:
+    name_ar: خالد
+    agency_type: primary_agent
+    affordance_slot: slot_خالد
+    vitals:
+      core_temp_c: 36.8
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (خالد)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  أبو_وليد:
+    name_ar: أبو وليد
+    agency_type: primary_agent
+    affordance_slot: slot_أبو_وليد
+    vitals:
+      core_temp_c: 36.8
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (أبو وليد)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  سردار:
+    name_ar: سردار
+    agency_type: cohort_agent
+    affordance_slot: slot_سردار
+    vitals:
+      core_temp_c: 36.5
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (سردار)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  بسام:
+    name_ar: بسام
+    agency_type: cohort_agent
+    affordance_slot: slot_بسام
+    vitals:
+      core_temp_c: 36.5
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (بسام)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  أبو_دريد:
+    name_ar: أبو دريد
+    agency_type: cohort_agent
+    affordance_slot: slot_أبو_دريد
+    vitals:
+      core_temp_c: 36.5
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (أبو دريد)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+  حجي_بسام:
+    name_ar: حجي بسام
+    agency_type: cohort_agent
+    affordance_slot: slot_حجي_بسام
+    vitals:
+      core_temp_c: 36.5
+      dexterity_percent: 90
+      allostatic_load: 0.2
+    epistemic_bubble:
+      known_truths:
+      - وجوده في المشهد السردي (حجي بسام)
+      blind_spots:
+      - ما يدور خلف الحواجز المكانية المعزولة
+spatial_slots:
+  active_occupants_count: 10

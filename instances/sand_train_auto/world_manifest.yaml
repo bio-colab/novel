@@ -1,0 +1,71 @@
+schema_version: 1.0.0
+world_id: sand_train_auto
+title: قطار الرمل
+genre: existential_survival_tragedy
+chronotope:
+  setting: سكة - صحراء - محطة
+  coordinates: 31.3°N, 45.3°E
+  historical_epoch: 1980s_analog
+  start_timestamp: 198X-01-18T19:00:00
+  total_duration_minutes: 360
+  timestep_minutes: 1.0
+environment:
+  temperature_celsius:
+    initial: 0.0
+    min: -8.0
+    max: 2.0
+  humidity_percent:
+    min: 8
+    max: 14
+  wind:
+    speed_kmh: 38.0
+    direction_degrees: 315.0
+    gust_kmh: 55.0
+  lux_ambient:
+    min: 0.0
+    max: 15.0
+spatial_topology:
+  coordinate_type: 1D_linear_track
+  total_envelope_meters: 15.0
+  zones:
+  - id: zone_1_عربة
+    name: عربة (enclosed_car)
+    bounds_meters:
+    - 0.0
+    - 15.0
+    acoustic_isolation_db: 35.0
+    thermal_conduction_factor: 1.1
+resource_ledger:
+  initial_inventories:
+  - resource_id: res_1_بندقية
+    category: ammunition
+    amount: 1.0
+    unit: units
+    location_zone_id: zone_1_عربة
+    consumption_rate_per_hour_per_capita: 0.0
+  - resource_id: res_2_مسدس
+    category: misc
+    amount: 1.0
+    unit: units
+    location_zone_id: zone_1_عربة
+    consumption_rate_per_hour_per_capita: 0.0
+  - resource_id: res_3_سلك
+    category: tool
+    amount: 1.0
+    unit: units
+    location_zone_id: zone_1_عربة
+    consumption_rate_per_hour_per_capita: 0.0
+  - resource_id: res_4_مفتاح
+    category: tool
+    amount: 3.0
+    unit: units
+    location_zone_id: zone_1_عربة
+    consumption_rate_per_hour_per_capita: 0.0
+headcount_target:
+  initial_total: 10
+  demographic_breakdown:
+    primary_agents: 6
+    cohort_agents: 4
+rules_manifest_ref: rules_manifest.yaml
+entities_catalog_ref: entities_catalog.yaml
+causality_graph_ref: causality_graph.yaml

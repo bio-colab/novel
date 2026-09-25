@@ -3,6 +3,24 @@
 
 جميع التغييرات والترقيات الموثقة في هذا المشروع تتبع معايير [Keep a Changelog](https://keepachangelog.com/ar/)، ونظام الترقيم الدلالي للإصدارات (Semantic Versioning).
 
+## [2.4.0-universal-ingestion] - 2026-09-25
+
+### أُضيف (Added)
+* **المرحلة 1 من التحول لنظام التشغيل الشامل (Universal Ingestion Pipeline):**
+  * بناء حزمة الاستيراد والتأريض السردي المستقلة داخل النواة [`world_engine/ingest/`](world_engine/ingest/):
+    * `text_chunker.py`: تجزئة النصوص السردية الخام وتقسيمها هرمياً إلى (أجزاء $\rightarrow$ فصول $\rightarrow$ فقرات) مع حساب التعداد والإحصاءات.
+    * `narrative_ner.py`: استخراج الكيانات والشخصيات من السياقات الحوارية العربية مع كشف اللوازم الحركية (Tics) والأدوار والمعدات والمركبات والمعالم بدقة متقدمة وتسامح مع السوابق اللغوية.
+    * `sensory_grounder.py`: مؤرض الحواس الفيزيائي القائم على استخراج الدلالات المادية وتأريضها في مقادير حتمية (درجة الحرارة، شدة الإضاءة، سرعة الرياح، الغلاف الجوي المغلق).
+    * `manifest_synthesizer.py`: التوليد التلقائي الشامل لعقد ومواصفة العالم (`world_manifest.yaml`، `entities_catalog.yaml`، `world_state.yaml`، `rules_manifest.yaml`، `causality_graph.yaml`).
+  * تزويد واجهة الأوامر الموحدة بأمر الاستيراد المباشر:
+    `python -m world_engine ingest <file.txt/md> --output <dir>`
+  * ترقية مفسر القوانين التصريحي `world_engine/evaluator.py` بالتحقق التلقائي المتبادل بين الحالة اللحظية وعقد المانيفست.
+  * تطبيق عملي ومعياري على متن الرواية المرجعي: استيراد تلقائي لنص [`00_BASELINE/novel_baseline.md`](00_BASELINE/novel_baseline.md) وتوليد مثيل عالمي مستقل في `instances/sand_train_auto/` واجتيازه الفحص والتدقيق بنسبة 100%.
+  * إضافة حزمة اختبارات شاملة للاستيراد السردي `tests/test_world_engine_ingest.py` (6 اختبارات).
+  * ارتفاع إجمالي اختبارات حزمة pytest من 107 إلى **113 اختباراً ناجحاً بنسبة 100% (Green)** دون أي تراجع.
+
+---
+
 ## [2.3.0-world-perfection] - 2026-09-24
 
 ### أُضيف (Added)

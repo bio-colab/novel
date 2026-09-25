@@ -231,6 +231,60 @@ def cmd_init(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ingest(args: argparse.Namespace) -> int:
+    """Ingest a raw narrative text, extract characters/sensory conditions, and synthesize a world instance."""
+    input_file = Path(args.input).resolve()
+    output_dir = Path(args.output).resolve()
+
+    if not input_file.exists():
+        print(f"❌ Error: Input narrative file not found: {input_file}")
+        return 1
+
+    print("===========================================================================")
+    print("  WORLD ENGINE CLI: NARRATIVE INGESTION (استيراد وتأريض النص السردي)")
+    print("===========================================================================")
+    print(f"Source Narrative: {input_file}")
+    print(f"Target Directory: {output_dir}")
+
+    from world_engine.ingest.manifest_synthesizer import WorldManifestSynthesizer
+
+    synthesizer = WorldManifestSynthesizer()
+    res = synthesizer.synthesize_from_file(
+        file_path=input_file,
+        output_dir=output_dir,
+        world_id=args.world_id,
+        title=args.title,
+        genre=args.genre,
+    )
+
+    print("\n--- 1. STRUCTURAL & SENSORY INGESTION ---")
+    print(f"  • Total Words Extracted:   {res['total_words']}")
+    print(f"  • Chapters Detected:       {res['chapters_count']}")
+    print(f"  • Physical Thermal Regime: {res['grounded_regime'].upper()}")
+
+    print("\n--- 2. EXTRACTED NARRATIVE ENTITIES ---")
+    print(f"  • Characters Found:        {res['characters_count']}")
+    print(f"  • Vehicles / Spaces:       {res['vehicles_count']}")
+    print(f"  • Material Props:          {res['props_count']}")
+    print(f"  • Landmarks:               {res['landmarks_count']}")
+
+    print("\n--- 3. SYNTHESIZED WORLD SPECIFICATION ---")
+    for f in res["files_created"]:
+        print(f"  📄 Generated: {f}")
+
+    # Automatic contract audit on newly generated world
+    manifest_path = output_dir / "world_manifest.yaml"
+    audit_report = audit_world(manifest_path)
+    print("\n--- 4. AUTOMATIC INITIAL AUDIT ---")
+    print(f"  • Contract Compliance:  {'✅ PASS' if audit_report['is_valid'] else '❌ FAIL'}")
+    print(f"  • Invariants Evaluated: {audit_report['invariants_passed']} / {audit_report['invariants_checked']}")
+
+    print("\n===========================================================================")
+    print(f"  INGESTION COMPLETE: cd {output_dir} and inspect your synthesized world.")
+    print("===========================================================================")
+    return 0 if audit_report["is_valid"] else 1
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="world_engine",
@@ -254,12 +308,22 @@ def main():
     init_parser.add_argument("--genre", type=str, default="existential_survival_tragedy", help="Narrative genre")
     init_parser.add_argument("--force", action="store_true", help="Force overwrite existing directory")
 
+    # Subcommand: ingest
+    ingest_parser = subparsers.add_parser("ingest", help="Ingest raw narrative text and synthesize world instance")
+    ingest_parser.add_argument("input", type=Path, help="Path to raw narrative text file (txt, md)")
+    ingest_parser.add_argument("--output", type=Path, required=True, help="Target output directory for synthesized world")
+    ingest_parser.add_argument("--world-id", type=str, default=None, help="Identifier for the new world")
+    ingest_parser.add_argument("--title", type=str, default=None, help="Title of the novel")
+    ingest_parser.add_argument("--genre", type=str, default="existential_survival_tragedy", help="Narrative genre")
+
     args = parser.parse_args()
 
     if args.command == "audit":
         sys.exit(cmd_audit(args))
     elif args.command == "init":
         sys.exit(cmd_init(args))
+    elif args.command == "ingest":
+        sys.exit(cmd_ingest(args))
     else:
         parser.print_help()
         sys.exit(0)
@@ -267,3 +331,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

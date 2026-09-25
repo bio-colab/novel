@@ -1,0 +1,199 @@
+metadata:
+  schema_version: 1.0.0
+  novel_id: sand_train_auto
+  charter: نحن نُحلل ونُقيّم.. ولا نُقوّم
+  total_entities_count: 25
+  breakdown:
+    characters_count: 10
+    vehicles_count: 1
+    props_count: 10
+    landmarks_count: 4
+characters:
+- entity_id: ENT-CHAR-1001
+  numeric_id: 1001
+  canonical_name: أبو علي
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_أبو_علي
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 70
+- entity_id: ENT-CHAR-1002
+  numeric_id: 1002
+  canonical_name: أبو اللول
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_أبو_اللول
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 18
+- entity_id: ENT-CHAR-1003
+  numeric_id: 1003
+  canonical_name: حجي عمار
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_حجي_عمار
+    tic: تحسس ندبة الفك بالسبابة
+    mentions_count: 16
+- entity_id: ENT-CHAR-1004
+  numeric_id: 1004
+  canonical_name: نحو
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: مهرب / وسيط تجاري
+    affordance_anchor: موضع_نحو
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 4
+- entity_id: ENT-CHAR-1005
+  numeric_id: 1005
+  canonical_name: خالد
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_خالد
+    tic: مسح الكفين الدائم بالبنطال
+    mentions_count: 4
+- entity_id: ENT-CHAR-1006
+  numeric_id: 1006
+  canonical_name: أبو وليد
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_أبو_وليد
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 2
+- entity_id: ENT-CHAR-1007
+  numeric_id: 1007
+  canonical_name: سردار
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_سردار
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 2
+- entity_id: ENT-CHAR-1008
+  numeric_id: 1008
+  canonical_name: بسام
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_بسام
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 2
+- entity_id: ENT-CHAR-1009
+  numeric_id: 1009
+  canonical_name: أبو دريد
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_أبو_دريد
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 1
+- entity_id: ENT-CHAR-1010
+  numeric_id: 1010
+  canonical_name: حجي بسام
+  category: CHARACTER
+  parent_entity_id: null
+  location_id: ENT-VEH-2001
+  properties:
+    role: شخصية رئيسية / فاعل سردي
+    affordance_anchor: موضع_حجي_بسام
+    tic: التأمل_الصامت_في_العتمة
+    mentions_count: 1
+vehicles:
+- entity_id: ENT-VEH-2001
+  canonical_name: عربة
+  category: VEHICLE
+  properties:
+    type: enclosed_car
+props:
+- entity_id: ENT-PROP-3001
+  canonical_name: بندقية
+  category: PROP
+  properties:
+    type: سلاح ناري فردي
+- entity_id: ENT-PROP-3002
+  canonical_name: مسدس
+  category: PROP
+  properties:
+    type: سلاح ناري خفيف
+- entity_id: ENT-PROP-3003
+  canonical_name: سلك
+  category: PROP
+  properties:
+    type: أداة صيانة وربط معدني
+- entity_id: ENT-PROP-3004
+  canonical_name: مفتاح
+  category: PROP
+  properties:
+    type: أداة ميكانيكية وربط
+- entity_id: ENT-PROP-3005
+  canonical_name: برميل
+  category: PROP
+  properties:
+    type: وعاء تخزين سوائل
+- entity_id: ENT-PROP-3006
+  canonical_name: ساعة
+  category: PROP
+  properties:
+    type: أداة قياس زمنية
+- entity_id: ENT-PROP-3007
+  canonical_name: وصل
+  category: PROP
+  properties:
+    type: وثيقة ورقية إدارية
+- entity_id: ENT-PROP-3008
+  canonical_name: حذاء
+  category: PROP
+  properties:
+    type: ملبس واقٍ
+- entity_id: ENT-PROP-3009
+  canonical_name: حصاة
+  category: PROP
+  properties:
+    type: أثر طبيعي رمزي
+- entity_id: ENT-PROP-3010
+  canonical_name: حقيبة
+  category: PROP
+  properties:
+    type: وعاء حفظ أمتعة
+landmarks:
+- entity_id: ENT-LAND-4001
+  canonical_name: سكة
+  category: LANDMARK
+  properties:
+    type: railway_track
+- entity_id: ENT-LAND-4002
+  canonical_name: صحراء
+  category: LANDMARK
+  properties:
+    type: arid_desert
+- entity_id: ENT-LAND-4003
+  canonical_name: محطة
+  category: LANDMARK
+  properties:
+    type: remote_station
+- entity_id: ENT-LAND-4004
+  canonical_name: سجن
+  category: LANDMARK
+  properties:
+    type: prison_fortress
