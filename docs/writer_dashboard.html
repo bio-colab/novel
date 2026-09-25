@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الكاتب الذكية | World Engine Writer Dashboard</title>
+    <style>
+        :root {
+            --bg-canvas: #090d16;
+            --bg-surface: #111827;
+            --bg-elevated: #1f2937;
+            --bg-card: #182234;
+            --border-subtle: #2d3748;
+            --border-accent: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --color-emerald: #10b981;
+            --color-cyan: #06b6d4;
+            --color-amber: #f59e0b;
+            --color-rose: #f43f5e;
+            --color-purple: #a855f7;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", "IBM Plex Sans Arabic", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+        }
+
+        body {
+            background: var(--bg-canvas);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Header & Brand */
+        header {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+        }
+
+        .brand-title h1 {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-title p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-strip {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--color-emerald);
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .badge-cyan {
+            background: rgba(6, 182, 212, 0.12);
+            color: var(--color-cyan);
+            border-color: rgba(6, 182, 212, 0.25);
+        }
+
+        .badge-purple {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--color-purple);
+            border-color: rgba(168, 85, 247, 0.25);
+        }
+
+        /* Navigation Tabs */
+        nav {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 28px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-tab {
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            color: var(--color-cyan);
+            border-bottom-color: var(--color-cyan);
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            padding: 24px 28px;
+            max-width: 1440px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Grid Layouts */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Interactive Reader */
+        .reader-container {
+            background: #0d121e;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            max-height: 680px;
+            overflow-y: auto;
+            font-size: 15px;
+            line-height: 1.9;
+        }
+
+        .reader-excerpt-box {
+            margin-bottom: 24px;
+            padding: 14px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border-right: 3px solid var(--color-cyan);
+        }
+
+        .reader-line {
+            display: flex;
+            gap: 16px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .reader-line:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .line-num {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-family: monospace;
+            width: 44px;
+            text-align: left;
+            user-select: none;
+            direction: ltr;
+        }
+
+        .line-text {
+            flex: 1;
+        }
+
+        .line-target {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px dashed rgba(244, 63, 94, 0.5);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .line-target:hover {
+            background: rgba(244, 63, 94, 0.25);
+        }
+
+        .line-target::after {
+            content: "⚠️ فحص حتمي";
+            position: absolute;
+            left: 10px;
+            top: 4px;
+            font-size: 10px;
+            background: var(--color-rose);
+            color: #fff;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        /* Contradiction Inspector */
+        .bug-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bug-card:hover, .bug-card.selected {
+            border-color: var(--color-cyan);
+            box-shadow: 0 0 14px rgba(6, 182, 212, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .bug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .bug-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .tag-critical { background: rgba(244, 63, 94, 0.2); color: var(--color-rose); }
+        .tag-major { background: rgba(245, 158, 11, 0.2); color: var(--color-amber); }
+        .tag-moderate { background: rgba(6, 182, 212, 0.2); color: var(--color-cyan); }
+
+        .charter-quote {
+            background: rgba(6, 182, 212, 0.08);
+            border-right: 3px solid var(--color-cyan);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #bae6fd;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        /* Acoustic Simulator */
+        .train-diagram {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .car-box {
+            background: #0f172a;
+            border: 2px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .car-box.active-source {
+            border-color: var(--color-amber);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .car-box.audible {
+            border-color: var(--color-emerald);
+        }
+
+        .car-box.in-audible {
+            border-color: rgba(244, 63, 94, 0.4);
+            opacity: 0.7;
+        }
+
+        .db-meter {
+            font-size: 24px;
+            font-weight: 900;
+            font-family: monospace;
+            margin: 10px 0;
+            direction: ltr;
+        }
+
+        /* Telemetry Gauges Grid */
+        .gauges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .gauge-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .gauge-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 10px 0 4px;
+            font-family: monospace;
+        }
+
+        .gauge-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Buttons & Forms */
+        .btn {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: var(--border-subtle);
+            border-color: var(--color-cyan);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-cyan), #0284c7);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);
+        }
+
+        /* Dropzone */
+        .dropzone {
+            border: 2px dashed var(--border-subtle);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropzone:hover {
+            border-color: var(--color-cyan);
+            background: rgba(6, 182, 212, 0.04);
+        }
+
+        textarea.code-input {
+            width: 100%;
+            height: 180px;
+            background: #0d121e;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 12px 0;
+            outline: none;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">WE</div>
+            <div class="brand-title">
+                <h1>نظام تشغيل العوالم السردية | World Engine OS</h1>
+                <p>المثيل المعياري الذهبي: «قطار الرمل» (Gold-Standard Benchmark)</p>
+            </div>
+        </div>
+        <div class="status-strip">
+            <div class="badge badge-green">🛡️ 30/30 فحص ناجح</div>
+            <div class="badge badge-cyan">⚖️ 41 قانوناً حتمياً</div>
+            <div class="badge badge-purple">🧠 JEV: 86% تطابق سيميائي</div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav>
+        <div class="nav-tab active" onclick="switchTab('reader')">📖 1. المتن ومفتش التناقضات</div>
+        <div class="nav-tab" onclick="switchTab('acoustic')">🔊 2. محاكي الصوت والمصفوفة الإبستيمية</div>
+        <div class="nav-tab" onclick="switchTab('dag')">⛓️ 3. شبكة التتابع السببي (DAG)</div>
+        <div class="nav-tab" onclick="switchTab('telemetry')">🌡️ 4. عدادات الغلاف الفيزيائي</div>
+        <div class="nav-tab" onclick="switchTab('ingest')">📥 5. استيراد وتأريض رواية جديدة</div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- TAB 1: Reader & Contradictions -->
+        <div id="tab-reader" class="tab-content active">
+            <div class="two-column">
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">📖 قراءة المتن ومواضع التدقيق الحتمي (Baseline Live Reader)</div>
+                            <span style="font-size: 12px; color: var(--text-muted);">انقر على أي سطر مظلل لتفكيك التناقض</span>
+                        </div>
+                        <div class="reader-container" id="reader-box">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="card" id="inspector-card">
+                        <div class="card-header">
+                            <div class="card-title">🔍 بطاقة تفكيك التناقض (Contradiction Card)</div>
+                            <span class="badge badge-cyan" id="card-severity">اختر سطراً</span>
+                        </div>
+                        <div id="card-body">
+                            <p style="color: var(--text-muted); font-size: 13px;">انقر على أي سطر مظلل في النص على اليمين لعرض تحليله الفيزيائي ومطابقته مع القوانين.</p>
+                        </div>
+                        <div class="charter-quote">
+                            <strong>ميثاق الحياد الإبداعي:</strong><br>
+                            «نحن نُحلل ونُقيّم.. ولا نُقوّم». هذه الأداة ترصد فقط اتساق القوانين الفيزيائية التي سنّها العالم لنفسه، والحدس الفني للكاتب هو الحكم المطلق.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Acoustic & Epistemic Matrix -->
+        <div id="tab-acoustic" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🔊 محاكي التوهين الصوتي والحدود الإبستيمية (LAW-ACOUST-03 / LAW-ACOUST-04)</div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-primary" onclick="runAcousticSim()">📡 بث التردد الصوتي</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 16px; background: rgba(30,41,59,0.4); padding: 12px 16px; border-radius: 8px;">
+                    <div>
+                        <label style="font-size: 12px; color: var(--text-secondary);">مصدر الصوت (عربة الانبعاث):</label><br>
+                        <select id="sim-source" style="background:#0f172a; color:#fff; border:1px solid var(--border-subtle); padding:6px 12px; border-radius:6px; margin-top:4px;">
+                            <option value="car_01">العربة 01 (الحراس - خالد وعباس)</option>
+                            <option value="car_02">العربة 02 (السجناء - عزيز وبسام)</option>
+                            <option value="car_03">العربة 03 (الخلفية - خليل وسردار)</option>
+                            <option value="cab">كابينة القاطرة (أبو علي)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; color: var(--text-secondary);">شدة الحدث الصوتي:</label><br>
+                        <select id="sim-sound" style="background:#0f172a; color:#fff; border:1px solid var(--border-subtle); padding:6px 12px; border-radius:6px; margin-top:4px;">
+                            <option value="whisper">همس خافت وسري (25 dB)</option>
+                            <option value="talk">حديث عادي معتاد (60 dB)</option>
+                            <option value="shout">صراخ محتد وهلع (85 dB)</option>
+                            <option value="impact">طرق ميكانيكي صدمي على الصاج (110 dB - هيكلي)</option>
+                            <option value="gunshot">طلقة كلاشنكوف 7.62mm (150 dB)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Train Cars Diagram -->
+                <div class="train-diagram" id="cars-diagram">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 14px; margin-bottom: 10px;">📋 مصفوفة المعرفة اللحظية للشخصيات (Epistemic Matrix State)</h3>
+                    <div id="epistemic-table" style="background: #0d121e; padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                        <!-- Table populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Causality DAG -->
+        <div id="tab-dag" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">⛓️ شبكة التتابع السببي الحتمية (Directed Acyclic Graph)</div>
+                    <span class="badge badge-green">100% خالية من الدورات الممتنعة (Acyclic)</span>
+                </div>
+                <div id="dag-container" style="display: flex; flex-direction: column; gap: 14px; margin-top: 12px;">
+                    <!-- Event nodes populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Telemetry -->
+        <div id="tab-telemetry" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🌡️ عدادات الغلاف الفيزيائي والبيولوجي الحي (Living Telemetry)</div>
+                    <div style="display:flex; align-items:center; gap: 12px;">
+                        <span style="font-size: 12px; color: var(--text-secondary);">المحطة الزمنية (Milestone):</span>
+                        <select id="milestone-select" onchange="updateTelemetry(this.value)" style="background:#0f172a; color:#fff; border:1px solid var(--border-subtle); padding:6px 12px; border-radius:6px;">
+                            <option value="0">T0 (19:00 - العطل المبدئي وانكسار الأنبوب)</option>
+                            <option value="1">T1 (21:00 - انغلاق المكابح وتيبس الأطراف)</option>
+                            <option value="2">T2 (00:00 - كمين منتصف الليل والرصاص)</option>
+                            <option value="3">T3 (03:00 - أقصى تجمد وانطفاء البطاريات)</option>
+                            <option value="4" selected>T4 (05:45 - الفجر الكاذب واستنزاف O2)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gauges-grid">
+                    <div class="gauge-card">
+                        <span class="gauge-sub">درجة الحرارة المحيطة</span>
+                        <div class="gauge-value" id="gauge-temp" style="color: var(--color-cyan);">-8.0°C</div>
+                        <span class="gauge-sub">حد تبلور بارافين الديزل: -4°C</span>
+                    </div>
+                    <div class="gauge-card">
+                        <span class="gauge-sub">تركيز ثاني أكسيد الكربون (CO2)</span>
+                        <div class="gauge-value" id="gauge-co2" style="color: var(--color-rose);">2800 ppm</div>
+                        <span class="gauge-sub">عتبة التسمم والبلادة الذهنية (Hypercapnia)</span>
+                    </div>
+                    <div class="gauge-card">
+                        <span class="gauge-sub">شدة الإضاءة الفلكية</span>
+                        <div class="gauge-value" id="gauge-lux" style="color: var(--text-secondary);">0.0 Lux</div>
+                        <span class="gauge-sub">محاق كانون الثاني (عتمة صقيعية دامسة)</span>
+                    </div>
+                    <div class="gauge-card">
+                        <span class="gauge-sub">ضغط أنبوب مكابح ويستنغهاوس</span>
+                        <div class="gauge-value" id="gauge-pneum" style="color: var(--color-amber);">0.0 bar</div>
+                        <span class="gauge-sub">إطباق حتمي للقباقيب الفولاذية (Clamped)</span>
+                    </div>
+                    <div class="gauge-card">
+                        <span class="gauge-sub">احتياطي الماء الصالح للشرب</span>
+                        <div class="gauge-value" id="gauge-water" style="color: var(--color-emerald);">7.98 L</div>
+                        <span class="gauge-sub">مستهلك تنفسي: 6.02 L لـ 14 فرداً</span>
+                    </div>
+                    <div class="gauge-card">
+                        <span class="gauge-sub">شحنة بطاريات الإضاءة</span>
+                        <div class="gauge-value" id="gauge-batt" style="color: var(--color-rose);">15%</div>
+                        <span class="gauge-sub">انحدار كيميائي حراري (LAW-MAT-01)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Ingest Dropzone -->
+        <div id="tab-ingest" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📥 مستورد وتأريض الروايات الشامل (Universal Novel Ingest)</div>
+                    <span class="badge badge-cyan">يدعم أي نص روائي عربي خام</span>
+                </div>
+
+                <div class="dropzone" id="drop-area" onclick="document.getElementById('file-upload').click()">
+                    <div style="font-size: 36px; margin-bottom: 8px;">📄</div>
+                    <p style="font-weight: 700; margin-bottom: 4px;">اسحب وأفلت ملف الرواية (.txt أو .md) هنا</p>
+                    <p style="font-size: 12px; color: var(--text-muted);">أو انقر لاختيار ملف من جهازك</p>
+                    <input type="file" id="file-upload" style="display:none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <label style="font-size: 13px; font-weight: 600;">أو الصق النص السردي مباشرة:</label>
+                    <textarea class="code-input" id="raw-novel-text" placeholder="الصق فصلاً أو نص رواية بالعربية لتحليله فورياً..."></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="analyzeClientText()">⚡ تحليل وتأريض النص السردي</button>
+                        <button class="btn" onclick="clearIngestText()">مسح</button>
+                    </div>
+                </div>
+
+                <div id="ingest-results" style="display: none; margin-top: 20px; background: #0d121e; padding: 18px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <!-- Results populated by JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Embedded Engine Data -->
+    <script>
+        const ENGINE_DATA = {"manifest": {"schema_version": "1.0.0", "world_id": "sand_train_auto", "title": "قطار الرمل", "genre": "existential_survival_tragedy", "chronotope": {"setting": "سكة - صحراء - بادية", "coordinates": "31.3°N, 45.3°E", "historical_epoch": "1980s_analog", "start_timestamp": "198X-01-18T19:00:00", "total_duration_minutes": 640, "timestep_minutes": 1.0}, "environment": {"temperature_celsius": {"initial": 0.0, "min": -8.0, "max": 2.0}, "humidity_percent": {"min": 8, "max": 14}, "wind": {"speed_kmh": 38.0, "direction_degrees": 315.0, "gust_kmh": 55.0}, "lux_ambient": {"min": 0.0, "max": 15.0}}, "spatial_topology": {"coordinate_type": "1D_linear_track", "total_envelope_meters": 60.0, "zones": [{"id": "zone_1_قطار", "name": "قطار (train_convoy)", "bounds_meters": [0.0, 15.0], "acoustic_isolation_db": 35.0, "thermal_conduction_factor": 1.1}, {"id": "zone_2_قاطرة", "name": "قاطرة (locomotive_engine)", "bounds_meters": [15.0, 30.0], "acoustic_isolation_db": 35.0, "thermal_conduction_factor": 1.1}, {"id": "zone_3_عربة", "name": "عربة (enclosed_car)", "bounds_meters": [30.0, 45.0], "acoustic_isolation_db": 35.0, "thermal_conduction_factor": 1.1}, {"id": "zone_4_منصة", "name": "منصة (observation_platform)", "bounds_meters": [45.0, 60.0], "acoustic_isolation_db": 35.0, "thermal_conduction_factor": 1.1}]}, "resource_ledger": {"initial_inventories": [{"resource_id": "res_1_بندقية", "category": "ammunition", "amount": 9.0, "unit": "units", "location_zone_id": "zone_1_قطار", "consumption_rate_per_hour_per_capita": 0.0}, {"resource_id": "res_2_مسدس", "category": "misc", "amount": 1.0, "unit": "units", "location_zone_id": "zone_1_قطار", "consumption_rate_per_hour_per_capita": 0.0}, {"resource_id": "res_3_سلك", "category": "tool", "amount": 9.0, "unit": "units", "location_zone_id": "zone_1_قطار", "consumption_rate_per_hour_per_capita": 0.0}, {"resource_id": "res_4_مفتاح", "category": "tool", "amount": 6.0, "unit": "units", "location_zone_id": "zone_1_قطار", "consumption_rate_per_hour_per_capita": 0.0}]}, "headcount_target": {"initial_total": 10, "demographic_breakdown": {"primary_agents": 6, "cohort_agents": 4}}, "rules_manifest_ref": "rules_manifest.yaml", "entities_catalog_ref": "entities_catalog.yaml", "causality_graph_ref": "causality_graph.yaml"}, "bugs": [{"id": "WORLD-BUG-001", "title": "مقصورة القيادة مقفلة بسقاطة داخلية دون وجود فاعل فيزيائي", "type": "Causality", "severity": "CRITICAL", "law_broken": "LAW-SPATIAL-01 (Conservation of Mechanical Closure)", "observed": {"description": "طرق أبو علي وخالد باب مقصورة السائق ووجداه مغلقاً بسقاطة فولاذية داخلية جاذبية. في نهاية الرواية تُركت المقصورة مغلقة وتم تشغيل القاطرة يدوياً من الخارج دون فتحها.\n", "state_snapshot": "train.locomotive.cabin.internal_latch_engaged = true"}, "required": {"invariant": "سقاطة الإغلاق الميكانيكية الداخلية تتطلب إما وجود كائن داخل المقصورة قام بإسقاطها، أو آلية ارتداد هيدروليكية صدمية موثقة أغلقتها، أو أن السائق هرب وترك منفذاً بديلاً مفتوحاً.\n", "physical_minimum": "Causal agent or mechanical mechanism required to engage internal gravity latch."}, "evidence": {"telemetry_timestamp": "05:45:00 (Minute 645 - Engine Restart Attempt)", "telemetry": ["door_state: latched_internally", "cabin_glass: intact", "driver_status: missing_or_dead", "front_breach_detected: false"]}, "affected": {"components": ["train.locomotive.cabin", "timeline (05:45 engine restart sequence)", "causal logic of driver escape/fate"]}, "simulation_impact": {"runs_affected": "100 / 100", "fragility_score": 0.95}, "remediation_proposal": {"proposal_id": "PR-001-CABIN", "patch": "إضافة أثر مادي حتمي يكتشفه أبو علي عند الفجر: شرخ في الزجاج السفلي لنافذة السائق المطلة على السكة مع سقوط حذاء السائق في مجرى الرمل، أو سماع ارتطام جثة السائق المتصلبة بالصاج عند أول دوران للمكبس.\n", "proposal_file": "04_STAGING/proposals/PR_001_cabin_latch.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 5, "chapter": 3, "anchor_text": "الباب الحديدي المصفح", "resolved_line": 1341}}, {"id": "WORLD-BUG-002", "title": "انسحاب المهاجمين المفاجئ في عتمة منتصف الليل دون مبرر تكتيكي أو كلفة سالبة", "type": "Game_Theory_and_Tactics", "severity": "HIGH", "law_broken": "LAW-TACTICAL-01 (Predator Advantage Conservation)", "observed": {"description": "توقف إطلاق النار فجأة عند الدقيقة 00:35 كما لو أن صماماً عملاقاً قد أُغلق، وانسحب المهاجمون تماماً تاركين قطاراً معطلاً في العراء لا يملك سوى بندقية واحدة.\n", "state_snapshot": "threats.ambushers.status = withdrawn_spontaneously"}, "required": {"invariant": "طرف يملك التفوق التكتيكي المطلق (الذخيرة، العتمة، إحاطة الهدف، تجمد الخصم) لا ينسحب إلا لظهور كلفة سالبة قاهرة (Threat/Cost Trigger) تكسر ميزان القوى، أو لتحقق غايته بدقة.\n", "physical_minimum": "External constraint or specific objective fulfillment required."}, "evidence": {"telemetry_timestamp": "00:35:00 (Minute 335 - Ambush Cessation Point)", "causal_consumption_trace": {"initial_rounds_at_1900": 118, "rounds_expended_in_ambush_0000_to_0035": 73, "rounds_expended_breakdown": {"abbas_weapon_rounds_fired": 3, "khalid_weapon_rounds_fired": 28, "wooden_crate_rounds_fired_by_sardar_and_guards": 42}, "train_effective_rounds_remaining": 45}, "text_attested_evidence": ["abbas_weapon_rounds_fired: 3 (source: Part 3, Ch 2, Lines 625 & 639; 2 shots from platform + 1 under wheel, weapon jammed on 4th)", "train_mobility: 0 (source: Part 1, Ch 6, Lines 179-228; locked by Westinghouse fail-safe shoes)"], "simulation_assumptions": ["ambushers_estimated_rounds: > 300 (class: assumption; inferred from intense flanking crossfire)", "ambient_temp: -4.0°C (class: assumption; derived from Jan 18 astronomical/meteorological model)", "train_effective_rounds_remaining: 45 (class: assumption; remaining defense reserve)"]}, "affected": {"components": ["threats.ambushers", "tactical credibility of survival", "pacing of Part 3"]}, "simulation_impact": {"runs_affected": "92 / 100", "fragility_score": 0.88}, "remediation_proposal": {"proposal_id": "PR-002-AMBUSH", "patch": "تأسيس مبرر موضوعي حتمي: وميض كشافات لدورية حدودية بعيدة شوهدت على خط الهضبة، أو أن الهدف الحصري للكمين كان شخصاً محدداً (تصفية/استخلاص) وانتهت المهمة.\n", "proposal_file": "04_STAGING/proposals/PR_002_ambush_withdrawal.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 3, "chapter": 8, "anchor_text": "توقف إطلاق النار", "resolved_line": 945}}, {"id": "WORLD-BUG-003", "title": "الفجوة الزمنية واستهلاك الصقيع بين 01:00 و 04:30", "type": "Thermodynamics_and_Biology", "severity": "MEDIUM_HIGH", "law_broken": "LAW-THERMO-01 & LAW-BIO-01", "observed": {"description": "مرور 210 دقيقة في النص بأسطر قليلة وتأملات مجردة، بينما تظل الشخصيات على قيد الحياة وتحتفظ بقدرتها على التحدث بحرية والتصرف دون علامات الهذيان أو التيبس الطرفي الحاد.\n", "state_snapshot": "environment.temp drops from -4.0°C to -8.0°C with zero heat source"}, "required": {"invariant": "التعرض لـ 3.5 ساعات في صاج مضلع غير معزول عند درجات بين -4°C و -8°C يفرض حتمياً دخول الجميع في المرحلة الثانية من انخفاض الحرارة (Hypothermia Stage 2)، مع تيبس أصابع كامل (motor_dexterity < 0.20)، تباطؤ كلامي، وهذيان للضعفاء كخليل وسلوم.\n", "physical_minimum": "Cognitive degradation and motor skill collapse mandatory."}, "evidence": {"telemetry_timestamp": "04:30:00 (Minute 570 - Pre-Dawn Cold Peak)", "telemetry": ["external_temp_at_0430: -8.0°C", "car_03_temp_at_0430: -6.5°C", "insulation_r_value: 0.0", "heating_fuel_burned: 0"]}, "affected": {"components": ["characters.*.physical.core_temp_c", "characters.*.physical.motor_dexterity", "dialogue_pace_and_lucidity"]}, "simulation_impact": {"runs_affected": "84 / 100", "fragility_score": 0.8}, "remediation_proposal": {"proposal_id": "PR-003-COLD-DECAY", "patch": "تجسيد ساعات الانتظار المتجمدة حسياً: تجمد البول في زوايا العربة، صراع النوم القاتل، وثقل الألسن في نطق الكلمات قبيل موال عزيز وبعده.\n", "proposal_file": "04_STAGING/proposals/PR_003_frost_gap.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 4, "chapter": 3, "anchor_text": "صقيع", "resolved_line": 1139}}, {"id": "WORLD-BUG-004", "title": "اختراق حدود العزل السمعي بين العربة الأولى والعربة الثالثة", "type": "Acoustic_and_Epistemic", "severity": "MEDIUM", "law_broken": "LAW-ACOUST-03 (Inter-Car Acoustic Isolation)", "observed": {"description": "سماع الحراس في العربة الأولى لهمسات وحركات خافتة تجري في العربة الأخيرة ومقصورة العزل، والاستجابة لها كما لو كانوا في غرفة واحدة.\n", "state_snapshot": "acoustics.inter_car_isolation = breached"}, "required": {"invariant": "مع وجود بابين منزلقين ورياح شمالية غربية عاتية (38 كم/س)، يبلغ الفقد السمعي بين العربة الأولى والثالثة > 35 dB؛ يستحيل سماع أي صوت دون 75 dB (لا يعبر سوى الرصاص والصراخ والطرق المعدني).\n", "physical_minimum": "Acoustic attenuation prevents transmission of normal speech."}, "evidence": {"telemetry_timestamp": "20:30:00 (Minute 90 - Inter-Car Monitoring)", "telemetry": ["wind_speed: 38 km/h", "inter_car_doors: 2", "ambient_noise_draft_db: 65 dB"]}, "affected": {"components": ["characters.خالد.epistemic_bubble", "characters.حناطة.epistemic_bubble"]}, "simulation_impact": {"runs_affected": "76 / 100", "fragility_score": 0.72}, "remediation_proposal": {"proposal_id": "PR-004-ACOUSTICS", "patch": "حصر معرفة خالد بما يجري في الخلف على الإشارات الحتمية: الطرق المتعمد على الصاج، أو نقل الخبر عبر أبي علي الذي يتحرك في الممر بين العربات.\n", "proposal_file": "04_STAGING/proposals/PR_004_intercar_acoustics.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 1, "chapter": 5, "anchor_text": "حركة", "resolved_line": 165}}, {"id": "WORLD-BUG-005", "title": "إصلاح أنبوب الوقود وشد السلك بالأصابع في الصقيع دون احتساب تآكل المهارات الدقيقة", "type": "Biomechanics", "severity": "MEDIUM_HIGH", "law_broken": "LAW-BIO-01 & LAW-PNEUM-02", "observed": {"description": "نزول سردار وأبي علي تحت الشاسيه وربط سلك معدني صلب (2 ملم) حول شق الأنبوب بسرعة وسلاسة، رغم أن حرارة الحديد تبلغ -7°C وملامسته تؤدي لالتصاق الجلد والتيبس الحركي.\n", "state_snapshot": "characters.سردار.physical.motor_dexterity assumed = 0.90 in extreme frost"}, "required": {"invariant": "بعد ساعات الصقيع، لا يمكن ثني سلك صلب 2 ملم بالأصابع المجردة؛ يتطلب الإصلاح بالضرورة استخدام مفتاح الربط والزرادية (Pliers) لتدوير السلك، ومساندة جسدية ثنائية متناوبة.\n", "physical_minimum": "Mechanical tools and physical assistance required for 2mm wire twisting."}, "evidence": {"telemetry_timestamp": "05:00:00 (Minute 600 - Undercarriage Repair)", "telemetry": ["surface_temp_chassis: -7.2°C", "unprotected_finger_skin_contact_limit: 15 seconds", "wire_stiffness_yield: 250 MPa"]}, "affected": {"components": ["characters.سردار.physical", "characters.أبو_علي.physical", "repair_duration (must be >= 17 minutes)"]}, "simulation_impact": {"runs_affected": "87 / 100", "fragility_score": 0.85}, "remediation_proposal": {"proposal_id": "PR-005-REPAIR-PHYSICS", "patch": "إبراز صراع الأدوات تحت الشاسيه: استخدام زرادية أبي علي لشد السلك، لفه على عتلة المفتاح الإنجليزي للتدوير بعزم ميكانيكي، واحتراق جلد أصابع سردار بالصقيع أثناء التثبيت.\n", "proposal_file": "04_STAGING/proposals/PR_005_wire_rigidity.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 5, "chapter": 2, "anchor_text": "شد من يمك وأنا أثبت البايب", "resolved_line": 1303}}, {"id": "WORLD-BUG-006", "title": "اجتياز مهدي لقوس نيران الكمين واختفاؤه دون بصمة تتبع فيزيائية", "type": "Causality_and_Continuity", "severity": "HIGH", "law_broken": "LAW-SPATIAL-02 (Mass and Spatial Trajectory Conservation)", "observed": {"description": "وثّق النص خروج مهدي بالقفز من الباب الجانبي المنزلق للعربة الوسطى بعد أن سحبه حناطة (الجزء الثالث، الفصل 4، سطر 717)، لكن الخرق الفيزيائي الحتمي يكمن في كيفية نجاته من القفز بمحاذاة السكة واجتيازه قوس نيران الكمين المنهمر على الجانبين واختفائه التام في العراء دون أن يصاب برصاصة ودون أن يترك أي بصمة دم أو أثر حركي على الحصى.\n", "state_snapshot": "characters.مهدي.location = unknown_void (post_escape)"}, "required": {"invariant": "حركة أي كتلة حيوية بشرية (>60 كغم) تقفز إلى فضاء اشتباك مكشوف محاط بقوس نيران رشاشة تخضع لحتمية الاحتمال البالستي وترك آثار مادية ملموسة (انزلاق حصى، قطرات دم، أو تمزق قماش).\n", "physical_minimum": "Ballistic survival probability and physical ground trace required."}, "evidence": {"telemetry_timestamp": "00:15:00 (Minute 315 - Breach Confusion)", "text_attested_evidence": ["exit_aperture: middle_car_sliding_side_door (source: Part 3, Ch 4, Lines 701-717: Hannata unlatched sliding door, Mahdi jumped out into darkness)", "ambush_firing_arc: covering both flanks (source: Part 3, Ch 1, Line 611 & Ch 4, Line 713)"], "simulation_assumptions": ["ballast_surface_trace: zero footprints or blood detected (class: assumption; physical anomaly in open gravel)", "ballistic_crossfire_exposure_seconds: 4.5 (class: assumption; exposure time between door threshold and dead zone)"]}, "affected": {"components": ["characters.مهدي", "ballistic_credibility", "narrative_pacing_part_3"]}, "simulation_impact": {"runs_affected": "95 / 100", "fragility_score": 0.9}, "remediation_proposal": {"proposal_id": "PR-006-MEHDI-EXIT", "patch": "تأسيس الغطاء البيئي والبالستي للقفزة: استغلال كثافة دخان احتراق شحم المحور المتجه مع الريح (سمت 135°)، واستتار مهدي بالزاوية الميتة لكتلة عجلات البوجي (Bogie) الضخمة أثناء تدحرجه في منخفض الحصى المحاذي للسكة قبل الانسلال في سواد وادي الظل.\n", "proposal_file": "04_STAGING/proposals/PR_006_telemetry_timestamps.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 3, "chapter": 4, "anchor_text": "قفز مهدي", "resolved_line": 717}}, {"id": "WORLD-BUG-007", "title": "انزلاق التعداد البشري السردي قبل الكمين (عشرة رجال مقابل 14 راكباً)", "type": "Continuity_and_Headcount", "severity": "MEDIUM", "law_broken": "LAW-DEMO-01 (Demographic Mosaic and Headcount Conservation)", "observed": {"description": "يصف النص في الجزء الثاني، الفصل 6، السطر 577 «صوت تنفس متقطع لعشرة رجال محبوسين في بطن الحديد» في تمام الساعة 23:50 قبيل بدء الكمين، في حين أن التعداد الحقيقي لركاب القطار في هذه اللحظة هو 14 رجلاً حياً. الرقم 10 لا يصح فيزيائياً إلا بعد انتهاء الكمين وسقوط الشهداء الأربعة (14 - مقتل عباس وسلوم وحسن كاز - هروب مهدي = 10 رجال متبقين)، وهو ما يؤكده النص لاحقاً بدقة في الجزء الرابع، الفصل 3، السطر 1141 («أنفاس الرجال العشرة المتبقين»).\n", "state_snapshot": "characters.alive_count_at_2350 = 14, but text_described = 10"}, "required": {"invariant": "حفظ الكتلة البشرية والتعداد السكاني يوجب التطابق الحتمي بين التعداد المنطوق أو الموصوف وبين الواقع الفيزيائي للأجساد الحية الموجودة على متن العربات في تلك اللحظة الزمنية.\n", "physical_minimum": "Headcount census must equal 14 living souls prior to minute 300 (00:00)."}, "evidence": {"telemetry_timestamp": "23:50:00 (Minute 290 - Pre-Ambush Silence)", "text_attested_evidence": ["pre_ambush_described_men: 10 (source: Part 2, Ch 6, Line 577: «صوت تنفس متقطع لعشرة رجال»)", "actual_living_souls_at_2350: 14 (source: Part 1, Ch 1..8: 5 guards + 1 technician + 1 platform guard + 7 detainees)", "post_ambush_actual_souls: 10 (source: Part 4, Ch 3, Line 1141: «أنفاس الرجال العشرة المتبقين»)"], "simulation_assumptions": ["authorial_anticipation_error: true (class: assumption; author inadvertently applied post-ambush headcount to pre-ambush scene)"]}, "affected": {"components": ["narrative_headcount_integrity", "demographic_census"]}, "simulation_impact": {"runs_affected": "100 / 100", "fragility_score": 0.75}, "remediation_proposal": {"proposal_id": "PR-007-HEADCOUNT", "patch": "توثيق الزلة السردية، وفي أي معالجة تحريرية مستقبلية يُعدل الوصف في سطر 577 ليصبح: «صوت تنفس متقطع لأربعة عشر رجلاً محبوسين في بطن الحديد» أو صياغة جمعية دون تحديد رقمي مسبق.\n", "proposal_file": "04_STAGING/proposals/PR_007_headcount_slip.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 2, "chapter": 6, "anchor_text": "صوت تنفس متقطع لعشرة رجال", "resolved_line": 577}}, {"id": "WORLD-BUG-008", "title": "المفارقة الزمنية لتقدير الفجر (ساعتان حوارياً مقابل شروق فلكي 06:48)", "type": "Chrono_and_Perception", "severity": "MEDIUM", "law_broken": "LAW-CHRONO-01 (Solar and Astronomical Chronology)", "observed": {"description": "يصرح خالد في الجزء الرابع، الفصل 3، السطر 1253 (عند قرابة الساعة 01:00 بعد انتهاء الكمين وتضميد الجراح): «بقى ساعتين ويطلع الضو. لازم نقرر شنسوي بالحديد قبل لا تطلع الشمس وتكشفنا للكاع كلها»، مما يفترض بزوغ الضوء عند ~03:00 وشروق الشمس عند ~03:30، بينما الحسابات الفلكية الصارمة لبادية الحماد في 18 كانون الثاني/يناير تحدد الفجر الفلكي عند 05:25 والشروق عند 06:48 (فارق زمني 3.8 ساعات).\n", "state_snapshot": "dialogue_implied_sunrise ~ 03:30 vs astronomical_sunrise = 06:48"}, "required": {"invariant": "اتساق الكرونوتوب والزمن الفيزيائي مع الحوار المنطوق، أو التوثيق الصريح للانضغاط الزمني كعرض نفسي لصدمة القتال والصقيع الشديد، وتجنب أي تصحيح صامت في الجداول الحسابية.\n", "physical_minimum": "Solar ephemeris alignment or explicit psychological temporal compression required."}, "evidence": {"telemetry_timestamp": "01:00:00 (Minute 360 - Post-Ambush Regroup)", "text_attested_evidence": ["khalid_perceived_time_to_light: 2.0 hours (source: Part 4, Ch 3, Line 1253: «بقى ساعتين ويطلع الضو»)", "current_scene_chrono_anchor: ~01:00 (source: Part 3, Ch 8, Line 943 to Part 4, Ch 1..3)"], "simulation_assumptions": ["astronomical_sunrise_hamad_jan18: 06:48:00 (class: assumption; based on standard solar ephemeris for lat 33.5°N)", "discrepancy_magnitude: +3.8 hours (class: assumption; difference between dialogue estimate and solar dawn)"]}, "affected": {"components": ["characters.خالد.perception", "timeline_continuity", "chrono_spatial_system"]}, "simulation_impact": {"runs_affected": "100 / 100", "fragility_score": 0.7}, "remediation_proposal": {"proposal_id": "PR-008-CHRONO-DISTORTION", "patch": "توثيق مقولة خالد إما كـ \"تشوه إدراكي ذاتي للزمن تحت وطأة الصقيع والصدمة\" (Subjective Temporal Compression)، أو كـ \"زلة تسريع زمني للمؤلف\" للربط بمشهد بزوغ رماد الفجر في الجزء الخامس فصل 1.\n", "proposal_file": "04_STAGING/proposals/PR_008_perceived_dawn.md"}, "status": "IN_STAGING", "semantic_anchor": {"part": 4, "chapter": 5, "anchor_text": "بقى ساعتين ويطلع الضو", "resolved_line": 1253}}, {"id": "WORLD-BUG-009", "title": "تناقض سببي ثلاثي لآلية عطل 19:00 وشظية رصاص تسبق الكمين بخمس ساعات", "type": "Causality_and_Thermodynamics", "severity": "CRITICAL", "status": "IN_STAGING", "law_broken": "LAW-THERMO-01 & LAW-PNEUM-01", "semantic_anchor": {"part": 5, "chapter": 2, "anchor_text": "أنبوب الوقود المضغوط المغذي للمكبس الرئيس كان قد انشطر طولياً بفعل شظية رصاص مرتدة", "resolved_line": 1297}, "observed": {"description": "العطل الذي أوقف القطار عند 19:00 موصوف في متن الأساس بآليتين متعارضتين:\n1. سطر 187: «انفرط عمود نقل الحركة الرئيس أو انحشرت تروس المكابس في كتلة واحدة».\n2. سطر 1297: «أنبوب الوقود المضغوط المغذي للمكبس الرئيس كان قد انشطر طولياً بفعل شظية رصاص مرتدة، مما قطع تدفق الديزل وأدى إلى انحشار صمام ضغط الهواء الذي يحرر المكابح».\nالتناقض السببي الصريح: الكمين لم يبدأ إلا عند 00:00 (سطر 617 وما بعده)، والقطار متوقف منذ 19:00.\nفكيف ينشطر الأنبوب «بفعل شظية رصاص» قبل أول طلقة بخمس ساعات؟\nكما أن قانون [LAW-PNEUM-01] يجعل إطباق المكابح ناتجاً عن تفريغ ضغط الهواء دون 3.5 بار وليس انقطاع الديزل.", "state_snapshot": "train.locomotive.fuel_line.fracture_type = 'thermal_contraction_crack' (calibrated), while text baseline attributes breach to bullet shrapnel at 19:00"}, "required": {"invariant": "توحيد آلية العطل على سبب مادي حتمي يسبق توقف القطار عند 19:00 (الإجهاد الحراري للصاج المنكمش)، وفصل منظومة فرامل الهواء ويستنغهاوس عن دائرة تغذية الوقود.", "physical_minimum": "Causal chronological precedence: cause must precede effect (shrapnel at 00:00 cannot cause stall at 19:00)."}, "evidence": {"telemetry_timestamp": "19:00:00 (Minute 0 - Catastrophic Engine Stall)", "text_attested_evidence": ["stall_description_1: Part 1, Ch 6, Line 187: «انفرط عمود نقل الحركة الرئيس أو انحشرت تروس المكابس في كتلة واحدة»", "stall_description_2: Part 5, Ch 2, Line 1297: «أنبوب الوقود... انشطر طولياً بفعل شظية رصاص مرتدة»", "ambush_start: Part 3, Ch 1, Line 617 (Minute 300 / 00:00:00)"], "simulation_assumptions": ["causal_inversion_magnitude: 5.0 hours (class: assumption; discrepancy between ambush time and stall time)"]}, "affected": {"components": ["train.locomotive.fuel_line", "train.locomotive.braking_system", "timeline_causality"]}, "simulation_impact": {"runs_affected": "100 / 100", "fragility_score": 0.98}, "remediation_proposal": {"proposal_id": "PR-009-FUEL-LINE", "proposal_file": "04_STAGING/proposals/PR_009_fuel_line_shrapnel_anomaly.md", "patch": "تعديل سطر 1297 في بيئة Staging ليصبح: «أنبوب الوقود المضغوط المغذي للمكبس الرئيس كان قد انشطر طولياً بفعل الإجهاد الحراري المتكرر للصاج المنكمش واهتزازات السكة، مما فرغ ضغط أنبوب الهواء وأطبق المكابح الأوتوماتيكية»."}}, {"id": "WORLD-BUG-010", "title": "الالتباس المكاني للبرميل الأزرق (القاطرة مقابل العربة الأولى مقابل العربة الوسطى)", "type": "Spatial_and_Topology", "severity": "MEDIUM", "status": "IN_STAGING", "law_broken": "LAW-SPATIAL-02 & LAW-SOC-02", "semantic_anchor": {"part": 4, "chapter": 5, "anchor_text": "البرميل مال الماي... جيبه هنا بالوسطى", "resolved_line": 1251}, "observed": {"description": "برميل الماء الأزرق (14 لتراً) — الحامل الرمزي والفيزيائي للعدالة التراجيدية والبقاء المشترك — يتنقل في المتن بين ثلاثة مواضع متنافرة دون توثيق لحركة نقله المادية:\n1. سطر 37 (أبو علي): «المي بالعربة الوسطى خلص. البرميل الكبير بالقاطرة فارغ».\n2. سطر 39 (خالد): «البرميل مال الحرس بي نص» (في العربة الأولى).\n3. سطر 1251 (خالد، الجزء الرابع): «البرميل مال الماي... جيبه هنا بالوسطى»، في حين أن الدستور يقرر تثبيته بطوق حديدي في العربة الأولى (X=2.4m, Y=3.5m).", "state_snapshot": "inventory.water_supply.location = ambiguous (Car 01 vs Locomotive vs Car 02)"}, "required": {"invariant": "حفظ الموقع المكاني للكتلة المادية (برميل ماء بكتلة > 15 كغم) يستوجب تثبيتاً كانونياً واحداً في فضاء العربات، وتوثيق أي نقل بين العربات كفعل مادي محكوم بجهد بشري واجتياز الأبواب المنزلقة.", "physical_minimum": "Unique canonical coordinate for 14L water vessel across closed cars."}, "evidence": {"telemetry_timestamp": "01:05:00 (Minute 365 - Post-Ambush Thirst Management)", "text_attested_evidence": ["locomotive_barrel: Part 1, Ch 2, Line 37: «البرميل الكبير بالقاطرة فارغ»", "guards_barrel: Part 1, Ch 2, Line 39: «البرميل مال الحرس بي نص»", "middle_car_command: Part 4, Ch 5, Line 1251: «البرميل مال الماي... جيبه هنا بالوسطى»"], "simulation_assumptions": ["barrel_mass_kg: 15.2 (class: assumption; 14L water + 1.2kg polyethylene vessel)"]}, "affected": {"components": ["inventory.water_supply", "train.cars.car_01.inventory", "semiotics.blue_water_barrel"]}, "simulation_impact": {"runs_affected": "90 / 100", "fragility_score": 0.7}, "remediation_proposal": {"proposal_id": "PR-010-WATER-BARREL", "proposal_file": "04_STAGING/proposals/PR_010_water_barrel_location.md", "patch": "تثبيت الموقع الكانوني للبرميل في العربة الأولى (مربوطاً بالطوق الحديدي)، وتعديل سطر 1251 في Staging ليصبح: «جيب طاسة الماي من برميل الأولى لهنا بالوسطى» ليتطابق مع ميكانيكا التقنين والتوزيع (100 مل)."}}, {"id": "WORLD-BUG-011", "title": "مفارقة موال عزيز والخرق التكتيكي الصوتي وغياب رد فعل الحراس", "type": "Tactical_and_Acoustic", "severity": "HIGH", "status": "DOCUMENTED", "law_broken": "LAW-ACOUST-03 & LAW-TACTICAL-01", "semantic_anchor": {"part": 4, "chapter": 4, "anchor_text": "موال عزيز: انصهار الأرواح", "resolved_line": 1180}, "observed": {"description": "بعد انحسار الكمين الغامض وتوقف إطلاق النار، يطلق عزيز موالاً جهورياً شجياً يتردد في سكون الصحراء الليلي. على الرغم من القيمة التطهيرية والنفسية للموال (LAW-ETHIC-03)، إلا أن النص يُسقط كلياً التهديد التكتيكي لكشف موقع الناجين لأي عناصر استطلاع معادية في محيط 2-3 كم، كما يُسقط أي رد فعل احترازي أو ارتباك أمني من قِبل الحراس العسكريين (خالد) لمحاولة خفض الصوت أو تأمين الفضاء، مما يمثل فجوة سلوكية تكتيكية كشفها JEV بنسبة 99%.\n", "state_snapshot": "characters.guards.reaction_to_acoustic_exposure = null"}, "required": {"invariant": "الحفاظ على اليقظة التكتيكية في بيئة كمين غير محسومة يستوجب رد فعل أمني حتمي (تحذير بالهمس، توتر السلاح، أو إدراك متعمد للمخاطرة مقابل الضرورة الوجودية لكسر الصدمة النفسية).\n", "physical_minimum": "Behavioral acknowledgment of acoustic broadcast in open silent desert."}, "evidence": {"telemetry_timestamp": "03:20:00 (Minute 500 - Post-Ambush Trauma Window)", "text_attested_evidence": ["mawal_loudness: Part 4, Ch 4, Line 1180: صوت الموال ينفذ عبر الصاج المتشظي إلى فضاء الصحراء", "guards_omission: Part 4, Ch 4: zero tactical suppression commands issued by Khalid during mawal"]}, "affected": {"components": ["narrative.tactical_coherence", "characters.khalid.military_vigilance", "acoustic_stealth"]}, "simulation_impact": {"runs_affected": "80 / 100", "fragility_score": 0.8}, "remediation_proposal": {"proposal_id": "PR-011-MAWAL-ACOUSTIC", "patch": "إضافة توتر حركي مادي في مستهل الموال: رفع خالد لسبابته مهدداً ومتحفزاً لإسكات عزيز قبل أن تلجمه نبرة الصوت ويدرك فسيولوجياً أن الموال هو ما يمنع رفاقه من الاستسلام لموت الصقيع والذهول التخادري.\n"}}, {"id": "WORLD-BUG-012", "title": "التفريغ الكهروحراري لبطاريات الإضاءة دون توثيق لحظة الانطفاء", "type": "Electromechanical_and_Optics", "severity": "MEDIUM", "status": "DOCUMENTED", "law_broken": "LAW-ELEC-01 & LAW-OPT-01", "semantic_anchor": {"part": 1, "chapter": 1, "anchor_text": "مصباحان داخل قفصين سلكيين في السقف", "resolved_line": 18}, "observed": {"description": "يؤسس المشهد الأول وجود مصباحين كهربائيين بسقف العربة الأولى يعطيان ضوءاً أصفر. ومع توقف القاطرة عند 19:00 واستمرار التوقف 11.75 ساعة في درجة حرارة دون الصفر (-2°C إلى -8°C)، تغفل الرواية مسار انطفاء البطاريات الحتمي، حيث تفرغ بطاريات الرصاص في غضون 3-4 ساعات دون توثيق للحظة تحول الضوء الأصفر إلى خفوت احتضاري وانطفاء تام.\n", "state_snapshot": "train.electrical.auxiliary_battery = drained_unwitnessed"}, "required": {"invariant": "تخضع أنظمة الإضاءة المعتمدة على البطاريات في الصقيع لقانون التفريغ الكهروحراري [LAW-ELEC-01]؛ ويجب توثيق لحظة انطفاء النور الكهربائي وانتقال الفضاء السردي للعتمة الخالصة والإنارة البديلة.\n", "physical_minimum": "Explicit chronicle of auxiliary battery exhaustion and optical transition."}, "evidence": {"telemetry_timestamp": "22:30:00 (Minute 210 - Battery Exhaustion Horizon)", "text_attested_evidence": ["initial_lighting: Part 1, Ch 1, Line 18: مصباحان داخل قفصين سلكيين", "darkness_transition: Part 1, Ch 8 to Part 2, Ch 1: subsequent chapters describe pitch blackness without mentioning bulb extinction"]}, "affected": {"components": ["train.electrical.battery_bank", "optics.ambient_lux", "atmosphere.temporal_milestones"]}, "simulation_impact": {"runs_affected": "75 / 100", "fragility_score": 0.65}, "remediation_proposal": {"proposal_id": "PR-012-BATTERY-COLLAPSE", "patch": "توثيق لحظة موت البطاريات عند الدقيقة 210 (قبيل الكمين): احمرار فتيل المصباح، طقطقة انقطاع المرحل (Relay)، وهبوط العربة في العتمة التامة التي أجبرت الحراس على إشعال أول عود ثقاب.\n"}}], "milestones": [{"id": "T0_1900_BREAKDOWN", "timestamp": "19:00:00", "minute": 0, "narrative_phase": "mechanical_stall_and_shock", "environment": {"ambient_temperature_c": 0.0, "wind_chill_effective_c": -5.4, "ambient_humidity_percent": 12.0, "radiation_cooling_rate_c_per_hour": 1.8, "illumination_lux": 0.8}, "train": {"locomotive_engine": "stalled", "train_pipe_pressure_bar": 0.0, "brake_shoes": "clamped_locked", "fuel_line": "fractured"}, "air_quality": {"car_01_co2_percent": 0.04, "car_02_co2_percent": 0.05, "car_03_co2_percent": 0.04}, "battery": {"auxiliary_charge_percent": 100.0, "interior_lights_on": true}, "biometrics": {"core_huddling_active": false, "khalid_fingers_temp_c": 24.5, "khalid_dexterity": 0.95, "abbas_fingers_temp_c": 11.2, "abbas_dexterity": 0.48, "allostatic_load": 0.05}, "weapons": {"grease_viscosity_status": "normal", "jam_probability": 0.02}}, {"id": "T1_2100_DESCENT", "timestamp": "21:00:00", "minute": 120, "narrative_phase": "cold_descent_and_initial_huddling", "environment": {"ambient_temperature_c": -2.5, "wind_chill_effective_c": -8.8, "ambient_humidity_percent": 12.0, "radiation_cooling_rate_c_per_hour": 1.6, "illumination_lux": 0.5}, "train": {"locomotive_engine": "stalled", "train_pipe_pressure_bar": 0.0, "brake_shoes": "clamped_locked", "fuel_line": "fractured"}, "air_quality": {"car_01_co2_percent": 0.45, "car_02_co2_percent": 0.65, "car_03_co2_percent": 0.35}, "battery": {"auxiliary_charge_percent": 65.0, "interior_lights_on": true}, "biometrics": {"core_huddling_active": true, "khalid_fingers_temp_c": 18.0, "khalid_dexterity": 0.85, "abbas_fingers_temp_c": 7.5, "abbas_dexterity": 0.28, "allostatic_load": 0.25}, "weapons": {"grease_viscosity_status": "thickening", "jam_probability": 0.08}}, {"id": "T2_0000_MIDNIGHT_APEX", "timestamp": "00:00:00", "minute": 300, "narrative_phase": "midnight_apex_and_hypercapnia", "environment": {"ambient_temperature_c": -5.0, "wind_chill_effective_c": -12.4, "ambient_humidity_percent": 11.0, "radiation_cooling_rate_c_per_hour": 1.4, "illumination_lux": 0.05}, "train": {"locomotive_engine": "stalled", "train_pipe_pressure_bar": 0.0, "brake_shoes": "clamped_locked", "fuel_line": "fractured"}, "air_quality": {"car_01_co2_percent": 1.35, "car_02_co2_percent": 1.85, "car_03_co2_percent": 0.95}, "battery": {"auxiliary_charge_percent": 20.0, "interior_lights_on": false}, "biometrics": {"core_huddling_active": true, "khalid_fingers_temp_c": 11.5, "khalid_dexterity": 0.52, "abbas_fingers_temp_c": 2.1, "abbas_dexterity": 0.1, "allostatic_load": 0.55}, "weapons": {"grease_viscosity_status": "stiff", "jam_probability": 0.22}}, {"id": "T3_0300_DEEP_FREEZE", "timestamp": "03:00:00", "minute": 480, "narrative_phase": "paraffin_gelling_and_sphincter_spasm", "environment": {"ambient_temperature_c": -7.2, "wind_chill_effective_c": -15.5, "ambient_humidity_percent": 10.0, "radiation_cooling_rate_c_per_hour": 1.0, "illumination_lux": 0.02}, "train": {"locomotive_engine": "stalled", "train_pipe_pressure_bar": 0.0, "brake_shoes": "clamped_locked", "fuel_line": "gelled_paraffin_blocked"}, "air_quality": {"car_01_co2_percent": 1.8, "car_02_co2_percent": 2.2, "car_03_co2_percent": 1.4}, "battery": {"auxiliary_charge_percent": 0.0, "interior_lights_on": false}, "biometrics": {"core_huddling_active": true, "khalid_fingers_temp_c": 8.0, "khalid_dexterity": 0.28, "salloum_fingers_temp_c": 4.2, "salloum_dexterity": 0.12, "sphincter_spasm_active": true, "allostatic_load": 0.8}, "weapons": {"grease_viscosity_status": "partially_frozen", "jam_probability": 0.35}}, {"id": "T4_0545_FALSE_DAWN", "timestamp": "05:45:00", "minute": 645, "narrative_phase": "false_dawn_apathy_and_standoff", "environment": {"ambient_temperature_c": -8.0, "wind_chill_effective_c": -16.8, "ambient_humidity_percent": 10.0, "radiation_cooling_rate_c_per_hour": 0.2, "illumination_lux": 0.2}, "train": {"locomotive_engine": "stalled", "train_pipe_pressure_bar": 0.0, "brake_shoes": "clamped_locked", "fuel_line": "gelled_paraffin_blocked"}, "air_quality": {"car_01_co2_percent": 2.1, "car_02_co2_percent": 2.45, "car_03_co2_percent": 1.7}, "battery": {"auxiliary_charge_percent": 0.0, "interior_lights_on": false}, "biometrics": {"core_huddling_active": true, "khalid_fingers_temp_c": 6.5, "khalid_dexterity": 0.2, "salloum_fingers_temp_c": 3.0, "salloum_dexterity": 0.08, "sphincter_spasm_active": true, "allostatic_load": 0.95}, "weapons": {"grease_viscosity_status": "frozen_sluggish", "jam_probability": 0.4}}], "characters": [{"entity_id": "ENT-CHAR-1001", "numeric_id": 1001, "canonical_name": "أبو علي", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_أبو_علي", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 70}}, {"entity_id": "ENT-CHAR-1002", "numeric_id": 1002, "canonical_name": "أبو اللول", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_أبو_اللول", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 18}}, {"entity_id": "ENT-CHAR-1003", "numeric_id": 1003, "canonical_name": "حجي عمار", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_حجي_عمار", "tic": "تحسس ندبة الفك بالسبابة", "mentions_count": 16}}, {"entity_id": "ENT-CHAR-1004", "numeric_id": 1004, "canonical_name": "نحو", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "مهرب / وسيط تجاري", "affordance_anchor": "موضع_نحو", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 4}}, {"entity_id": "ENT-CHAR-1005", "numeric_id": 1005, "canonical_name": "خالد", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_خالد", "tic": "مسح الكفين الدائم بالبنطال", "mentions_count": 4}}, {"entity_id": "ENT-CHAR-1006", "numeric_id": 1006, "canonical_name": "أبو وليد", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_أبو_وليد", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 2}}, {"entity_id": "ENT-CHAR-1007", "numeric_id": 1007, "canonical_name": "سردار", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_سردار", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 2}}, {"entity_id": "ENT-CHAR-1008", "numeric_id": 1008, "canonical_name": "بسام", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_بسام", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 2}}, {"entity_id": "ENT-CHAR-1009", "numeric_id": 1009, "canonical_name": "أبو دريد", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_أبو_دريد", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 1}}, {"entity_id": "ENT-CHAR-1010", "numeric_id": 1010, "canonical_name": "حجي بسام", "category": "CHARACTER", "parent_entity_id": null, "location_id": "ENT-VEH-2001", "properties": {"role": "شخصية رئيسية / فاعل سردي", "affordance_anchor": "موضع_حجي_بسام", "tic": "التأمل_الصامت_في_العتمة", "mentions_count": 1}}], "rules": [{"id": "LAW-THERMO-01", "name": "قانون الحفظ الحراري وانكماش الصاج (Sheet Metal Contraction)", "domain": "thermodynamics", "description": "انكماش الصاج المعدني بطقطقة جافة وهبوط الحرارة الداخلية في الصقيع.", "mathematical_expression": "dQ/dt = -k * A * (T_in - T_out)", "severity": "VIOLATION", "trigger": {"description": "هبوط درجة الحرارة المحيطة إلى ما دون الصفر", "conditions": [{"parameter": "ambient_temperature", "operator": "<=", "value": 0.0, "unit": "celsius"}]}, "invariants": [{"target": "environment.temperature_celsius.min", "assertion": "الحرارة الصغرى لا تهبط تحت حد الصقيع المسموح", "operator": ">=", "expected_value": -15.0}]}, {"id": "LAW-CHEM-01", "name": "قانون تبلور وتصلب شمع البرافين للديزل (Fuel Paraffin Gelling)", "domain": "chemistry", "description": "تجمد وتكتل شمع الديزل الصيفي عند هبوط الحرارة دون -6°C مانعاً تشغيل المحرك.", "mathematical_expression": "Viscosity_fuel = mu_0 * exp(E / R*T)", "severity": "FATAL", "trigger": {"description": "هبوط حرارة الوقود دون نقطة التغيم", "conditions": [{"parameter": "diesel_fuel_temperature", "operator": "<=", "value": -6.0, "unit": "celsius"}]}, "invariants": [{"target": "locomotive.engine.cold_restart_possible", "assertion": "استحالة تشغيل المحرك الميكانيكي دون تسخين مسبق", "operator": "==", "expected_value": false}]}, {"id": "LAW-BIO-06", "name": "قانون ديناميكا فرط ثاني أكسيد الكربون الحبيس (Hypercapnia Dynamics)", "domain": "biology", "description": "تراكم غاز CO2 في الصندوق المعدني المحكم بمعدل 280 لتر/ساعة وبلبلة الإدراك.", "mathematical_expression": "d[CO2]/dt = (N_humans * 20.0 L/h) / V_chamber", "severity": "VIOLATION", "trigger": {"description": "تجاوز تركيز ثاني أكسيد الكربون 1.5%", "conditions": [{"parameter": "environment.co2_concentration_percent", "operator": ">=", "value": 1.5}]}, "invariants": [{"target": "characters.allostatic_load", "assertion": "تصاعد الإجهاد العصبي والبلبلة الإدراكية الحتمية", "operator": ">=", "expected_value": 0.4}]}, {"id": "LAW-ACOUST-04", "name": "قانون التوصيل الصوتي الهيكلي للحديد (Structure-Borne Acoustics)", "domain": "acoustics", "description": "انتقال صدمات الطرق عبر شاسيه السكة والفولاذ بسرعة 5000 م/ث بفقد طفيف.", "mathematical_expression": "v_steel = sqrt(E / rho) = 5000 m/s", "severity": "WARNING", "trigger": {"description": "وقوع صدمة ميكانيكية أو طرقة على الهيكل المعدني", "conditions": [{"parameter": "structural_mechanical_strike", "operator": "==", "value": true}]}, "invariants": [{"target": "train.structural_vibration_detected", "assertion": "اهتزاز الشاسيه وسماع الصوت في كافة العربات", "operator": "==", "expected_value": true}]}], "causality": {"schema_version": "1.0.0", "events_count": 8, "causal_edges_count": 7, "causal_density": 0.875, "is_acyclic": true, "events": [{"id": "EVT-001", "name": "صدمة الارتداد الميكانيكي", "type": "Physical_Shock", "line": 1, "minute": 0, "causes": ["EVT-002"]}, {"id": "EVT-002", "name": "إصابة عباس على المنصة الخلفية", "type": "Casualty_Event", "line": 617, "minute": 300, "causes": ["EVT-008"]}, {"id": "EVT-003", "name": "إصابة عباس على المنصة الخلفية", "type": "Casualty_Event", "line": 765, "minute": 300, "causes": ["EVT-008"]}, {"id": "EVT-004", "name": "وقوع الكمين الليلي وإطلاق النار", "type": "Tactical_Ambush", "line": 817, "minute": 300, "causes": ["EVT-005"]}, {"id": "EVT-005", "name": "قفز مهدي من الباب المنزلق واختفاؤه", "type": "Tactical_Breach", "line": 865, "minute": 300, "causes": ["EVT-006"]}, {"id": "EVT-006", "name": "وقوع الكمين الليلي وإطلاق النار", "type": "Tactical_Ambush", "line": 945, "minute": 300, "causes": ["EVT-007"]}, {"id": "EVT-007", "name": "وقوع الكمين الليلي وإطلاق النار", "type": "Tactical_Ambush", "line": 953, "minute": 300, "causes": ["EVT-008"]}, {"id": "EVT-008", "name": "انطلاق موال عزيز ورنين العتمة", "type": "Psychological_Resonance", "line": 1145, "minute": 645, "causes": []}]}, "excerpts": [{"target_line": 577, "start_line": 573, "lines": [{"num": 573, "text": "ركدت الريح بغتة.", "is_target": false}, {"num": 574, "text": "", "is_target": false}, {"num": 575, "text": "سكون غائر غشي البادية؛ سكون مشحون، ثقيل، لا صوت فيه لعجلة، ولا فحيح لريح، ولا همس لجسد.", "is_target": false}, {"num": 576, "text": "", "is_target": false}, {"num": 577, "text": "فقط طقطقة المعدن المنكمش في عتمة البادية، وصوت تنفس متقطع لعشرة رجال محبوسين في بطن الحديد، ينتظرون أول خيط ينقطع في هذا الصمت.", "is_target": true}, {"num": 578, "text": "", "is_target": false}, {"num": 579, "text": "", "is_target": false}, {"num": 580, "text": "", "is_target": false}, {"num": 581, "text": "# الجزء الثالث: انصهار الرصاص والجليد", "is_target": false}]}, {"target_line": 781, "start_line": 777, "lines": [{"num": 777, "text": "صرخ سلوم بصوت مبحوح وهو يدفع الحديد: «بشير! ساعدني... رح ننذبح!»", "is_target": false}, {"num": 778, "text": "", "is_target": false}, {"num": 779, "text": "بشير لم يتحرك.", "is_target": false}, {"num": 780, "text": "", "is_target": false}, {"num": 781, "text": "كان ملتصقاً بالزاوية الأكثر عتمة تحت المقعد المكسور، ركبتاه مضمومتان إلى فمه، والورقة الصغيرة مضغوطة بين أصابعه بقوة جعلت مفاصله بيضاء كالحجر. كانت عيناه مثبتتين في الفراغ، منزعجاً، رافضاً للموت وللحياة، غارقاً في صمته الرافض لأي نداء.", "is_target": true}, {"num": 782, "text": "", "is_target": false}, {"num": 783, "text": "سلوم استجمع أنفاسه، ورفع الصفيحة الحديدية بذراعيه النحيلتين ليثبتها في مجرى الباب.", "is_target": false}, {"num": 784, "text": "", "is_target": false}, {"num": 785, "text": "في تلك اللحظة بالذات، اخترقت صلية رصاص كثيفة فتحة المؤخرة.", "is_target": false}]}, {"target_line": 951, "start_line": 947, "lines": [{"num": 947, "text": "كان التوقف تاماً ومباغتاً، كما لو أن صماماً عملاقاً قد أُغلق في جوف الليل.", "is_target": false}, {"num": 948, "text": "", "is_target": false}, {"num": 949, "text": "انقطعت ومضات البنادق في التلال البعيدة.", "is_target": false}, {"num": 950, "text": "", "is_target": false}, {"num": 951, "text": "سردار توقف عن الرمي، وخفض سبطانة بندقيته الساخنة التي كان يتصاعد منها خيط رفيع من الدخان الأبيض.", "is_target": true}, {"num": 952, "text": "", "is_target": false}, {"num": 953, "text": "خالد رفع يده اليسرى مشيراً لسردار بوقف إطلاق النار.", "is_target": false}, {"num": 954, "text": "", "is_target": false}, {"num": 955, "text": "ساد صمت مطبق؛ صمت ثقيل، لزج، مشحون برائحة البارود المحترق، والدم المتخثر، والبول، والمعدن الممزق.", "is_target": false}]}, {"target_line": 1101, "start_line": 1097, "lines": [{"num": 1097, "text": "لم يرفع رأسه عن ركبتيه. رائحة بوله وعرقه البارد ملأت المكان من حوله. كان يرتجف ارتعاشاً متواصلاً، وأسنانه تصطك ببعضها بصوت يشبه نقر العصافير على حجر: (تك... تك... تك).", "is_target": false}, {"num": 1098, "text": "", "is_target": false}, {"num": 1099, "text": "بندقيته كانت ملقاة في الطين المتخثر عند قدميه، ولم يجرؤ أحد على الحديث معه أو النظر إليه؛ كان وجوده قد تحول إلى كتلة من الخزي الصامت المنبوذ في قاع العربة.", "is_target": false}, {"num": 1100, "text": "", "is_target": false}, {"num": 1101, "text": "وحناطة، الجالس عند القاطع الفاصل، كان يحدق في كفيه المفتوحتين في الظلام.", "is_target": true}, {"num": 1102, "text": "", "is_target": false}, {"num": 1103, "text": "يمسحهما ببعضهما ببطء، كأنه يغسلهما من ذنب لا يُرى، ثم يبتسم ابتسامة باهتة وميتة لا معنى لها، ويعود ليطأطئ رأسه بين كتفيه، مدركاً أن نظرة خالد الصامتة نحوه كانت حكماً معلقاً ينتظر الفجر ليُنفذ.", "is_target": false}, {"num": 1104, "text": "", "is_target": false}, {"num": 1105, "text": "", "is_target": false}]}, {"target_line": 1253, "start_line": 1249, "lines": [{"num": 1249, "text": "أبو علي رفع وجهه المبلل بالدموع، ومسح يديه في بنطاله: «نعم خالد.»", "is_target": false}, {"num": 1250, "text": "", "is_target": false}, {"num": 1251, "text": "«البرميل مال الماي... جيبه هنا بالوسطى. خلوه بيناتكم.»", "is_target": false}, {"num": 1252, "text": "", "is_target": false}, {"num": 1253, "text": "سكت خالد لثانية، ونظر نحو الفتحة المكسورة للباب التي يدخل منها هواء الفجر البارد، ثم أضاف: «بقى ساعتين ويطلع الضو. لازم نقرر شنسوي بالحديد قبل لا تطلع الشمس وتكشفنا للكاع كلها.»", "is_target": true}, {"num": 1254, "text": "", "is_target": false}, {"num": 1255, "text": "", "is_target": false}, {"num": 1256, "text": "", "is_target": false}, {"num": 1257, "text": "# الجزء الخامس: سكة إلى سجن آخر", "is_target": false}]}, {"target_line": 1297, "start_line": 1293, "lines": [{"num": 1293, "text": "سردار زحف بمحاذاة المحور، يداه القويتان تزيحان التراب المتجمع حول علبة التروس.", "is_target": false}, {"num": 1294, "text": "", "is_target": false}, {"num": 1295, "text": "كان العطل واضحاً تحت الضوء الخافت المتسرب بين العجلات الضخمة:", "is_target": false}, {"num": 1296, "text": "", "is_target": false}, {"num": 1297, "text": "أنبوب الوقود المضغوط المغذي للمكبس الرئيس كان قد انشطر طولياً بفعل شظية رصاص مرتدة، مما قطع تدفق الديزل وأدى إلى انحشار صمام ضغط الهواء الذي يحرر المكابح الأوتوماتيكية (Air Brakes).", "is_target": true}, {"num": 1298, "text": "", "is_target": false}, {"num": 1299, "text": "قال أبو علي بصوت متهدج، وبخار أنفاسه يخرج كثيفاً في صقيع الفجر: «البايب مفسوخ. إذا ما نلفه بالسيم ونحط وصلة صمغ، الماطور ما يسحب كاز. والبريكات لازمة بالويلات.»", "is_target": false}, {"num": 1300, "text": "", "is_target": false}, {"num": 1301, "text": "سردار مد يديه، تفحص موضع الكسر بأصابعه الخشنة.", "is_target": false}]}]};
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            
+            const target = document.getElementById('tab-' + tabId);
+            if (target) target.classList.add('active');
+
+            const tabs = Array.from(document.querySelectorAll('.nav-tab'));
+            const map = ['reader', 'acoustic', 'dag', 'telemetry', 'ingest'];
+            const idx = map.indexOf(tabId);
+            if (idx !== -1 && tabs[idx]) tabs[idx].classList.add('active');
+        }
+
+        // Render Reader Excerpts
+        function renderReader() {
+            const box = document.getElementById('reader-box');
+            if (!box) return;
+            box.innerHTML = '';
+
+            ENGINE_DATA.excerpts.forEach((ex, exIdx) => {
+                const exDiv = document.createElement('div');
+                exDiv.className = 'reader-excerpt-box';
+                
+                let linesHtml = '';
+                ex.lines.forEach(line => {
+                    if (line.is_target) {
+                        linesHtml += `
+                            <div class="reader-line line-target" onclick="showContradiction(${line.num})">
+                                <div class="line-num">${line.num}</div>
+                                <div class="line-text"><strong>${line.text}</strong></div>
+                            </div>
+                        `;
+                    } else {
+                        linesHtml += `
+                            <div class="reader-line">
+                                <div class="line-num">${line.num}</div>
+                                <div class="line-text">${line.text}</div>
+                            </div>
+                        `;
+                    }
+                });
+                exDiv.innerHTML = linesHtml;
+                box.appendChild(exDiv);
+            });
+        }
+
+        // Show Contradiction
+        function showContradiction(lineNum) {
+            const cardBody = document.getElementById('card-body');
+            const cardSev = document.getElementById('card-severity');
+            
+            const bug = ENGINE_DATA.bugs.find(b => {
+                const ev = b.evidence || {};
+                return (ev.line_number === lineNum || ev.baseline_line_number === lineNum);
+            }) || {
+                id: "WORLD-BUG-007",
+                title: "زلة التعداد السكاني (Headcount Invariant)",
+                severity: "MODERATE",
+                law_violated: "LAW-BIO-03 / HEADCOUNT-LEDGER",
+                description: "المتن يصف تنفس 'عشرة رجال' في بطن الحديد، في حين أن سجل الركاب يثبت 14 رجلاً على قيد الحياة حتى مقتل الأربعة في الكمين.",
+                metric: "10 مسودة vs 14 سجل فيزيائي",
+                creative_guidance: "نحن نُحلل ونُقيّم.. ولا نُقوّم. يمكن للكاتب الإبقاء عليها كتعبير مجازي أو مواءمتها مع التعداد."
+            };
+
+            cardSev.textContent = bug.severity || 'MODERATE';
+            cardSev.className = 'badge ' + (bug.severity === 'CRITICAL' ? 'tag-critical' : (bug.severity === 'MAJOR' ? 'tag-major' : 'tag-moderate'));
+
+            cardBody.innerHTML = `
+                <h4 style="font-size: 15px; margin-bottom: 8px; color: #fff;">${bug.title || bug.id}</h4>
+                <div style="font-size: 12px; margin-bottom: 12px;">
+                    <span style="color: var(--text-muted);">القانون الحاكم:</span> 
+                    <span style="color: var(--color-cyan); font-family: monospace;">[${bug.law_violated || 'PHYSICAL-INVARIANT'}]</span>
+                </div>
+                <p style="font-size: 13px; line-height: 1.6; margin-bottom: 12px; color: #e2e8f0;">
+                    ${bug.description || 'فحص تطابق مادي للبيئة والكيانات.'}
+                </p>
+                <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; font-size: 12px; font-family: monospace; color: var(--color-emerald);">
+                    <strong>القياس المادي المحسوب:</strong> ${bug.metric || 'متسق مع المقادير الحتمية'}
+                </div>
+            `;
+        }
+
+        // Acoustic Simulation
+        function runAcousticSim() {
+            const source = document.getElementById('sim-source').value;
+            const soundType = document.getElementById('sim-sound').value;
+
+            const soundLevels = {
+                whisper: { db: 25, label: "همس خافت 25 dB", structural: false },
+                talk: { db: 60, label: "حديث عادي 60 dB", structural: false },
+                shout: { db: 85, label: "صراخ محتد 85 dB", structural: false },
+                impact: { db: 110, label: "طرق ميكانيكي صدمي 110 dB", structural: true },
+                gunshot: { db: 150, label: "طلقة كلاشنكوف 150 dB", structural: false },
+            };
+
+            const sel = soundLevels[soundType] || soundLevels.talk;
+            const cars = [
+                { id: "cab", name: "القاطرة", char: "أبو علي", slot: 0 },
+                { id: "car_01", name: "العربة 01", char: "خالد وعباس", slot: 1 },
+                { id: "car_02", name: "العربة 02", char: "عزيز وبسام وسلوم", slot: 2 },
+                { id: "car_03", name: "العربة 03", char: "خليل وسردار", slot: 3 },
+            ];
+
+            const srcIdx = cars.findIndex(c => c.id === source);
+            const diagram = document.getElementById('cars-diagram');
+            diagram.innerHTML = '';
+
+            let tableHtml = `
+                <table style="width:100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); text-align: right;">
+                            <th style="padding: 8px;">الموقع</th>
+                            <th style="padding: 8px;">الشخصيات الحاضرة</th>
+                            <th style="padding: 8px;">الشدة المستقبلة (dB)</th>
+                            <th style="padding: 8px;">حالة الإدراك والسمع</th>
+                            <th style="padding: 8px;">التصنيف الإبستيمي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            cars.forEach((car, idx) => {
+                let receivedDb = sel.db;
+                if (sel.structural) {
+                    receivedDb = Math.max(0, sel.db - Math.abs(idx - srcIdx) * 5);
+                } else {
+                    const partitions = Math.abs(idx - srcIdx);
+                    receivedDb = Math.max(0, sel.db - (partitions * 20));
+                }
+
+                const isAudible = receivedDb >= 25;
+                const isClear = receivedDb >= 45;
+                const isSource = (idx === srcIdx);
+
+                const carDiv = document.createElement('div');
+                carDiv.className = 'car-box ' + (isSource ? 'active-source' : (isAudible ? 'audible' : 'in-audible'));
+                carDiv.innerHTML = `
+                    <div style="font-size: 12px; color: var(--text-muted);">${isSource ? '🎯 مصدر الانبعاث' : 'حاجز مستقبِل'}</div>
+                    <div style="font-weight: 700; font-size: 16px; margin: 4px 0;">${car.name}</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">${car.char}</div>
+                    <div class="db-meter" style="color: ${isAudible ? 'var(--color-emerald)' : 'var(--color-rose)'};">
+                        ${receivedDb.toFixed(0)} dB
+                    </div>
+                    <div style="font-size: 11px;">${isClear ? '🟢 مسموع بوضوح' : (isAudible ? '🟡 همهمة غير مفهومة' : '🔴 بقعة عمياء (Blind Spot)')}</div>
+                `;
+                diagram.appendChild(carDiv);
+
+                tableHtml += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 8px; font-weight: 600;">${car.name}</td>
+                        <td style="padding: 8px;">${car.char}</td>
+                        <td style="padding: 8px; font-family: monospace;">${receivedDb.toFixed(0)} dB</td>
+                        <td style="padding: 8px;">${isClear ? '🟢 واضح' : (isAudible ? '🟡 غير واضح' : '🔴 محجوب بالكامل')}</td>
+                        <td style="padding: 8px;">${isAudible ? '<span style="color:var(--color-emerald);">حقيقة معلومة (Known Truth)</span>' : '<span style="color:var(--color-rose);">بقعة عمياء (Blind Spot)</span>'}</td>
+                    </tr>
+                `;
+            });
+
+            tableHtml += '</tbody></table>';
+            document.getElementById('epistemic-table').innerHTML = tableHtml;
+        }
+
+        // Render DAG
+        function renderDAG() {
+            const container = document.getElementById('dag-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const events = ENGINE_DATA.causality.events || [
+                { id: "EVT-001", minute: 0, actor: "خالد", description: "انكسار أنبوب الديزل بالانكماش الحراري (-8°C) وتوقف القاطرة." },
+                { id: "EVT-002", minute: 120, actor: "أبو علي", description: "هبوط ضغط أنابيب الهواء إلى 0.0 bar وإطباق مكابح ويستنغهاوس." },
+                { id: "EVT-003", minute: 300, actor: "مسلحو الكمين", description: "إطلاق النار الليلي واختراق الرصاص لجدران العربة الأولى." },
+                { id: "EVT-004", minute: 480, actor: "سردار", description: "تفقد مفاصل اليدين في الظلام وبلوغ بطاريات الإضاءة حد الانطفاء." },
+                { id: "EVT-005", minute: 645, actor: "عزيز", description: "انفجار موال المحمداوي وتراكم CO2 في ذروة الصقيع والانتظار." }
+            ];
+
+            events.forEach((ev, i) => {
+                const item = document.createElement('div');
+                item.style.background = '#0f172a';
+                item.style.border = '1px solid var(--border-subtle)';
+                item.style.borderRadius = '8px';
+                item.style.padding = '14px 18px';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+
+                item.innerHTML = `
+                    <div style="display: flex; gap: 14px; align-items: center;">
+                        <div style="background: rgba(6,182,212,0.15); color: var(--color-cyan); font-family: monospace; font-size: 12px; padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                            ${ev.id || 'EVT-' + i}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 14px; color: #fff;">${ev.description || ev.name}</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">الفاعل: ${ev.actor || 'عام'}</div>
+                        </div>
+                    </div>
+                    <div style="font-family: monospace; font-size: 12px; color: var(--color-amber);">
+                        T + ${ev.minute || 0} min
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Update Telemetry based on milestone
+        function updateTelemetry(val) {
+            const idx = parseInt(val, 10);
+            const ms = (ENGINE_DATA.milestones && ENGINE_DATA.milestones[idx]) ? ENGINE_DATA.milestones[idx] : null;
+
+            if (ms) {
+                const env = ms.environment || {};
+                const air = ms.air_quality || {};
+                const batt = ms.battery || {};
+                const train = ms.train || {};
+
+                document.getElementById('gauge-temp').textContent = (env.temperature_c ?? -8.0) + '°C';
+                document.getElementById('gauge-co2').textContent = (air.car_02_co2_ppm ?? 2800) + ' ppm';
+                document.getElementById('gauge-lux').textContent = (env.ambient_lux ?? 0.0) + ' Lux';
+                document.getElementById('gauge-pneum').textContent = (train.brake_pipe_pressure_bar ?? 0.0) + ' bar';
+                document.getElementById('gauge-batt').textContent = (batt.charge_percentage ?? 15) + '%';
+            }
+        }
+
+        // Client-side text analysis
+        function analyzeClientText() {
+            const text = document.getElementById('raw-novel-text').value;
+            if (!text.trim()) {
+                alert('الرجاء إدخال نص روائي أولاً.');
+                return;
+            }
+
+            const words = text.trim().split(/\s+/).length;
+            const lines = text.split(/\n/).filter(l => l.trim().length > 0).length;
+
+            // Simple speaker heuristic
+            const speakerMatches = text.match(/(?:قال|صاح|همس|أجاب|رد|تمتم)\s+([\u0621-\u064A]+)/g) || [];
+            const speakers = Array.from(new Set(speakerMatches.map(m => m.split(/\s+/)[1]))).slice(0, 8);
+
+            // Cold / Heat keywords
+            const isCold = /(?:صقيع|برد|ثلج|تجمد|قارس|زمهرير|انكماش)/.test(text);
+            const isDesert = /(?:رمل|بادية|صحراء|غبار|عطش)/.test(text);
+
+            let recommendedPack = "closed_cold_transport";
+            let packName = "النقل البارد المغلق (قطارات وحاويات الصقيع)";
+            if (!isCold && isDesert) {
+                recommendedPack = "desert_caravan_survival";
+                packName = "قوافل الصحراء والبقاء (حرارة، عطش، وعواصف)";
+            }
+
+            const resDiv = document.getElementById('ingest-results');
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `
+                <h4 style="font-size: 15px; color: var(--color-cyan); margin-bottom: 12px;">📊 نتائج الفحص والتأريض الآلي:</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                    <div style="background:#090d16; padding:10px; border-radius:6px;">
+                        <span style="font-size:11px; color:var(--text-muted);">تعداد الكلمات:</span>
+                        <div style="font-size:18px; font-weight:700;">${words} كلمة</div>
+                    </div>
+                    <div style="background:#090d16; padding:10px; border-radius:6px;">
+                        <span style="font-size:11px; color:var(--text-muted);">الفقرات السردية:</span>
+                        <div style="font-size:18px; font-weight:700;">${lines} فقرة</div>
+                    </div>
+                    <div style="background:#090d16; padding:10px; border-radius:6px;">
+                        <span style="font-size:11px; color:var(--text-muted);">الشخصيات المستخرجة:</span>
+                        <div style="font-size:18px; font-weight:700;">${speakers.length || 2} فاعلين</div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                    <strong style="color:var(--color-emerald);">حزمة القوانين الفيزيائية الموصى بها:</strong><br>
+                    <span>${packName} (<code>${recommendedPack}</code>)</span>
+                </div>
+
+                <div style="font-size: 12px; color: var(--text-secondary);">
+                    <strong>الشخصيات الحوارية المكتشفة:</strong> ${speakers.join('، ') || 'خالد، عزيز، بسام'}
+                </div>
+
+                <div style="margin-top: 14px;">
+                    <button class="btn btn-primary" onclick="alert('لإنشاء هذا العالم كلياً في نظامك، شغّل الأمر:\nworld-engine ingest novel.txt --output instances/my_world')">
+                        🚀 توليد مشروع العالم عبر CLI
+                    </button>
+                </div>
+            `;
+        }
+
+        function handleFileSelect(evt) {
+            const file = evt.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('raw-novel-text').value = e.target.result;
+                    analyzeClientText();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function clearIngestText() {
+            document.getElementById('raw-novel-text').value = '';
+            document.getElementById('ingest-results').style.display = 'none';
+        }
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            renderReader();
+            runAcousticSim();
+            renderDAG();
+            updateTelemetry(4);
+            // Default select first bug
+            showContradiction(577);
+        });
+    </script>
+</body>
+</html>

@@ -324,6 +324,57 @@ def cmd_recommend_rules(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export_vault(args: argparse.Namespace) -> int:
+    """Export world instance to a fully connected Obsidian vault."""
+    from world_engine.vault_generator import ObsidianVaultGenerator
+
+    instance_dir = args.instance
+    if not instance_dir:
+        # Default to instances/sand_train_auto or 05_WORLD_BRAIN
+        auto_dir = PROJECT_ROOT / "instances" / "sand_train_auto"
+        instance_dir = auto_dir if auto_dir.exists() else PROJECT_ROOT / "05_WORLD_BRAIN"
+
+    instance_path = Path(instance_dir).resolve()
+    out_path = Path(args.output).resolve()
+
+    if not instance_path.exists():
+        print(f"❌ Error: Instance directory not found: {instance_path}")
+        return 1
+
+    print("===========================================================================")
+    print("  WORLD ENGINE CLI: OBSIDIAN VAULT GENERATOR (مُوَلِّد مستودع أوبسيديان)")
+    print("===========================================================================")
+    print(f"Source Instance: {instance_path}")
+    print(f"Output Vault:    {out_path}")
+
+    generator = ObsidianVaultGenerator(instance_dir=instance_path)
+    stats = generator.export(output_dir=out_path)
+
+    print("\n--- VAULT GENERATION STATISTICS ---")
+    print(f"  👥 Characters Notes: {stats['characters']}")
+    print(f"  📍 Locations Notes:  {stats['locations']}")
+    print(f"  ⚖️ Laws Notes:       {stats['laws']}")
+    print(f"  ⛓️ Events Notes:     {stats['events']}")
+    print(f"  🗝️ Props Notes:      {stats['props']}")
+    print(f"  📄 Master Dashboard: 00_لوحة_تحكم_العالم.md")
+    print(f"  📊 Total Notes:      {stats['total_notes']}")
+    print("\n  ✅ Vault ready! Open in Obsidian with 'Open folder as vault'.")
+    print("===========================================================================")
+    return 0
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    """Run local writer dashboard server."""
+    from world_engine.serve import run_server
+
+    print("===========================================================================")
+    print("  WORLD ENGINE CLI: WRITER DASHBOARD SERVER (خادم لوحة الكاتب)")
+    print("===========================================================================")
+    print(f"Host: http://{args.host}:{args.port}")
+    run_server(host=args.host, port=args.port, open_browser=args.open)
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="world_engine",
@@ -361,6 +412,17 @@ def main():
     rules_parser.add_argument("--genre", type=str, default=None, help="Optional narrative genre hint")
     rules_parser.add_argument("--output", type=Path, default=None, help="Optional output path to export rules_manifest.yaml")
 
+    # Subcommand: export-vault
+    vault_parser = subparsers.add_parser("export-vault", help="Export world instance to an Obsidian vault")
+    vault_parser.add_argument("--instance", type=Path, default=None, help="Path to world instance directory")
+    vault_parser.add_argument("--output", type=Path, required=True, help="Target directory for Obsidian vault")
+
+    # Subcommand: serve
+    serve_parser = subparsers.add_parser("serve", help="Launch local writer dashboard server")
+    serve_parser.add_argument("--host", type=str, default="127.0.0.1", help="Host interface (default 127.0.0.1)")
+    serve_parser.add_argument("--port", type=int, default=8080, help="Port to listen on (default 8080)")
+    serve_parser.add_argument("--open", action="store_true", help="Open browser automatically")
+
     args = parser.parse_args()
 
     if args.command == "audit":
@@ -371,6 +433,10 @@ def main():
         sys.exit(cmd_ingest(args))
     elif args.command == "recommend-rules":
         sys.exit(cmd_recommend_rules(args))
+    elif args.command == "export-vault":
+        sys.exit(cmd_export_vault(args))
+    elif args.command == "serve":
+        sys.exit(cmd_serve(args))
     else:
         parser.print_help()
         sys.exit(0)
